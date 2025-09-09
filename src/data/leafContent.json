@@ -1,0 +1,75 @@
+{
+  "news/release-notes/2025-09": {
+    "renderType": "template",
+    "templateKey": "ProductNews",
+    "title": "Ra mắt sản phẩm SH69 – Lãi suất linh hoạt",
+    "subtitle": "Phát hành: 08/09/2025 — Bộ phận Sản phẩm",
+    "bannerImg": "banner-2.jpg",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "SHS chính thức giới thiệu sản phẩm tiết kiệm mới mang tên SH69..."
+      },
+      {
+        "type": "paragraph",
+        "text": "Sản phẩm được thiết kế nhằm đáp ứng nhu cầu đa dạng..."
+      },
+      {
+        "type": "table",
+        "headers": [
+          "Kỳ hạn",
+          "Lãi suất",
+          "Điều kiện"
+        ],
+        "rows": [
+          [
+            "1 tháng",
+            "4.2%",
+            "Tối thiểu 5 triệu VNĐ"
+          ],
+          [
+            "3 tháng",
+            "4.6%",
+            "Tối thiểu 10 triệu VNĐ"
+          ],
+          [
+            "6 tháng",
+            "5.0%",
+            "Tối thiểu 10 triệu VNĐ"
+          ]
+        ]
+      }
+    ],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-xxxx để được hỗ trợ."
+  },
+  "news/release-notes/2025-08": {
+    "renderType": "template",
+    "templateKey": "ProductNews",
+    "title": "Bản tin gì đéo nói",
+    "subtitle": "Phát hành: 10/09/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "avatar.png",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "ok man"
+      }
+    ],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-xxxx để được hỗ trợ."
+  },
+
+  "tin-tuc-san-pham/uu-ai/test4": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn nộp tiền vào tài khoản giao dịch",
+    "subtitle": "Phát hành: 09/09/2025 — Bộ phận Sản phẩm",
+    "gallery": [
+      "hdsd/hd-nop1.jpg",
+      "hdsd/hd-nop2.jpg"
+    ],
+    "content": [
+      { "type": "paragraph", "text": "Bước 1: ..." },
+      { "type": "paragraph", "text": "Bước 2: ..." }
+    ],
+    "endingNote": "Mọi thắc mắc vui lòng liên hệ Hotline 1900-xxxx."
+  }
+}

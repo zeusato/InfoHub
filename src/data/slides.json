@@ -1,0 +1,23 @@
+[
+  {
+    "id": "s1",
+    "title": "Sản phẩm mới: Lãi suất hấp dẫn",
+    "desc": "Khám phá gói SH69 với ưu đãi linh hoạt.",
+    "img": "banner-1.jpg",
+    "link": "/news/promotions/sh69"
+  },
+  {
+    "id": "s2",
+    "title": "Nâng cấp hệ thống",
+    "desc": "Hiệu năng và trải nghiệm người dùng tốt hơn.",
+    "img": "banner-2.jpg",
+    "link": "https://shs.com.vn/blog/upgrade-2025"
+  },
+  {
+    "id": "s3",
+    "title": "Ưu đãi khách hàng thân thiết",
+    "desc": "Quà tặng độc quyền cho hội viên.",
+    "img": "banner-3.jpg",
+    "link": "/news/release-notes/2025-09"
+  }
+]

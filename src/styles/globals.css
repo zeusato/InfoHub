@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand tokens */
+:root {
+  --bg: #0b0b0d;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --brand: #ff7a18;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* Glass helpers */
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+.glass-hover:hover {
+  @apply bg-white/10 border-white/20;
+}
+
+/* Neon brand glow */
+.brand-glow {
+  box-shadow: 0 0 0 1px rgba(255, 122, 24, 0.25), 0 0 18px rgba(255, 122, 24, 0.35);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}

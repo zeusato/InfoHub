@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Menu Builder (menuData.ts)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root { color-scheme: dark; --brand:#ff7a18; --bg:#0b0b0d; --glass:rgba(255,255,255,.06); --glass2:rgba(255,255,255,.1); }
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0b0b0d;color:#e5e7eb}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .bar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .btn{border:1px solid #ffffff22;background:#ffffff10;color:#e5e7eb;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn:hover{border-color:#ffffff55;background:#ffffff18}
+    .btn.brand{border-color:#ff7a1855;background:#ff7a181a;color:#ffd4bd}
+    .btn.brand:hover{background:#ff7a1828}
+    .btn.ghost{background:transparent;border-color:#ffffff22}
+    .muted{color:#9ca3af;font-size:13px}
+    .glass{background:var(--glass);border:1px solid #ffffff1a;border-radius:14px}
+    .col{display:flex;flex-direction:column;gap:8px}
+    .row{display:flex;gap:8px;align-items:center}
+    .tree{display:flex;gap:16px}
+    .panel{flex:1;padding:12px}
+    .lvlTop>.item{background:linear-gradient(180deg,#ffffff0f,#ffffff06);padding:10px;border-radius:12px;border:1px solid #ffffff1a}
+    .lvlMid>.item{background:#ffffff08;padding:8px;border-radius:10px;border:1px dashed #ffffff2a}
+    .lvlLeaf>.item{background:#ffffff06;padding:6px;border-radius:8px;border:1px solid #ffffff14}
+    .tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #ffffff1f;background:#ffffff10}
+    .tag.top{border-color:#ff7a1822;background:#ff7a180f;color:#ffd9c7}
+    .tag.mid{border-color:#10b98144;background:#10b9811a}
+    .tag.leaf{border-color:#22d3ee44;background:#22d3ee1a}
+    .grow{flex:1}
+    input,textarea{background:#0e0f12;border:1px solid #ffffff22;border-radius:10px;color:#e5e7eb;padding:8px 10px}
+    input:focus,textarea:focus{outline:2px solid #ff7a1833;border-color:#ff7a1866}
+    .small{font-size:12px}
+    .danger{color:#fca5a5}
+    .sep{height:1px;background:#ffffff12;margin:8px 0}
+    .list{display:flex;flex-direction:column;gap:6px}
+    .op{display:flex;gap:6px}
+    .drag{cursor:ns-resize;opacity:.8}
+    .hidden{display:none}
+    .note{font-size:12px;color:#9ca3af}
+    .footer{margin-top:12px;display:flex;justify-content:flex-end;gap:8px}
+    a{color:#ffd3bd}
+    .code{white-space:pre-wrap;background:#0e0f12;border:1px solid #ffffff22;padding:10px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="bar">
+      <div class="row" style="gap:12px">
+        <button id="openBtn" class="btn brand">Open menuData.ts</button>
+        <button id="saveBtn" class="btn">Save (overwrite)</button>
+        <span id="fileLabel" class="muted">No file</span>
+      </div>
+      <div class="row muted">
+        <span>Top fixed. Add (+) at Top → Mid, Add at Mid → Leaf.</span>
+      </div>
+    </div>
+
+    <div id="status" class="muted"></div>
+
+    <div class="tree glass">
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;">
+          <h3>Menu Editor</h3>
+          <button id="expandAllBtn" class="btn ghost small">Expand all</button>
+        </div>
+        <div id="menuRoot" class="col"></div>
+      </div>
+      <div class="panel" style="max-width:420px">
+        <h3>Node Form</h3>
+        <div id="formBox" class="col">
+          <div class="note">Chọn **Top** rồi bấm (+) để thêm **Mid**. Chọn **Mid** rồi bấm (+) để thêm **Leaf**.</div>
+          <div class="sep"></div>
+          <label class="small">Label</label>
+          <input id="fLabel" placeholder="Nhập label..." />
+          <div id="slugRow" class="col">
+            <label class="small">Slug (leaf)</label>
+            <input id="fSlug" placeholder="vd: 2025-09" />
+          </div>
+          <div class="row small">
+                <span>Full path:</span>&nbsp;<span id="pathPreview" class="muted"></span>
+        </div>
+          <div class="row small">
+            <span>ID gợi ý:</span><span id="idPreview" class="muted"></span>
+          </div>
+          <div class="footer">
+            <button id="applyAddBtn" class="btn brand">Add</button>
+            <button id="cancelBtn" class="btn ghost">Cancel</button>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <h3>Generate Code</h3>
+        <div class="row">
+          <button id="genBtn" class="btn">Preview code</button>
+          <button id="copyBtn" class="btn ghost">Copy</button>
+        </div>
+        <div id="codeBox" class="code small hidden"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // State
+  let fileHandle = null;
+  let menu = []; // MenuNode[]
+  let expanded = new Set(); // for UI expand/collapse
+  let pendingAdd = null; // { parentId, level: 'mid'|'leaf' }
+
+  const byId = new Map();
+
+  // UI refs
+  const $ = (s)=>document.querySelector(s);
+  const menuRoot = $('#menuRoot');
+  const formBox = $('#formBox');
+  const fLabel = $('#fLabel');
+  const fSlug  = $('#fSlug');
+  const slugRow = $('#slugRow');
+  const pathPreview = $('#pathPreview');
+  const idPreview = $('#idPreview');
+  const codeBox = $('#codeBox');
+  const status = $('#status');
+  const fileLabel = $('#fileLabel');
+
+  // Helpers
+  const slug = (s)=> s.toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+
+  const deepClone = (obj)=> JSON.parse(JSON.stringify(obj));
+
+  const rebuildIndex = ()=>{
+    byId.clear();
+    const walk=(nodes)=>{
+      for(const n of nodes){
+        byId.set(n.id, n);
+        if(n.children) walk(n.children);
+      }
+    };
+    walk(menu);
+  };
+
+  const ensureExpanded = (id)=>{
+    expanded.add(id);
+    render();
+  };
+
+  const setStatus = (msg)=> status.textContent = msg || '';
+
+  // File System Access
+  async function openTs() {
+    try {
+      const [h] = await window.showOpenFilePicker({
+        types: [{ description:'TypeScript', accept:{ 'text/typescript':['.ts'] } }],
+        excludeAcceptAllOption: false,
+        multiple: false
+      });
+      fileHandle = h;
+      fileLabel.textContent = h.name;
+      const ts = await (await h.getFile()).text();
+      const out = tsToMenu(ts);
+      if (!out || !Array.isArray(out.MENU)) throw new Error('Không đọc được MENU từ file này.');
+      menu = out.MENU;
+      setStatus('Loaded MENU with ' + countNodes(menu) + ' nodes.');
+      expanded = new Set(out.topIds || []);
+      rebuildIndex();
+      render();
+    } catch (e) {
+      console.error(e);
+      setStatus('Open failed: ' + e.message);
+    }
+  }
+
+  async function saveTs() {
+  try {
+    if (!fileHandle) {
+      alert('Chưa mở menuData.ts');
+      return;
+    }
+    if (!confirm('Ghi đè menuData.ts?')) return;
+
+    const ts = generateTs(menu);
+    const writable = await fileHandle.createWritable();
+    await writable.write(ts);
+    await writable.close();
+
+    setStatus('Đã ghi đè file menuData.ts thành công');
+  } catch (e) {
+    console.error(e);
+    setStatus('Save failed: ' + e.message);
+  }
+}
+
+  // Parse TS -> JS (best-effort for our known structure)
+  function tsToMenu(ts) {
+    // strip types
+    let js = ts
+      .replace(/export\s+type[\s\S]*?\n}\s*\n/g, '')
+      .replace(/export\s+interface[\s\S]*?\n}\s*\n/g, '')
+      .replace(/satisfies\s+[^\n]+/g, '')
+      .replace(/export\s+const\s+(\w+)\s*:\s*[^=]+=/g, 'var $1 =')
+      .replace(/export\s+const\s+(\w+)\s*=/g, 'var $1 =')
+      .replace(/export\s+\{[\s\S]*?\};?/g, '')
+      ;
+
+    // Execute in sandboxed Function
+    try {
+      const fn = new Function(js + '; return { MENU, MENU_COLORS };');
+      const { MENU, MENU_COLORS } = fn();
+      const topIds = (MENU||[]).map(n=>n.id);
+      return { MENU, MENU_COLORS, topIds };
+    } catch (e) {
+      console.error('Eval failed', e);
+      throw new Error('Không parse được menuData.ts (format khác kỳ vọng).');
+    }
+  }
+
+  function countNodes(nodes){
+    let c=0;
+    const walk=(arr)=>arr.forEach(n=>{ c++; if(n.children) walk(n.children); });
+    walk(nodes||[]);
+    return c;
+  }
+    function findParent(rootArr, childId, parent=null){
+    for (const n of rootArr){
+        if (n.id === childId) return parent;
+        if (n.children){
+        const r = findParent(n.children, childId, n);
+        if (r) return r;
+        }
+    }
+    return null;
+    }
+
+    function findTopOf(rootArr, nodeId){
+    // trả về node top (cấp 0) chứa nodeId
+    function dfs(arr, top){
+        for (const n of arr){
+        const t = top ?? n;
+        if (n.id === nodeId) return t;
+        if (n.children){
+            const r = dfs(n.children, t);
+            if (r) return r;
+        }
+        }
+        return null;
+    }
+    return dfs(rootArr, null);
+    }
+
+    function composeLeafPath(parentMidId, slugPart){
+    const mid = byId.get(parentMidId);
+    const top = findTopOf(menu, parentMidId);
+    if (!mid || !top) return slugPart; // fallback
+    const sTop = slug(top.label);
+    const sMid = slug(mid.label);
+    const sLeaf = slug(slugPart || '');
+    return `${sTop}/${sMid}/${sLeaf}`;
+    }
+
+  // Render Tree
+  function render(){
+    menuRoot.innerHTML = '';
+    const topWrap = document.createElement('div');
+    topWrap.className = 'lvlTop col';
+
+    for(const top of menu){
+      const tItem = document.createElement('div');
+      tItem.className = 'item';
+
+      const row = document.createElement('div');
+      row.className = 'row';
+
+      const tag = document.createElement('span');
+      tag.className = 'tag top';
+      tag.textContent = 'TOP';
+      const title = document.createElement('div');
+      title.textContent = top.label + `  (${top.id})`;
+      title.className = 'grow';
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn small';
+      addBtn.textContent = '＋ Mid';
+      addBtn.title = 'Thêm nhánh tầng giữa vào "'+top.label+'"';
+      addBtn.onclick = ()=>{
+        pendingAdd = { parentId: top.id, level:'mid' };
+        openForm({label:'', slug:''}, 'Add Mid under: '+top.label);
+        ensureExpanded(top.id);
+      };
+
+      const expandBtn = document.createElement('button');
+      expandBtn.className='btn ghost small';
+      expandBtn.textContent = expanded.has(top.id) ? '–' : '+';
+      expandBtn.onclick = ()=>{
+        if (expanded.has(top.id)) expanded.delete(top.id);
+        else expanded.add(top.id);
+        render();
+      };
+
+      row.append(tag, title, addBtn, expandBtn);
+      tItem.appendChild(row);
+
+      // children mid
+      if(expanded.has(top.id)){
+        const midWrap = document.createElement('div');
+        midWrap.className = 'lvlMid col';
+        (top.children||[]).forEach((mid, idx)=>{
+          midWrap.appendChild(renderMid(top, mid, idx));
+        });
+        tItem.appendChild(midWrap);
+      }
+
+      topWrap.appendChild(tItem);
+    }
+
+    menuRoot.appendChild(topWrap);
+  }
+
+  function renderMid(top, mid, idx){
+    const item = document.createElement('div');
+    item.className = 'item';
+
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const tag = document.createElement('span');
+    tag.className = 'tag mid';
+    tag.textContent = 'MID';
+
+    const title = document.createElement('div');
+    title.className='grow';
+    title.textContent = mid.label + `  (${mid.id})`;
+
+    const addLeafBtn = document.createElement('button');
+    addLeafBtn.className = 'btn small';
+    addLeafBtn.textContent = '＋ Leaf';
+    addLeafBtn.onclick = ()=>{
+      pendingAdd = { parentId: mid.id, level:'leaf' };
+      openForm({label:'', slug:suggestPath(top, mid)}, 'Add Leaf under: '+mid.label);
+    };
+
+    const editBtn = document.createElement('button');
+    editBtn.className='btn ghost small';
+    editBtn.textContent='Edit';
+    editBtn.onclick = ()=>{
+      const labelOld = mid.label;
+      const newLabel = prompt('Sửa label cho Mid:', labelOld);
+      if(newLabel && newLabel.trim()){
+        mid.label = newLabel.trim();
+        // keep id (ổn định)
+        render();
+      }
+    };
+
+    const upBtn = document.createElement('button');
+    upBtn.className='btn ghost small drag';
+    upBtn.textContent='↑';
+    upBtn.onclick = ()=>{
+      const arr = top.children||[];
+      if (idx>0){ [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; render(); }
+    };
+    const downBtn = document.createElement('button');
+    downBtn.className='btn ghost small drag';
+    downBtn.textContent='↓';
+    downBtn.onclick = ()=>{
+      const arr = top.children||[];
+      if (idx<arr.length-1){ [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; render(); }
+    };
+
+    const delBtn = document.createElement('button');
+    delBtn.className='btn ghost small danger';
+    delBtn.textContent='Delete';
+    delBtn.onclick = ()=>{
+      if (!confirm('Xoá MID và toàn bộ con?')) return;
+      top.children = (top.children||[]).filter(x=>x!==mid);
+      render();
+    };
+
+    const expandBtn = document.createElement('button');
+    expandBtn.className='btn ghost small';
+    expandBtn.textContent = expanded.has(mid.id) ? '–' : '+';
+    expandBtn.onclick = ()=>{
+      if (expanded.has(mid.id)) expanded.delete(mid.id);
+      else expanded.add(mid.id);
+      render();
+    };
+
+    row.append(tag, title, addLeafBtn, editBtn, upBtn, downBtn, delBtn, expandBtn);
+    item.appendChild(row);
+
+    // leaves
+    if(expanded.has(mid.id)){
+      const leafWrap = document.createElement('div');
+      leafWrap.className='lvlLeaf list';
+      (mid.children||[]).forEach((leaf, i)=> leafWrap.appendChild(renderLeaf(mid, leaf, i)));
+      item.appendChild(leafWrap);
+    }
+
+    return item;
+  }
+
+  function renderLeaf(mid, leaf, idx){
+    const line = document.createElement('div');
+    line.className='item row';
+
+    const tag = document.createElement('span');
+    tag.className='tag leaf';
+    tag.textContent='LEAF';
+
+    const title = document.createElement('div');
+    title.className='grow';
+    title.innerHTML = `<b>${leaf.label}</b> <span class="muted">(${leaf.id})</span> <span class="muted">— ${leaf.path||''}</span>`;
+
+    const editBtn = document.createElement('button');
+    editBtn.className='btn ghost small';
+    editBtn.textContent='Edit';
+    editBtn.onclick = ()=>{
+      const newLabel = prompt('Sửa label:', leaf.label) ?? leaf.label;
+      const newPath = prompt('Sửa path:', leaf.path||'') ?? leaf.path;
+      leaf.label = newLabel.trim();
+      leaf.path = (newPath||'').trim();
+      render();
+    };
+
+    const upBtn = document.createElement('button');
+    upBtn.className='btn ghost small drag';
+    upBtn.textContent='↑';
+    upBtn.onclick = ()=>{
+      const arr = mid.children||[];
+      if (idx>0){ [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; render(); }
+    };
+
+    const downBtn = document.createElement('button');
+    downBtn.className='btn ghost small drag';
+    downBtn.textContent='↓';
+    downBtn.onclick = ()=>{
+      const arr = mid.children||[];
+      if (idx<arr.length-1){ [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; render(); }
+    };
+
+    const delBtn = document.createElement('button');
+    delBtn.className='btn ghost small danger';
+    delBtn.textContent='Delete';
+    delBtn.onclick = ()=>{
+      if (!confirm('Xoá leaf này?')) return;
+      mid.children = (mid.children||[]).filter(x=>x!==leaf);
+      render();
+    };
+
+    line.append(tag, title, editBtn, upBtn, downBtn, delBtn);
+    return line;
+  }
+
+  function openForm(init, titleText){
+    formBox.querySelector('h4')?.remove();
+    const h = document.createElement('h4');
+    h.textContent = titleText || 'Add';
+    h.style.margin='0';
+    h.style.fontWeight='600';
+    formBox.insertBefore(h, formBox.children[1]);
+
+    fLabel.value = init.label||'';
+    fSlug.value  = init.slug || '';
+    idPreview.textContent = fLabel.value ? slug(fLabel.value) : '(auto id)';
+    slugRow.style.display = (pendingAdd && pendingAdd.level==='leaf') ? 'flex' : 'none';
+    // preview path full nếu đang thêm leaf
+    if (pendingAdd && pendingAdd.level==='leaf') {
+        const full = composeLeafPath(pendingAdd.parentId, fSlug.value || fLabel.value);
+        if (pathPreview) pathPreview.textContent = full;
+    } else {
+        if (pathPreview) pathPreview.textContent = '';
+    }
+    codeBox.classList.add('hidden');
+  }
+
+  function suggestPath(top, mid){
+    const sTop = slug(top.label);
+    const sMid = slug(mid.label);
+    return `${sTop}/${sMid}/${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+  }
+
+  fLabel.addEventListener('input', ()=>{
+    idPreview.textContent = fLabel.value ? slug(fLabel.value) : '(auto id)';
+    if (pendingAdd && pendingAdd.level==='leaf') {
+        if (!fSlug.value) fSlug.value = slug(fLabel.value);
+        const full = composeLeafPath(pendingAdd.parentId, fSlug.value || fLabel.value);
+        if (pathPreview) pathPreview.textContent = full;
+    }
+  });
+
+   fSlug.addEventListener('input', ()=>{
+   if (pendingAdd && pendingAdd.level==='leaf') {
+     const full = composeLeafPath(pendingAdd.parentId, fSlug.value || fLabel.value);
+     if (pathPreview) pathPreview.textContent = full;
+   }
+ });
+  $('#applyAddBtn').onclick = ()=>{
+    if (!pendingAdd) return;
+    const label = fLabel.value.trim();
+    if (!label) return alert('Label bắt buộc.');
+
+    const id = uniqueId(slug(label));
+
+    if (pendingAdd.level==='mid') {
+      const parent = byId.get(pendingAdd.parentId);
+      parent.children = parent.children || [];
+      parent.children.push({ id, label, children: [] });
+      ensureExpanded(parent.id);
+
+    } else if (pendingAdd.level==='leaf') {
+      const parent = byId.get(pendingAdd.parentId);
+      const slugPart = (fSlug.value || fLabel.value || '').trim();
+      if (!slugPart) return alert('Slug bắt buộc cho leaf.');
+      const path = composeLeafPath(pendingAdd.parentId, slugPart);
+      parent.children = parent.children || [];
+      parent.children.push({ id, label, path });
+      ensureExpanded(parent.id);
+    }
+
+    pendingAdd = null;
+    rebuildIndex();
+    fLabel.value = ''; fSlug.value='';
+    idPreview.textContent='';
+    setStatus('Added.');
+  };
+
+  $('#cancelBtn').onclick = ()=>{
+    pendingAdd = null; fLabel.value=''; fSlug.value=''; idPreview.textContent='';
+  };
+
+  function uniqueId(base){
+    let i=0, id=base||'node';
+    const exists=(x)=> byId.has(x) || existsIn(menu,x);
+    function existsIn(arr,x){
+      for(const n of arr){
+        if(n.id===x) return true;
+        if(n.children && existsIn(n.children,x)) return true;
+      }
+      return false;
+    }
+    while(exists(id)) { i++; id = base + '-' + i; }
+    return id;
+  }
+
+  // Generate TS
+  function generateTs(menu){
+    const header =
+`export type MenuNode = {
+  id: string
+  label: string
+  path?: string
+  children?: MenuNode[]
+}
+
+export const MENU_COLORS: Record<number, string> = {
+  0: 'border-brand/40 bg-brand/5',
+  1: 'border-emerald-400/30 bg-emerald-400/5',
+  2: 'border-cyan-400/30 bg-cyan-400/5',
+}
+`;
+
+    const menuStr = arrayToTs(menu, 0);
+    return `${header}
+
+export const MENU: MenuNode[] = ${menuStr}
+`;
+  }
+
+  function arrayToTs(arr, indent){
+    const sp = '  '.repeat(indent);
+    const sp1 = '  '.repeat(indent+1);
+    const lines = ['['];
+    for(const n of arr){
+      const objLines = [];
+      objLines.push(`${sp1}{`);
+      objLines.push(`${sp1}  id: '${n.id}',`);
+      objLines.push(`${sp1}  label: '${esc(n.label)}',`);
+      if (n.path) objLines.push(`${sp1}  path: '${esc(n.path)}',`);
+      if (n.children && n.children.length){
+        objLines.push(`${sp1}  children: ${arrayToTs(n.children, indent+2)},`);
+      }
+      objLines.push(`${sp1}},`);
+      lines.push(objLines.join('\n'));
+    }
+    lines.push(sp + ']');
+    return lines.join('\n');
+  }
+
+  const esc = (s) => String(s)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\r/g, '\\r')
+      .replace(/\n/g, '\\n')
+      .replace(/\t/g, '\\t');
+
+  // Actions
+  $('#openBtn').onclick = openTs;
+  $('#saveBtn').onclick = saveTs;
+  $('#expandAllBtn').onclick = ()=>{
+    const walk=(nodes)=>nodes.forEach(n=>{ expanded.add(n.id); if(n.children) walk(n.children); });
+    walk(menu); render();
+  };
+
+  $('#genBtn').onclick = ()=>{
+    const ts = generateTs(menu);
+    codeBox.textContent = ts;
+    codeBox.classList.remove('hidden');
+  };
+  $('#copyBtn').onclick = async ()=>{
+    if (codeBox.classList.contains('hidden')) return;
+    await navigator.clipboard.writeText(codeBox.textContent);
+    setStatus('Code copied.');
+  };
+
+})();
+</script>
+</body>
+</html>
