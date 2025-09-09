@@ -1,0 +1,54 @@
+{
+  "faqs": [
+    {
+      "qNo": 1,
+      "question": "câu hỏi 1",
+      "answer": "trả lời 1"
+    },
+    {
+      "qNo": 2,
+      "question": "câu hỏi 2",
+      "answer": "trả lời 2"
+    },
+    {
+      "qNo": 3,
+      "question": "câu hỏi 3",
+      "answer": "trả lời 3"
+    },
+    {
+      "qNo": 4,
+      "question": "câu hỏi 4",
+      "answer": "trả lời 4"
+    },
+    {
+      "qNo": 5,
+      "question": "câu hỏi 5",
+      "answer": "trả lời 5"
+    },
+    {
+      "qNo": 6,
+      "question": "câu hỏi 6",
+      "answer": "trả lời 6"
+    },
+    {
+      "qNo": 7,
+      "question": "câu hỏi 7",
+      "answer": "trả lời 7"
+    },
+    {
+      "qNo": 8,
+      "question": "câu hỏi 8",
+      "answer": "trả lời 8"
+    },
+    {
+      "qNo": 9,
+      "question": "câu hỏi 9",
+      "answer": "trả lời 9"
+    },
+    {
+      "qNo": 10,
+      "question": "câu hỏi 10",
+      "answer": "trả lời 10"
+    }
+  ]
+}
