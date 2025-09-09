@@ -258,7 +258,7 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
             onMouseLeave={onMouseUp}
             onMouseDown={onMouseDown}
           >
-            <div className="w-full h-full grid place-items-center">
+            <div className="grid place-items-center mr-4">
               <img
                 ref={imgRef}
                 src={current?.src}

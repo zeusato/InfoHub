@@ -3,6 +3,7 @@ import contentJson from '@/data/leafContent.json'
 import ProductNewsTemplate from './ProductNewsTemplate'
 import Placeholder from './Placeholder'
 import TemplateFeatureGuide from './TemplateFeatureGuide'
+import FAQAccordionTemplate from './FAQAccordionTemplate'
 
 export function ContentHost({ activeLeaf }: { activeLeaf: LeafPayload | null }) {
   if (!activeLeaf) {
@@ -27,6 +28,15 @@ if (entry?.renderType === 'template') {
           gallery={(entry.gallery || []).map((src: string) => ({ src }))}
           contentBlocks={Array.isArray(entry.content) ? entry.content : undefined}
           contentHtml={typeof entry.contentHtml === 'string' ? entry.contentHtml : undefined}
+          endingNote={entry.endingNote}
+        />
+      )
+      case 'FAQAccordion':
+      return (
+        <FAQAccordionTemplate
+          title={entry.title}
+          subtitle={entry.subtitle}
+          faqJsonPath={entry.faqJsonPath}
           endingNote={entry.endingNote}
         />
       )

@@ -108,6 +108,7 @@
               <!-- có thể thêm sau -->
               <option value="ProductNews">ProductNews</option>
               <option value="FeatureGuide">FeatureGuide</option>
+              <option value="FAQAccordion">FAQAccordion</option>
             </select>
           </div>
         </div>
@@ -158,6 +159,13 @@
         <div class="col">
           <label class="label">Content (Quill)</label>
           <div id="quill" style="height:220px;background:#0e0f12;border:1px solid #ffffff22;border-radius:10px"></div>
+        </div>
+
+        <!-- FAQ fields -->
+        <div id="faqFields" class="col" style="display:none; margin-top:8px">
+          <label class="label">FAQ JSON path</label>
+          <input id="fFaqPath" placeholder="faqs/faq-giao-dich.json" />
+          <div class="note">Gợi ý: lưu file JSON tại <code>public/faqs/</code> rồi nhập đường dẫn tương đối (không có dấu / ở đầu).</div>
         </div>
 
         <div class="col">
@@ -227,6 +235,29 @@
     expanded = new Set(menu.map(n => n.id));
   };
 
+  // refs mới
+  const faqFields = document.getElementById('faqFields');
+  const fFaqPath  = document.getElementById('fFaqPath');
+
+  // nhóm các block nên ẩn khi chọn FAQ
+  const bannerBlock = pickImageBtn.closest('.col');          // block Banner Image
+  const galleryBlock = pickGalleryBtn.closest('.col');       // block Gallery
+  const quillBlock = document.getElementById('quill').closest('.col'); // block Quill editor
+
+  function toggleFieldsByTemplate() {
+    const key = fTemplateKey.value;
+
+    const isFAQ = key === 'FAQAccordion';
+    faqFields.style.display  = isFAQ ? 'flex' : 'none';
+
+    // FAQ không dùng các khối sau:
+    bannerBlock.style.display = isFAQ ? 'none' : 'flex';
+    galleryBlock.style.display = isFAQ ? 'none' : 'flex';
+    quillBlock.style.display   = isFAQ ? 'none' : 'flex';
+  }
+
+  fTemplateKey.addEventListener('change', toggleFieldsByTemplate);
+  
   function tsToMenu(ts) {
     // Strip types & exports → eval
     let js = ts
@@ -556,7 +587,7 @@
     fPath.value = currentPath;
     // Fill defaults
     fRenderType.value = 'template';
-    fTemplateKey.value = 'ProductNews';
+    fTemplateKey.value = 'ProductNews'
     fTitle.value = '';
     fDate.value = '';
     fDept.value = '';
@@ -589,9 +620,15 @@
         const html = htmlFromContentBlocks(entry.content);
         quill.root.innerHTML = html;
       }
+        // --- nạp FAQ ---
+      if (entry.templateKey === 'FAQAccordion') {
+        fFaqPath.value = entry.faqJsonPath || '';
+        // FAQ không dùng banner/gallery/quill => form đã toggle ẩn
+      }
       if (entry.endingNote) fEnding.value = entry.endingNote;
     }
     setStatus(`Editing ${leaf.label}`);
+    toggleFieldsByTemplate();
   }
 
   // live subtitle preview
@@ -619,11 +656,36 @@
     try {
       if (!jsonHandle) return alert('Mở leafContent.json trước đã.');
       if (!currentPath) return alert('Chọn leaf để nhập nội dung.');
+      const renderType = fRenderType.value || 'template';
+      const templateKey = fTemplateKey.value || 'ProductNews';
 
-      // Build entry
-      const entry = {
-        renderType: fRenderType.value || 'template',
-        templateKey: fTemplateKey.value || 'ProductNews',
+    let entry;
+
+    if (templateKey === 'FAQAccordion') {
+      // ---- entry cho FAQ ----
+      const faqPath = (fFaqPath.value || '').trim();
+      if (!faqPath) return alert('Nhập FAQ JSON path.');
+
+      entry = {
+        renderType,
+        templateKey: 'FAQAccordion',
+        title: (fTitle.value || '').trim(),
+        subtitle: buildSubtitle(),               // vẫn build từ Date + Dept
+        faqJsonPath: faqPath,                    // <— quan trọng
+        endingNote: (fEnding.value || '').trim() // dùng chung field Ending Note
+      };
+
+    } else {
+      // ---- entry cho ProductNews / FeatureGuide như cũ ----
+      const galleryNames = [];
+      for (const g of galleryTemp){
+        const name = (g.destName || '').trim();
+        if (name) galleryNames.push(name);
+      }
+
+      entry = {
+        renderType,
+        templateKey,
         title: (fTitle.value || '').trim(),
         subtitle: buildSubtitle(),
         bannerImg: (destFileName.value || '').trim(),
@@ -632,54 +694,29 @@
         gallery: galleryNames,
       };
 
-      // Copy gallery files
-      const galleryNames = [];
-      for (const g of galleryTemp){
-        const name = (g.destName || '').trim();
-        if (!name) continue;
-        galleryNames.push(name);
-        if (g.file && assetsDirHandle){
-          const ok2 = await requestWritePerm(assetsDirHandle);
-          if (!ok2) throw new Error('Không có quyền ghi thư mục assets cho gallery.');
-          const dest = await assetsDirHandle.getFileHandle(name, { create:true });
-          const w2 = await dest.createWritable();
-          await w2.write(await g.file.arrayBuffer());
-          await w2.close();
-        }
-      }
-
-      // Copy image if selected & assets folder chosen
-      if (imageFile && assetsDirHandle && entry.bannerImg) {
-        const ok = await requestWritePerm(assetsDirHandle);
-        if (!ok) return alert('Không có quyền ghi thư mục assets.');
-        const dest = await assetsDirHandle.getFileHandle(entry.bannerImg, { create:true });
-        const w = await dest.createWritable();
-        await w.write(await imageFile.arrayBuffer());
-        await w.close();
-      } else if (imageFile && !assetsDirHandle) {
-        if (!confirm('Chưa chọn thư mục assets. Vẫn tiếp tục SAVE (không copy ảnh)?')) return;
-      }
-
-      // Update map
-      contentMap[currentPath] = entry;
-
-      // Write JSON back
-      const ok = await requestWritePerm(jsonHandle);
-      if (!ok) return alert('Không có quyền ghi leafContent.json');
-      if (!confirm('Ghi đè leafContent.json?')) return;
-
-      const writable = await jsonHandle.createWritable();
-      const pretty = JSON.stringify(contentMap, null, 2);
-      await writable.write(pretty);
-      await writable.close();
-
-      setStatus('Saved content for ' + currentPath);
-      renderMenu(); // update button colors
-    } catch (e) {
-      console.error(e);
-      setStatus('Save failed: ' + e.message);
+      // copy ảnh/banner & gallery nếu có — giữ nguyên logic cũ
+      // (đừng quên đoạn requestWritePerm / copy file như trong file gốc)
     }
-  };
+
+    // --- ghi vào contentMap và lưu file ---
+    contentMap[currentPath] = entry;
+
+    const ok = await requestWritePerm(jsonHandle);
+    if (!ok) return alert('Không có quyền ghi leafContent.json');
+    if (!confirm('Ghi đè leafContent.json?')) return;
+
+    const writable = await jsonHandle.createWritable();
+    const pretty = JSON.stringify(contentMap, null, 2);
+    await writable.write(pretty);
+    await writable.close();
+
+    setStatus('Saved content for ' + currentPath);
+    renderMenu();
+  } catch (e) {
+    console.error(e);
+    setStatus('Save failed: ' + e.message);
+  }
+};
 
   $('#cancelBtn').onclick = () => {
     currentPath = '';

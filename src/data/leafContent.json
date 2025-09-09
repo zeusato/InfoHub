@@ -56,7 +56,6 @@
     ],
     "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-xxxx để được hỗ trợ."
   },
-
   "tin-tuc-san-pham/uu-ai/test4": {
     "renderType": "template",
     "templateKey": "FeatureGuide",
@@ -67,9 +66,31 @@
       "hdsd/hd-nop2.jpg"
     ],
     "content": [
-      { "type": "paragraph", "text": "Bước 1: ..." },
-      { "type": "paragraph", "text": "Bước 2: ..." }
+      {
+        "type": "paragraph",
+        "text": "Bước 1: ..."
+      },
+      {
+        "type": "paragraph",
+        "text": "Bước 2: ..."
+      }
     ],
     "endingNote": "Mọi thắc mắc vui lòng liên hệ Hotline 1900-xxxx."
+  },
+  "guides/features/a": {
+    "renderType": "template",
+    "templateKey": "FAQAccordion",
+    "title": "Câu hỏi thường gặp – Giao dịch",
+    "subtitle": "Cập nhật: 09/09/2025 — Bộ phận Dịch vụ Khách hàng",
+    "faqJsonPath": "faqs/faq-giao-dich.json",
+    "endingNote": "Lưu ý: Nội dung chỉ mang tính tham khảo. Vui lòng liên hệ SHS để được tư vấn chính thức."
+  },
+  "guides/features/b": {
+    "renderType": "template",
+    "templateKey": "FAQAccordion",
+    "title": "Test FAQ",
+    "subtitle": "Phát hành: 11/05/2025",
+    "faqJsonPath": "faqs/faq-test.json",
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-xxxx để được hỗ trợ."
   }
 }

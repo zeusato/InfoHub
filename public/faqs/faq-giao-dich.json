@@ -1,0 +1,19 @@
+{
+  "faqs": [
+    {
+      "qNo": 1,
+      "question": "Mở tài khoản giao dịch cần giấy tờ gì?",
+      "answer": "Căn cước công dân/CMND còn hiệu lực. Nếu mở online cần thêm email và số điện thoại đang sử dụng."
+    },
+    {
+      "qNo": 2,
+      "question": "Phí giao dịch chứng khoán cơ sở là bao nhiêu?",
+      "answer": "Theo biểu phí SHS (có thể ưu đãi theo chương trình). Vui lòng xem mục Biểu phí trên InfoHub."
+    },
+    {
+      "qNo": 3,
+      "question": "Nộp/rút tiền như thế nào?",
+      "answer": "Nộp qua chuyển khoản ngân hàng liên kết, hoặc nộp/rút tại quầy. Trên InfoHub có hướng dẫn chi tiết."
+    }
+  ]
+}

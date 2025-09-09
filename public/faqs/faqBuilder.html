@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>FAQ Builder (Excel → JSON)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Style tái sử dụng từ menuBuilder.html -->
+  <style>
+    :root { color-scheme: dark; --brand:#ff7a18; --bg:#0b0b0d; --glass:rgba(255,255,255,.06); --glass2:rgba(255,255,255,.1); }
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0b0b0d;color:#e5e7eb}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    .bar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .btn{border:1px solid #ffffff22;background:#ffffff10;color:#e5e7eb;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn:hover{border-color:#ffffff55;background:#ffffff18}
+    .btn.brand{border-color:#ff7a1855;background:#ff7a181a;color:#ffd4bd}
+    .btn.brand:hover{background:#ff7a1828}
+    .btn.ghost{background:transparent;border-color:#ffffff22}
+    .muted{color:#9ca3af;font-size:13px}
+    .glass{background:var(--glass);border:1px solid #ffffff1a;border-radius:14px}
+    .col{display:flex;flex-direction:column;gap:8px}
+    .row{display:flex;gap:8px;align-items:center}
+    .panel{flex:1;padding:12px}
+    input,textarea{background:#0e0f12;border:1px solid #ffffff22;border-radius:10px;color:#e5e7eb;padding:8px 10px}
+    input:focus,textarea:focus{outline:2px solid #ff7a1833;border-color:#ff7a1866}
+    .small{font-size:12px}
+    .sep{height:1px;background:#ffffff12;margin:8px 0}
+    .hidden{display:none}
+    table{width:100%;border-collapse:collapse}
+    th,td{border:1px solid #ffffff22;padding:8px;border-radius:6px}
+    th{background:#ffffff10}
+    .footer{margin-top:12px;display:flex;justify-content:flex-end;gap:8px}
+    .note{font-size:12px;color:#9ca3af}
+    .code{white-space:pre-wrap;background:#0e0f12;border:1px solid #ffffff22;padding:10px;border-radius:10px}
+  </style>
+  <!-- SheetJS để đọc Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <div class="row" style="gap:12px">
+      <label class="btn brand" for="excelFile">Chọn file Excel</label>
+      <input id="excelFile" type="file" accept=".xlsx,.xls,.csv" class="hidden" />
+      <span id="fileLabel" class="muted">Chưa chọn file</span>
+    </div>
+    <div class="row muted">
+      <span>Excel chỉ cần 2 cột: <b>A = Question</b>, <b>B = Answer</b>.</span>
+    </div>
+  </div>
+
+  <div id="status" class="muted"></div>
+
+  <div class="glass" style="display:flex;gap:16px">
+    <!-- Bên trái: Form & Actions -->
+    <div class="panel" style="max-width:420px">
+      <h3>Tạo JSON FAQ</h3>
+      <div class="col">
+        <label class="small">Tên file JSON (không chứa dấu /)</label>
+        <input id="jsonName" placeholder="vd: faq-giao-dich.json" />
+        <div class="note">
+          Gợi ý thư mục lưu: <code>public/faqs/</code> của dự án.
+        </div>
+        <div class="sep"></div>
+        <div class="row">
+          <button id="previewBtn" class="btn">Xem trước JSON</button>
+          <button id="copyBtn" class="btn ghost">Copy JSON</button>
+        </div>
+        <div id="jsonPreview" class="code small hidden" style="max-height:260px;overflow:auto"></div>
+
+        <div class="footer">
+          <button id="saveBtn" class="btn brand">Lưu file…</button>
+        </div>
+        <div class="note">
+          Lưu ý: Trình duyệt Chromium (Chrome/Edge) hỗ trợ hộp thoại lưu (File System Access API). Nếu không, hệ thống sẽ tự tải file về.
+        </div>
+      </div>
+
+    <!-- Bên phải: Bảng xem trước -->
+    <div class="panel">
+      <h3>Xem dữ liệu từ Excel</h3>
+      <div class="note">Hiển thị 2 cột A/B của sheet đầu tiên.</div>
+      <div id="tableBox" style="max-height:380px;overflow:auto" class="hidden">
+        <table id="previewTable">
+          <thead><tr><th style="width:55%">Cột A — Question</th><th>Cột B — Answer</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="emptyHint" class="muted">Chưa có dữ liệu.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (s)=>document.querySelector(s);
+  const excelInput = $('#excelFile');
+  const fileLabel = $('#fileLabel');
+  const status = $('#status');
+  const tableBox = $('#tableBox');
+  const emptyHint = $('#emptyHint');
+  const previewTable = $('#previewTable tbody');
+  const jsonName = $('#jsonName');
+  const previewBtn = $('#previewBtn');
+  const copyBtn = $('#copyBtn');
+  const saveBtn = $('#saveBtn');
+  const jsonPreview = $('#jsonPreview');
+
+  let rows = []; // [{q, a}]
+  let faqs = []; // [{qNo,question,answer}]
+
+  function setStatus(msg){ status.textContent = msg || ''; }
+
+  function parseWorkbook(wb){
+    const sheetName = wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+    if (!ws) { rows=[]; renderTable(); return; }
+    // Đọc sheet thành mảng mảng (AOA)
+    const aoa = XLSX.utils.sheet_to_json(ws, { header:1, raw:true, defval:'' });
+    // Lấy 2 cột đầu tiên (A,B)
+    rows = aoa
+      .filter(r=> (r[0]!=='' || r[1]!=='')) // bỏ dòng rỗng
+      .map(r => ({ q: String(r[0] ?? '').trim(), a: String(r[1] ?? '').trim() }))
+      .filter(r => r.q || r.a); // chỉ lấy dòng có dữ liệu
+    renderTable();
+  }
+
+  function renderTable(){
+    previewTable.innerHTML = '';
+    if (!rows.length){
+      tableBox.classList.add('hidden');
+      emptyHint.classList.remove('hidden');
+      setStatus('Không có dòng dữ liệu hợp lệ trong sheet đầu tiên.');
+      return;
+    }
+    emptyHint.classList.add('hidden');
+    tableBox.classList.remove('hidden');
+    rows.forEach((r, i)=>{
+      const tr = document.createElement('tr');
+      const tdA = document.createElement('td'); tdA.textContent = r.q;
+      const tdB = document.createElement('td'); tdB.textContent = r.a;
+      tr.append(tdA, tdB);
+      previewTable.appendChild(tr);
+    });
+    setStatus('Đã nạp ' + rows.length + ' dòng.');
+  }
+
+  function buildFaqs(){
+    faqs = rows.map((r, idx)=>({
+      qNo: idx+1,
+      question: r.q,
+      answer: r.a
+    }));
+    return { faqs };
+  }
+
+  function getJsonName(){
+    let name = (jsonName.value || '').trim();
+    if (!name) name = 'faq.json';
+    if (!name.toLowerCase().endsWith('.json')) name += '.json';
+    if (name.includes('/') || name.includes('\\')) {
+      alert('Tên file không được chứa dấu "/" hoặc "\\".');
+      throw new Error('Invalid filename');
+    }
+    return name;
+  }
+
+  // Open Excel
+  excelInput.addEventListener('change', async (e)=>{
+    const file = e.target.files?.[0];
+    if (!file) return;
+    fileLabel.textContent = file.name;
+    setStatus('Đang đọc file Excel…');
+    try {
+      const data = await file.arrayBuffer();
+      const wb = XLSX.read(data, { type: 'array' });
+      parseWorkbook(wb);
+      setStatus('Đọc xong.');
+    } catch (err) {
+      console.error(err);
+      setStatus('Không đọc được file Excel: ' + (err?.message || err));
+    }
+  });
+
+  // Preview JSON
+  previewBtn.onclick = ()=>{
+    const obj = buildFaqs();
+    const text = JSON.stringify(obj, null, 2);
+    jsonPreview.textContent = text;
+    jsonPreview.classList.remove('hidden');
+  };
+
+  // Copy JSON
+  copyBtn.onclick = async ()=>{
+    const obj = buildFaqs();
+    const text = JSON.stringify(obj, null, 2);
+    await navigator.clipboard.writeText(text);
+    setStatus('Đã copy JSON vào clipboard.');
+  };
+
+  // Save JSON
+  saveBtn.onclick = async ()=>{
+    try{
+      const obj = buildFaqs();
+      const blob = new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' });
+      const suggestedName = getJsonName();
+
+      if (window.showSaveFilePicker){
+        const handle = await window.showSaveFilePicker({
+          suggestedName,
+          types: [{ description:'JSON', accept:{ 'application/json':['.json'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        setStatus('Đã lưu file: ' + handle.name);
+      } else {
+        // Fallback tải file (nếu browser ko hỗ trợ File System Access)
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = suggestedName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(a.href);
+        setStatus('Đã tải file JSON về máy.');
+      }
+    } catch(e){
+      if (e?.message !== 'Invalid filename'){
+        console.error(e);
+        setStatus('Lưu thất bại: ' + (e?.message || e));
+      }
+    }
+  };
+})();
+</script>
+</body>
+</html>
