@@ -6,6 +6,7 @@ export type LeafPayload = {
   id: string
   label: string
   path: string
+  item?: any
 }
 
 type Props = {

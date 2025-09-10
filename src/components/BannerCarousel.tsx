@@ -31,7 +31,8 @@ export default function BannerCarousel() {
   const isExternal = cur.link.startsWith('http')
 
   return (
-    <div className="relative h-36 md:h-40 lg:h-48 w-full overflow-hidden rounded-2xl">
+    <div className="relative w-full overflow-hidden rounded-2xl
+                h-[clamp(160px,30vw,200px)]">
       {/* Ảnh nền phủ toàn khung, được mask để mờ dần về bên trái */}
       <img
         src={cur.imgUrl}
@@ -49,12 +50,12 @@ export default function BannerCarousel() {
         className="absolute inset-y-0 left-0 w-[60%] min-w-[280px]"
         style={{
           background:
-            'linear-gradient(90deg, rgba(255,122,24,0.35) 0%, rgba(255,122,24,0.20) 45%, rgba(255,122,24,0.08) 70%, rgba(255,122,24,0) 100%)',
+            'linear-gradient(90deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.50) 45%, rgba(255,255,255,0.3) 70%, rgba(255,122,24,0) 100%)',
         }}
       />
 
       {/* Overlay tối rất nhẹ toàn khung để chữ dễ đọc (không glow) */}
-      <div className="absolute inset-0 bg-black/15" />
+      {/* <div className="absolute inset-0 bg-black/15" /> */}
 
       {/* Nội dung (nằm trong panel trái) */}
       <a
@@ -63,13 +64,15 @@ export default function BannerCarousel() {
         rel={isExternal ? 'noopener noreferrer' : undefined}
         className="absolute inset-y-0 left-0 w-[46%] min-w-[280px] p-5 flex flex-col justify-center text-left focus:outline-none"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-zinc-200 text-xs w-max">
-          Tin nổi bật
-        </div>
-        <h3 className="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-100">
+        <h3 className="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-[#0E3995]">
           {cur.title}
         </h3>
-        <p className="text-zinc-300 mt-1">{cur.desc}</p>
+        <p className="text-[#0E3995] mt-1">{cur.desc}</p>
+        <br/>
+        <br/>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#0E3995]/15 bg-white/5 text-[#0E3995] text-xs w-max">
+          Chi tiết
+        </div>
       </a>
 
       {/* Dots điều hướng */}

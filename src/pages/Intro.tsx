@@ -2,9 +2,19 @@ import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { GridBackground } from '../components/lightswind/grid-dot-backgrounds'
 import SmokeyCursor from '@/components/lightswind/smokey-cursor'
+import { useEffect } from "react"
 
 export default function Intro() {
   const navigate = useNavigate()
+  useEffect(() => {
+    // Khi Intro mount → chặn cuộn
+    document.body.style.overflow = "hidden"
+
+    // Khi rời Intro → trả lại
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [])
 
   return (
     <GridBackground 
