@@ -11,9 +11,10 @@ export type LeafPayload = {
 type Props = {
   menu: MenuNode[]
   onLeafSelect: (leaf: LeafPayload) => void
+  onHomeClick?: () => void   // ← thêm prop
 }
 
-export default function SidebarMenu({ menu, onLeafSelect }: Props) {
+export default function SidebarMenu({ menu, onLeafSelect, onHomeClick }: Props) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
   // Build parent & depth maps to control accordion by level
@@ -35,29 +36,24 @@ export default function SidebarMenu({ menu, onLeafSelect }: Props) {
     return { parentOf, depthOf, topAncestorOf }
   }, [menu])
 
-  // Toggle logic:
-  // - Level 0: exclusive (accordion toàn cục). Mở nhánh khác -> đóng sạch nhánh cũ, chỉ mở level 0 mới.
-  // - Level >=1: sibling-exclusive trong cùng parent. Không ảnh hưởng các top-level khác đang mở.
+  // Toggle logic
   const toggleBranch = (id: string) =>
     setExpanded(prev => {
       const isOpen = !!prev[id]
       const depth = depthOf[id] ?? 0
 
       if (depth === 0) {
-        // Top-level: nếu mở nhánh khác -> reset sạch, chỉ giữ id này mở
-        if (isOpen) return {}               // click lại để đóng hết
-        return { [id]: true }               // mở nhánh top mới, không giữ child cũ
+        if (isOpen) return {}
+        return { [id]: true }
       }
 
-      // Middle/leaf-branch: sibling-exclusive theo cùng parent
       const parent = parentOf[id]
       const next: Record<string, boolean> = {}
 
-      // Giữ mọi expansion hiện tại TRỪ các anh em cùng parent & cùng depth với id
       for (const k of Object.keys(prev)) {
         const sameParent = parentOf[k] === parent
         const sameDepth = (depthOf[k] ?? 0) === depth
-        if (sameParent && sameDepth) continue // bỏ anh em
+        if (sameParent && sameDepth) continue
         next[k] = prev[k]
       }
 
@@ -67,11 +63,23 @@ export default function SidebarMenu({ menu, onLeafSelect }: Props) {
 
   const collapseAll = () => setExpanded({})
 
+  // Bấm tiêu đề "InfoHub" → collapse + báo về cha để reset content
+  const goHome = () => {
+    collapseAll()
+    onHomeClick?.()
+  }
+
   const header = (
     <div className="flex items-center justify-between p-3 border-b border-white/10">
-      <div className="font-bold">
+      <button
+        type="button"
+        onClick={goHome}
+        className="font-bold text-left hover:text-brand transition focus:outline-none"
+        title="Về màn hình mặc định"
+      >
         <span className="text-brand">Info</span>Hub
-      </div>
+      </button>
+
       <button
         className="px-2 py-1 rounded-lg border border-white/10 hover:border-brand/50 hover:text-brand transition"
         onClick={collapseAll}
@@ -117,18 +125,19 @@ function MenuBranch({
   const isLeaf = !node.children || node.children.length === 0
   const open = expanded[node.id]
   const color = MENU_COLORS[depth] ?? 'border-white/15 bg-white/5'
-  const indentPx = Math.min(depth, 3) * 12; // tối đa 36px
+  const indentPx = Math.min(depth, 3) * 12 // tối đa 36px
 
   const bullet = (
     <span
       className={`inline-block h-2 w-2 rounded-full mr-2 ${
         depth === 0 ? 'bg-brand'
-        : depth === 1 ? 'bg-emerald-400'   // tầng 2 (xanh lá)
-        : depth === 2 ? 'bg-cyan-400'      // tầng 3 (xanh dương)
-        : 'bg-purple-400'                  // tầng 4 (tím)
+        : depth === 1 ? 'bg-emerald-400'
+        : depth === 2 ? 'bg-cyan-400'
+        : 'bg-purple-400'
       }`}
     />
   )
+
   if (isLeaf) {
     return (
       <button
@@ -161,19 +170,20 @@ function MenuBranch({
       </button>
 
       {open && node.children && (
-      <div className="mt-1 space-y-1">
-        {node.children.map((child) => (
-          <div key={child.id}>
-            <MenuBranch
-              node={child}
-              depth={depth + 1}
-              expanded={expanded}
-              onToggle={onToggle}
-              onLeafSelect={onLeafSelect}
-            />
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
+        <div className="mt-1 space-y-1">
+          {node.children.map((child) => (
+            <div key={child.id}>
+              <MenuBranch
+                node={child}
+                depth={depth + 1}
+                expanded={expanded}
+                onToggle={onToggle}
+                onLeafSelect={onLeafSelect}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

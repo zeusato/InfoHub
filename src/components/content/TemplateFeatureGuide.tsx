@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
+// src/components/TemplateFeatureGuide.tsx
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 type ContentBlock =
   | { type: 'paragraph'; text?: string }
@@ -11,9 +12,8 @@ export type FeatureGuideProps = {
   contentHtml?: string
   contentBlocks?: ContentBlock[]
   endingNote?: string
-  /** Viewport width/height (px). Default 1000 x 707. Adjust as needed. */
-  viewportWidth?: number
-  viewportHeight?: number
+  /** Min height for the viewport (px). Port width auto-co giãn theo ảnh. */
+  minViewportHeight?: number // default 500
 }
 
 function Blocks({ blocks }: { blocks?: ContentBlock[] }) {
@@ -62,123 +62,67 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
     contentHtml,
     contentBlocks,
     endingNote,
-    viewportWidth = 1550,
-    viewportHeight = 500,
+    minViewportHeight = 500,
   } = props
 
   const [idx, setIdx] = useState(0)
-  const [imgW, setImgW] = useState(0)    // fitted width in px
-  const [imgH, setImgH] = useState(0)    // fitted height in px
-  const [zoom, setZoom] = useState(1)    // additional zoom factor over fitted size
-  const [tx, setTx] = useState(0)        // pan X (px)
-  const [ty, setTy] = useState(0)        // pan Y (px)
-  const [isPanning, setIsPanning] = useState(false)
-  const startRef = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null)
-  const imgRef = useRef<HTMLImageElement | null>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const zoomRef = React.useRef(1)
-  const txRef = React.useRef(0)
-  const tyRef = React.useRef(0)
+  const [displayW, setDisplayW] = useState<number | undefined>(undefined)
+  const [displayH, setDisplayH] = useState<number>(minViewportHeight)
+  const [containerH, setContainerH] = useState<number>(minViewportHeight)
+
+  const imgRef = useRef<HTMLImageElement | null>(null)
+  const frameRef = useRef<HTMLDivElement | null>(null) // khung 100% để đo maxPortW
 
   const hasGallery = !!(gallery && gallery.length)
   const total = gallery?.length ?? 0
   const current = gallery?.[idx]
 
-  // Compute base fit using dominant dimension (H vs W).
-  // Rule: if ih >= iw -> scale = ch/ih ; else scale = cw/iw.
-  const computeFit = (iw: number, ih: number, cw: number, ch: number) => {
-    const scale = ih >= iw ? (ch / ih) : (cw / iw)
-    return {
-      w: Math.round(iw * scale),
-      h: Math.round(ih * scale),
-    }
-  }
-
-  const refit = () => {
+  const fitToPort = useCallback(() => {
     const img = imgRef.current
-    const c = containerRef.current
-    if (!img || !c) return
-    const iw = img.naturalWidth || img.width
-    const ih = img.naturalHeight || img.height
-    const cw = viewportWidth
-    const ch = viewportHeight
-    const { w, h } = computeFit(iw, ih, cw, ch)
-    setImgW(w)
-    setImgH(h)
-    setZoom(1)
-    setTx(0)
-    setTy(0)
-  }
+    const frame = frameRef.current
+    if (!img || !frame) return
 
-  React.useEffect(() => { zoomRef.current = zoom }, [zoom])
-  React.useEffect(() => { txRef.current = tx }, [tx])
-  React.useEffect(() => { tyRef.current = ty }, [ty])
+    const naturalW = img.naturalWidth || img.width || 1
+    const naturalH = img.naturalHeight || img.height || 1
 
-  // Refit when image changes or idx changes
+    // maxPortW = chiều rộng có thể dùng (chiều rộng cha)
+    const maxPortW = frame.clientWidth || window.innerWidth || naturalW
+
+    // Ảnh không vượt quá port → width = min(naturalW, maxPortW)
+    const w = Math.min(naturalW, maxPortW)
+    const scale = w / naturalW
+    const h = Math.max(minViewportHeight, Math.round(naturalH * scale))
+
+    setDisplayW(w)
+    setDisplayH(h)
+    setContainerH(h)
+  }, [minViewportHeight])
+
+  // Refit khi ảnh đổi / load
   useEffect(() => {
-    // Try immediate refit; if natural sizes not ready, attach onload
     const img = imgRef.current
     if (!img) return
-    const doRefit = () => refit()
+    const handler = () => fitToPort()
+
     if (img.complete && img.naturalWidth && img.naturalHeight) {
-      doRefit()
+      handler()
     } else {
-      img.addEventListener('load', doRefit, { once: true })
-      return () => img.removeEventListener('load', doRefit)
+      img.addEventListener('load', handler, { once: true })
+      return () => img.removeEventListener('load', handler)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, current?.src, viewportWidth, viewportHeight])
+  }, [idx, current?.src, fitToPort])
 
-  // Wheel zoom in container only; prevent page scroll
-  // const onWheel = (e: React.WheelEvent) => {
-  //   e.preventDefault()
-  //   const rect = containerRef.current?.getBoundingClientRect()
-  //   const mx = e.clientX - (rect?.left ?? 0)
-  //   const my = e.clientY - (rect?.top ?? 0)
-  //   const factor = e.deltaY > 0 ? 1 / 1.1 : 1.1
-  //   // keep point under cursor stable
-  //   setZoom((prev) => {
-  //     const newZoom = Math.max(0.25, Math.min(8, Number((prev * factor).toFixed(3))))
-  //     // translate adjust (relative to center)
-  //     const cx = viewportWidth / 2
-  //     const cy = viewportHeight / 2
-  //     const ix = (mx - cx - tx) / prev
-  //     const iy = (my - cy - ty) / prev
-  //     const ntx = mx - cx - ix * newZoom
-  //     const nty = my - cy - iy * newZoom
-  //     setTx(ntx)
-  //     setTy(nty)
-  //     return newZoom
-  //   })
-  // }
-
-  const onMouseDown = (e: React.MouseEvent) => {
-    if (zoom <= 1.001) return
-    setIsPanning(true)
-    startRef.current = { x: e.clientX, y: e.clientY, tx, ty }
-  }
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!isPanning || !startRef.current) return
-    const dx = e.clientX - startRef.current.x
-    const dy = e.clientY - startRef.current.y
-    setTx(startRef.current.tx + dx)
-    setTy(startRef.current.ty + dy)
-  }
-  const onMouseUp = () => {
-    setIsPanning(false)
-    startRef.current = null
-  }
+  // Refit khi resize cửa sổ
+  useEffect(() => {
+    const onResize = () => fitToPort()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [fitToPort])
 
   const go = (n: number) => {
     if (!total) return
     setIdx((i) => (i + n + total) % total)
-  }
-
-  const reset = () => {
-    setZoom(1)
-    setTx(0)
-    setTy(0)
   }
 
   const Indicators = () => (
@@ -186,45 +130,6 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
       <span>{idx + 1} / {total}</span>
     </div>
   )
-
-  // === Wheel zoom trong viewport, KHÔNG scroll toàn trang ===
-  React.useEffect(() => {
-    const el = containerRef.current
-    if (!el) return
-
-    const handler = (e: WheelEvent) => {
-      e.preventDefault()
-      e.stopPropagation()
-
-      const rect = el.getBoundingClientRect()
-      const mx = e.clientX - rect.left
-      const my = e.clientY - rect.top
-
-      // đổi độ “nhạy” zoom ở đây (1.1 = 10%)
-      const factor = e.deltaY > 0 ? 1 / 1.1 : 1.1
-
-      const prevZoom = zoomRef.current
-      const prevTx = txRef.current
-      const prevTy = tyRef.current
-      const newZoom = Math.max(0.25, Math.min(8, +(prevZoom * factor).toFixed(3)))
-
-      // giữ điểm dưới con trỏ cố định khi zoom
-      const cx = el.clientWidth / 2
-      const cy = el.clientHeight / 2
-      const ix = (mx - cx - prevTx) / prevZoom
-      const iy = (my - cy - prevTy) / prevZoom
-      const ntx = mx - cx - ix * newZoom
-      const nty = my - cy - iy * newZoom
-
-      setZoom(newZoom)
-      setTx(ntx)
-      setTy(nty)
-    }
-
-    el.addEventListener('wheel', handler, { passive: false })
-    return () => el.removeEventListener('wheel', handler as any)
-  }, [])
-
 
   return (
     <div className="space-y-6">
@@ -241,35 +146,25 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
           <div className="absolute top-3 right-3 z-10 flex gap-2">
             <button className="px-2 py-1 rounded-md border border-white/15 bg-black/40 hover:bg-black/60" onClick={() => go(-1)} title="Ảnh trước">←</button>
             <button className="px-2 py-1 rounded-md border border-white/15 bg-black/40 hover:bg-black/60" onClick={() => go(1)} title="Ảnh sau">→</button>
-            <div className="mx-1 w-px bg-white/20" />
-            <button className="px-2 py-1 rounded-md border border-white/15 bg-black/40 hover:bg-black/60" onClick={() => setZoom((z)=>Math.max(0.25, Number((z/1.1).toFixed(3))))} title="Thu nhỏ">−</button>
-            <button className="px-2 py-1 rounded-md border border-white/15 bg-black/40 hover:bg-black/60" onClick={() => setZoom((z)=>Math.min(8, Number((z*1.1).toFixed(3))))} title="Phóng to">＋</button>
-            <button className="px-2 py-1 rounded-md border border-white/15 bg-black/40 hover:bg-black/60" onClick={reset} title="Reset">Reset</button>
           </div>
 
-          {/* Viewport */}
-          <div
-            ref={containerRef}
-            className="overflow-hidden rounded-2xl select-none"
-            style={{ width: viewportWidth, height: viewportHeight }}
-            // onWheel={onWheel}
-            onMouseMove={onMouseMove}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseUp}
-            onMouseDown={onMouseDown}
-          >
-            <div className="grid place-items-center mr-4">
+          {/* Frame (w-full để đo được giới hạn; port sẽ co theo ảnh) */}
+          <div ref={frameRef} className="w-full px-0 py-0">
+            {/* Viewport: inline-block để width co giãn theo ảnh */}
+            <div
+              className="overflow-hidden rounded-2xl select-none inline-block"
+              style={{ width: displayW, height: containerH }}
+            >
+              {/* Ảnh bám trái, không zoom/pan */}
               <img
                 ref={imgRef}
                 src={current?.src}
                 alt={current?.alt || `Slide ${idx + 1}`}
-                className="shadow-lg"
+                className="block shadow-lg"
                 style={{
-                  width: imgW || 'auto',
-                  height: imgH || 'auto',
-                  transform: `translate(${tx}px, ${ty}px) scale(${zoom})`,
-                  transformOrigin: 'center center',
-                  transition: isPanning ? 'none' : 'transform 80ms ease-out',
+                  // Ảnh không vượt quá port; port đã co = displayW
+                  width: displayW,
+                  height: displayH,
                 }}
                 draggable={false}
               />
@@ -281,7 +176,6 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
             <div className="px-4 py-3 text-sm text-white/80 border-t border-white/10">{current.caption}</div>
           ) : null}
 
-          {/* Indicator */}
           <Indicators />
         </div>
       ) : null}

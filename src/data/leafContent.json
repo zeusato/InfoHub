@@ -4,7 +4,7 @@
     "templateKey": "ProductNews",
     "title": "Ra mắt sản phẩm SH69 – Lãi suất linh hoạt",
     "subtitle": "Phát hành: 08/09/2025 — Bộ phận Sản phẩm",
-    "bannerImg": "banner-2.jpg",
+    "bannerImg": "avatar.png",
     "content": [
       {
         "type": "paragraph",
@@ -47,7 +47,7 @@
     "templateKey": "ProductNews",
     "title": "Bản tin gì đéo nói",
     "subtitle": "Phát hành: 10/09/2025 — Bộ phận Phát triển sản phẩm",
-    "bannerImg": "avatar.png",
+    "bannerImg": "UT.png",
     "content": [
       {
         "type": "paragraph",
@@ -62,8 +62,8 @@
     "title": "Hướng dẫn nộp tiền vào tài khoản giao dịch",
     "subtitle": "Phát hành: 09/09/2025 — Bộ phận Sản phẩm",
     "gallery": [
-      "hdsd/hd-nop1.jpg",
-      "hdsd/hd-nop2.jpg"
+      "hdsd/hd-nop1.png",
+      "hdsd/hd-nop2.png"
     ],
     "content": [
       {
