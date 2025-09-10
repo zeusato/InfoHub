@@ -31,33 +31,32 @@ export default function BannerCarousel() {
   const isExternal = cur.link.startsWith('http')
 
   return (
-    // Port: chiều cao cố định theo breakpoint, overflow để cắt phần thừa bên trái
     <div className="relative h-36 md:h-40 lg:h-48 w-full overflow-hidden rounded-2xl">
-      {/* Ảnh: max-h = 100% port; width auto theo tỉ lệ; căn phải; phần dư tràn về bên trái */}
+      {/* Ảnh nền phủ toàn khung, được mask để mờ dần về bên trái */}
       <img
         src={cur.imgUrl}
         alt={cur.title}
-        className="absolute right-0 top-1/2 -translate-y-1/2 max-h-full h-auto w-auto max-w-none block"
-        // Giải thích:
-        // - max-h-full + h-auto: chiều cao ảnh <= chiều cao port (không vượt quá)
-        // - w-auto: rộng co dãn theo tỉ lệ theo chiều cao
-        // - right-0: căn sát lề phải
-        // - overflow-hidden ở container sẽ cắt phần thừa về bên trái
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-auto h-auto max-h-full max-w-none block z-0"
+        style={{
+          // ảnh rõ ở bên phải (đen = opaque), mờ dần về bên trái (transparent)
+          WebkitMaskImage: 'linear-gradient(to left, black 60%, transparent 92%)',
+          maskImage: 'linear-gradient(to left, black 50%, transparent 92%)',
+        }}
       />
 
-      {/* Panel trái để đặt text (giữ nguyên nếu đại ca đang dùng) */}
+      {/* Panel trái: nền cam gradient đậm -> nhạt -> trong suốt để blend với ảnh */}
       <div
-        className="absolute inset-y-0 left-0 w-[60%] min-w-[280px] pointer-events-none"
+        className="absolute inset-y-0 left-0 w-[60%] min-w-[280px]"
         style={{
           background:
             'linear-gradient(90deg, rgba(255,122,24,0.35) 0%, rgba(255,122,24,0.20) 45%, rgba(255,122,24,0.08) 70%, rgba(255,122,24,0) 100%)',
         }}
       />
 
-      {/* Overlay tối nhẹ để chữ dễ đọc */}
-      <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+      {/* Overlay tối rất nhẹ toàn khung để chữ dễ đọc (không glow) */}
+      <div className="absolute inset-0 bg-black/15" />
 
-      {/* Nội dung */}
+      {/* Nội dung (nằm trong panel trái) */}
       <a
         href={cur.link}
         target={isExternal ? '_blank' : undefined}
