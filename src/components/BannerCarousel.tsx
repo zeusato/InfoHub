@@ -67,12 +67,7 @@ export default function BannerCarousel() {
         <h3 className="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-[#4ade80]">
           {cur.title}
         </h3>
-        <p className="text-[#4ade80] mt-1">{cur.desc}</p>
-        <br/>
-        <br/>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#4ade80]/15 bg-white/5 text-[#4ade80] text-xs w-max">
-          Chi tiết
-        </div>
+        <p className="text-[#4ade80] mt-1">{cur.desc}</p>        
       </a>
 
       {/* Dots điều hướng */}
@@ -85,6 +80,26 @@ export default function BannerCarousel() {
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
+      </div>
+
+      {/* 1) Lớp cut-out: tạo cảm giác banner bị khoét, bo tròn phần còn lại */}
+      <div
+        className="absolute left-3 bottom-3 z-10
+                  w-[min(60%,720px)] h-14
+                  rounded-2xl bg-background pointer-events-none"
+      />
+
+      {/* 2) Dock thật: thanh menu nổi, bo tròn bốn góc */}
+      <div
+        className="absolute left-0 bottom-0 mt-auto  z-20
+                  w-[min(58%,700px)] h-12
+                  rounded-2xl bg-white/5 backdrop-blur
+                  ring-1 ring-white/15
+                  shadow-[0_18px_40px_-20px_rgba(0,0,0,0.8)]
+                  flex items-center gap-3 px-4"
+      >
+
+        {/* thêm các nút khác tại đây */}
       </div>
     </div>
   )

@@ -20,7 +20,7 @@ const ACCENT: Record<keyof typeof RSS_SOURCES, { from: string; to: string }> = {
 export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
   return (
     <div className={cn("w-full h-full p-4", className)}>
-      <div className="text-xs uppercase tracking-wider text-white/60 mb-2">Đọc báo</div>
+      <div className="text-sm font-bold uppercase tracking-wider text-white mb-2">Đọc báo</div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-[calc(100%-1.5rem)]">
         {(Object.entries(RSS_SOURCES) as [keyof typeof RSS_SOURCES, (typeof RSS_SOURCES)[keyof typeof RSS_SOURCES]][])
@@ -68,10 +68,14 @@ export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
                       {/* <div className="text-[10px] uppercase tracking-wider text-white/55 mb-1">
                         {cfg.label}
                       </div> */}
-                      <div className="text-[1.075rem] font-semibold truncate">
+                      <ChevronRight
+                          className="block md:hidden size-4 translate-x-0 group-hover:translate-x-[2px] transition-transform"
+                          aria-hidden="true"
+                        />
+                      <div className="hidden md:block text-[1.075rem] sm:hidden font-semibold truncate">
                         {cfg.label} News
                       </div>
-                      <div className="text-xs text-white/60 mt-1">
+                      <div className="hidden lg:block text-xs text-white/60 mt-1 sm:hidden">
                         Bấm để xem danh sách mới nhất
                       </div>
                     </div>
@@ -81,7 +85,7 @@ export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
                         {IconNode ?? <div className="text-base font-bold">{cfg.label?.[0] || "N"}</div>}
                       </div>
 
-                      <div className="grid place-items-center w-8 h-8 rounded-full border border-white/15 hover:border-white/15 bg-white/[0.06]">
+                      <div className="sm:hidden grid place-items-center w-8 h-8 rounded-full border border-white/15 hover:border-white/15 bg-white/[0.06]">
                         <ChevronRight
                           className="size-4 translate-x-0 group-hover:translate-x-[2px] transition-transform"
                           aria-hidden="true"
