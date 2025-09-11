@@ -50,7 +50,7 @@ export default function BannerCarousel() {
         className="absolute inset-y-0 left-0 w-[60%] min-w-[280px]"
         style={{
           background:
-            'linear-gradient(90deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.50) 45%, rgba(255,255,255,0.3) 70%, rgba(255,122,24,0) 100%)',
+            'linear-gradient(90deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 45%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0) 100%)',
         }}
       />
 
@@ -64,13 +64,13 @@ export default function BannerCarousel() {
         rel={isExternal ? 'noopener noreferrer' : undefined}
         className="absolute inset-y-0 left-0 w-[46%] min-w-[280px] p-5 flex flex-col justify-center text-left focus:outline-none"
       >
-        <h3 className="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-[#0E3995]">
+        <h3 className="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-[#4ade80]">
           {cur.title}
         </h3>
-        <p className="text-[#0E3995] mt-1">{cur.desc}</p>
+        <p className="text-[#4ade80] mt-1">{cur.desc}</p>
         <br/>
         <br/>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#0E3995]/15 bg-white/5 text-[#0E3995] text-xs w-max">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#4ade80]/15 bg-white/5 text-[#4ade80] text-xs w-max">
           Chi tiết
         </div>
       </a>
