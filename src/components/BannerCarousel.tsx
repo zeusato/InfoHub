@@ -1,106 +1,151 @@
 // src/components/BannerCarousel.tsx
-import { useEffect, useMemo, useState } from 'react'
-import slidesJson from '@/data/slides.json'
+import { useEffect, useMemo, useState } from "react";
+import slidesJson from "@/data/slides.json";
+import { DynamicNavigation } from "@/components/lightswind/dynamic-navigation";
+import { Home, ChartCandlestick, ChartNoAxesCombined, LayoutGrid} from "lucide-react";
 
 type Slide = {
-  id: string
-  title: string
-  desc: string
-  img: string   // tên file trong src/assets
-  link: string  // link nội/ngoại
-}
+  id: string;
+  title: string;
+  desc: string;
+  img: string;
+  link: string;
+};
+
+const links = [
+  { id: 'home', label: 'Homepage', href: 'https://www.shs.com.vn/', icon: <Home /> },
+  { id: 'ChartCandlestick', label: 'Sboard', href: 'https://sboard.shs.com.vn/', icon: <ChartCandlestick /> },
+  { id: 'Trading', label: 'Trading_System', href: 'https://qr.me-qr.com/KIuncOL4', icon: <ChartNoAxesCombined /> },
+  { id: 'Utilities', label: 'Utilities', href: 'https://zeusato.github.io/Z-Utilities/', icon: <LayoutGrid /> }
+];
 
 export default function BannerCarousel() {
-  const [idx, setIdx] = useState(0)
+  const [idx, setIdx] = useState(0);
 
   const slides: (Slide & { imgUrl: string })[] = useMemo(() => {
-    const list = (slidesJson as Slide[]).map(s => ({
+    return (slidesJson as Slide[]).map((s) => ({
       ...s,
       imgUrl: new URL(`../assets/${s.img}`, import.meta.url).href,
-    }))
-    return list
-  }, [])
+    }));
+  }, []);
 
   useEffect(() => {
-    const t = setInterval(() => setIdx(v => (v + 1) % slides.length), 5000)
-    return () => clearInterval(t)
-  }, [slides.length])
+    const t = setInterval(() => setIdx((v) => (v + 1) % slides.length), 5000);
+    return () => clearInterval(t);
+  }, [slides.length]);
 
-  if (slides.length === 0) return null
-  const cur = slides[idx]
-  const isExternal = cur.link.startsWith('http')
+  if (slides.length === 0) return null;
+  const cur = slides[idx];
+  const isExternal = cur.link.startsWith("http");
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl
-                h-[clamp(160px,30vw,200px)]">
-      {/* Ảnh nền phủ toàn khung, được mask để mờ dần về bên trái */}
+    <div
+      className="relative w-full overflow-hidden rounded-2xl"
+      style={
+        {
+          // ---- T U N E Ở ĐÂY ----
+          // chiều cao banner, kích thước notch + dock, khoảng hở
+          // (để giống hình: dock nhỏ hơn cutout 8px, tạo khe đều)
+          "--banner-h": "200px",
+          "--cut-w": "40%",   // chiều rộng phần bị khoét
+          "--cut-h": "60px",  // chiều cao phần bị khoét
+          "--gap": "8px",     // khe hở giữa cutout và dock
+          "--dock-h": "48px", // chiều cao dock
+        } as React.CSSProperties
+      }
+    >
+      {/* Ảnh nền */}
       <img
         src={cur.imgUrl}
         alt={cur.title}
-        className="absolute right-0 top-1/2 -translate-y-1/2 w-auto h-auto max-h-full max-w-none block z-0"
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-auto h-auto max-h-full max-w-none z-0"
         style={{
-          // ảnh rõ ở bên phải (đen = opaque), mờ dần về bên trái (transparent)
-          WebkitMaskImage: 'linear-gradient(to left, black 60%, transparent 92%)',
-          maskImage: 'linear-gradient(to left, black 50%, transparent 92%)',
+          height: "var(--banner-h)",
+          WebkitMaskImage:
+            "linear-gradient(to left, black 60%, transparent 92%)",
+          maskImage: "linear-gradient(to left, black 50%, transparent 92%)",
         }}
       />
 
-      {/* Panel trái: nền cam gradient đậm -> nhạt -> trong suốt để blend với ảnh */}
+      {/* Panel chữ bên trái */}
       <div
         className="absolute inset-y-0 left-0 w-[60%] min-w-[280px]"
         style={{
           background:
-            'linear-gradient(90deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 45%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0) 100%)',
+            "linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.4) 45%, rgba(0,0,0,.3) 70%, rgba(0,0,0,0) 100%)",
+          height: "var(--banner-h)",
         }}
       />
-
-      {/* Overlay tối rất nhẹ toàn khung để chữ dễ đọc (không glow) */}
-      {/* <div className="absolute inset-0 bg-black/15" /> */}
-
-      {/* Nội dung (nằm trong panel trái) */}
       <a
         href={cur.link}
-        target={isExternal ? '_blank' : undefined}
-        rel={isExternal ? 'noopener noreferrer' : undefined}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
         className="absolute inset-y-0 left-0 w-[46%] min-w-[280px] p-5 flex flex-col justify-center text-left focus:outline-none"
+        style={{ height: "var(--banner-h)" }}
       >
-        <h3 className="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight text-[#4ade80]">
-          {cur.title}
-        </h3>
-        <p className="text-[#4ade80] mt-1">{cur.desc}</p>        
+        <div className="flex flex-col h-full">
+          <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#4ade80]">
+            {cur.title}
+          </h3>
+          <p className="text-[#4ade80] mt-1">{cur.desc}</p>
+          <div className="mt-auto"> 
+            {/* chỗ để nút hoặc nội dung muốn đẩy xuống cuối */}
+          </div>
+        </div>
       </a>
 
-      {/* Dots điều hướng */}
+      {/* Dots */}
       <div className="absolute bottom-3 right-5 flex gap-2">
         {slides.map((s, i) => (
           <button
             key={s.id}
             onClick={() => setIdx(i)}
-            className={`h-2.5 rounded-full transition-all ${i === idx ? 'w-6 bg-brand' : 'w-2.5 bg-white/40'}`}
+            className={`h-2.5 rounded-full transition-all ${
+              i === idx ? "w-6 bg-brand" : "w-2.5 bg-white/40"
+            }`}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
       </div>
 
-      {/* 1) Lớp cut-out: tạo cảm giác banner bị khoét, bo tròn phần còn lại */}
+      {/* ======= EFFECT “KHOÉT GÓC” + DOCK ======= */}
+
+      {/* 1) CUT-OUT: khối cùng màu nền trang để “cắt” banner, bo tròn mép còn lại */}
       <div
-        className="absolute left-3 bottom-3 z-10
-                  w-[min(60%,720px)] h-14
-                  rounded-2xl bg-background pointer-events-none"
+        aria-hidden
+        className="absolute z-10 rounded-2xl pointer-events-none"
+        style={{
+          left: "0px",
+          bottom: "0px",
+          width: "var(--cut-w)",
+          height: "var(--cut-h)",
+          background: "var(--tw-prose-bg, #111214)", // đổi cho khớp theme nền
+          boxShadow:
+            "inset 0 0 0 1px rgba(255,255,255,0.06), 0 2px 12px rgba(0,0,0,0.35)",
+        }}
       />
 
-      {/* 2) Dock thật: thanh menu nổi, bo tròn bốn góc */}
+      {/* 2) DOCK: thanh menu thật, bo tròn 4 góc, nổi tách rời */}
       <div
-        className="absolute left-0 bottom-0 mt-auto  z-20
-                  w-[min(58%,700px)] h-12
-                  rounded-2xl bg-white/5 backdrop-blur
-                  ring-1 ring-white/15
-                  shadow-[0_18px_40px_-20px_rgba(0,0,0,0.8)]
-                  flex items-center gap-3 px-4"
+        className="absolute z-20 rounded-2xl flex items-center gap-3 bg-white/8 backdrop-blur shadow-[0_16px_36px_-18px_rgba(0,0,0,0.8)]"
+        style={{
+          left: `calc(0px + var(--gap))`,
+          bottom: `calc(0px + var(--gap))`,
+          width: `calc(var(--cut-w) - var(--gap)*2)`,
+          height: "var(--dock-h)",
+        }}
       >
-
-        {/* thêm các nút khác tại đây */}
+        {/* ví dụ 1 nút */}
+      <DynamicNavigation 
+        links={links}      
+        glowIntensity={5}
+        onLinkClick={(id) => console.log("Clicked:", id)}
+        />
+        {/* thêm các nút khác ở đây */}
       </div>
+
+      {/* Container height */}
+      <div style={{ height: "var(--banner-h)" }} />
     </div>
-  )
+  );
 }

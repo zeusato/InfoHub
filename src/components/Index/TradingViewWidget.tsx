@@ -115,11 +115,6 @@ function TradingViewWidget({
         className="tradingview-widget-container__widget w-full"
         style={{ height: h }}
       />
-      {/* <div className="tradingview-widget-copyright">
-        <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-          <span className="blue-text">Ticker tape by TradingView</span>
-        </a>
-      </div> */}
     </div>
   );
 }

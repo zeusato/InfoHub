@@ -57,7 +57,7 @@ export default function Intro() {
               className="mt-10 inline-flex items-center gap-2 rounded-2xl px-8 py-4 border border-brand/60 bg-brand/50 text-white font-semibold transition
                         hover:shadow-neon hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-brand/60 brand-glow"
             >
-              Vào màn thao tác
+              Bắt đầu
             </button>
           {/* </Link> */}
         </main>

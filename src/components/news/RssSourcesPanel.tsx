@@ -38,40 +38,36 @@ export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
                 key={key}
                 onClick={() => onSelect(key)}
                 className={cn(
-                  "group relative w-full h-full rounded-2xl overflow-hidden text-left",
+                  "group/card relative w-full h-full rounded-2xl overflow-hidden text-left",
                   "transition-transform duration-300 hover:-translate-y-[2px] focus:outline-none",
                   "focus-visible:ring-2 focus-visible:ring-white/30"
                 )}
                 title={`Mở danh sách ${cfg.label}`}
-                // tránh flicker: KHÔNG dùng mask composite
               >
-                {/* Overlay gradient BORDER (không mask, show nhờ margin 1px của content) */}
+                {/* Overlay gradient BORDER */}
                 <div
                   aria-hidden
-                  className="absolute inset-0 z-0 opacity-0 group-hover:opacity-60 transition-opacity"
+                  className="absolute inset-0 z-0 opacity-0 group-hover/card:opacity-60 transition-opacity"
                   style={{
                     background: `conic-gradient(from 0deg at 50% 50%, ${from}, ${to}, ${from})`,
                   }}
                 />
 
-                {/* Content card (đẩy cách viền 1px để lộ gradient) */}
+                {/* Content card */}
                 <div className="relative z-10 m-[1px] rounded-[1rem] border border-white/10 bg-white/[0.035] backdrop-blur-sm h-full">
-                  {/* blob ánh sáng bên phải (không che viền vì ở dưới content) */}
+                  {/* blob ánh sáng bên phải */}
                   <div
                     aria-hidden
-                    className="absolute -right-10 top-1/2 -translate-y-1/2 w-40 h-40 rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"
+                    className="absolute -right-10 top-1/2 -translate-y-1/2 w-40 h-40 rounded-full blur-2xl opacity-20 group-hover/card:opacity-40 transition-opacity"
                     style={{ background: `radial-gradient(closest-side, ${to}, transparent 70%)` }}
                   />
 
                   <div className="relative flex items-center justify-between gap-4 p-4 h-full">
                     <div className="min-w-0 pr-2">
-                      {/* <div className="text-[10px] uppercase tracking-wider text-white/55 mb-1">
-                        {cfg.label}
-                      </div> */}
                       <ChevronRight
-                          className="block md:hidden size-4 translate-x-0 group-hover:translate-x-[2px] transition-transform"
-                          aria-hidden="true"
-                        />
+                        className="block md:hidden size-4 translate-x-0 group-hover/card:translate-x-[2px] transition-transform"
+                        aria-hidden="true"
+                      />
                       <div className="hidden md:block text-[1.075rem] sm:hidden font-semibold truncate">
                         {cfg.label} News
                       </div>
@@ -87,7 +83,7 @@ export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
 
                       <div className="sm:hidden grid place-items-center w-8 h-8 rounded-full border border-white/15 hover:border-white/15 bg-white/[0.06]">
                         <ChevronRight
-                          className="size-4 translate-x-0 group-hover:translate-x-[2px] transition-transform"
+                          className="size-4 translate-x-0 group-hover/card:translate-x-[2px] transition-transform"
                           aria-hidden="true"
                         />
                       </div>

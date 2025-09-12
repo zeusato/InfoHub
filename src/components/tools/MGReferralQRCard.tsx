@@ -35,7 +35,7 @@ export default function MGReferralQRCard() {
   };
 
   return (
-    <div className="p-3">
+    <div className="p-3 w-full">
       <div className="grid grid-cols-2 grid-cols-[2fr_1fr] items-center">
         {/* Bên trái: label + input + button */}
         <div className="flex flex-col gap-3 justify-left ml-3 item-center">
