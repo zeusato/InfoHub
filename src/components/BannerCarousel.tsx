@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import slidesJson from "@/data/slides.json";
 import { DynamicNavigation } from "@/components/lightswind/dynamic-navigation";
-import { Home, ChartCandlestick, ChartNoAxesCombined, LayoutGrid} from "lucide-react";
+import { Home, CandlestickChart, BarChart, LayoutGrid} from "lucide-react";
 
 type Slide = {
   id: string;
@@ -14,8 +14,8 @@ type Slide = {
 
 const links = [
   { id: 'home', label: 'Homepage', href: 'https://www.shs.com.vn/', icon: <Home /> },
-  { id: 'ChartCandlestick', label: 'Sboard', href: 'https://sboard.shs.com.vn/', icon: <ChartCandlestick /> },
-  { id: 'Trading', label: 'Trading_System', href: 'https://qr.me-qr.com/KIuncOL4', icon: <ChartNoAxesCombined /> },
+  { id: 'ChartCandlestick', label: 'Sboard', href: 'https://sboard.shs.com.vn/', icon: <CandlestickChart /> },
+  { id: 'Trading', label: 'Trading_System', href: 'https://qr.me-qr.com/KIuncOL4', icon: <BarChart /> },
   { id: 'Utilities', label: 'Utilities', href: 'https://zeusato.github.io/Z-Utilities/', icon: <LayoutGrid /> }
 ];
 
@@ -47,7 +47,7 @@ export default function BannerCarousel() {
           // chiều cao banner, kích thước notch + dock, khoảng hở
           // (để giống hình: dock nhỏ hơn cutout 8px, tạo khe đều)
           "--banner-h": "200px",
-          "--cut-w": "40%",   // chiều rộng phần bị khoét
+          "--cut-w": "50%",   // chiều rộng phần bị khoét
           "--cut-h": "60px",  // chiều cao phần bị khoét
           "--gap": "8px",     // khe hở giữa cutout và dock
           "--dock-h": "48px", // chiều cao dock
@@ -127,7 +127,7 @@ export default function BannerCarousel() {
 
       {/* 2) DOCK: thanh menu thật, bo tròn 4 góc, nổi tách rời */}
       <div
-        className="absolute z-20 rounded-2xl flex items-center gap-3 bg-white/8 backdrop-blur shadow-[0_16px_36px_-18px_rgba(0,0,0,0.8)]"
+        className="absolute z-20 rounded-2xl flex items-center gap-5 bg-white/8 backdrop-blur shadow-[0_16px_36px_-18px_rgba(0,0,0,0.8)]"
         style={{
           left: `calc(0px + var(--gap))`,
           bottom: `calc(0px + var(--gap))`,

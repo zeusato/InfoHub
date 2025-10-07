@@ -19,22 +19,23 @@ export const MENU: MenuNode[] = [
     children: [
       {
         id: 'release-notes',
-        label: 'Release Notes',
+        label: 'Phân phối IPO',
         children: [
           {
-            id: 'rn-2025-09',
-            label: 'Bản phát hành 09/2025',
-            path: 'news/release-notes/2025-09',
-          },
-          {
-            id: 'rn-2025-08',
-            label: 'Bản phát hành 08/2025',
-            path: 'news/release-notes/2025-08',
-          },
-          {
-            id: 'test2',
-            label: 'Test2',
-            path: 'tin-tuc-san-pham/release-notes/e2',
+            id: 'phan-phoi-ipo-vpbs',
+            label: 'Phân phối IPO - VPBS',
+            children: [
+              {
+                id: 'Huong-dan-dang-ky',
+                label: 'HD đăng ký CTV',
+                path: 'tin-tuc-san-pham/phan-phoi-ipo/tin-tuc-san-pham-phan-phoi-ipo-2025-10',
+              },
+              {
+                id: 'huong-dan-ang-ky-at-mua',
+                label: 'HD Đăng ký đặt mua',
+                path: 'tin-tuc-san-pham/phan-phoi-ipo/phan-phoi-ipo-vpbs/tin-tuc-san-pham-phan-phoi-ipo-phan-phoi-ipo-vpbs-2025-10',
+              },
+            ],
           },
         ],
       },
@@ -62,12 +63,18 @@ export const MENU: MenuNode[] = [
     children: [
       {
         id: 'onboarding',
-        label: 'Bắt đầu nhanh',
+        label: 'SHSmart (MTS 2.0)',
         children: [
           {
-            id: 'quick-start',
-            label: 'Quick Start',
-            path: 'guides/quick-start',
+            id: 'tai-khoan',
+            label: 'Tài khoản',
+            children: [
+              {
+                id: 'hd-mo-tk-bang-ekyc',
+                label: 'HD Mở TK bằng eKYC',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/huong-dan-su-dung-shsmart-mts-2-0-tai-khoan-2025-10',
+              },
+            ],
           },
         ],
       },
