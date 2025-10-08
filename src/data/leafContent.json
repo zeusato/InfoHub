@@ -92,5 +92,325 @@
     "subtitle": "Phát hành: 11/05/2025",
     "faqJsonPath": "faqs/faq-test.json",
     "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-xxxx để được hỗ trợ."
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/huong-dan-su-dung-shsmart-mts-2-0-tai-khoan-2025-10": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Mở TK bằng eKYC",
+    "subtitle": "",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD dang ky TK bang eKYC (3).jpg",
+      "hdsd/HD dang ky TK bang eKYC (2).jpg",
+      "hdsd/HD dang ky TK bang eKYC (1).jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/hd-dang-ky-smart-otp": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Đăng ký Smart OTP",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển Sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ",
+    "gallery": [
+      "hdsd/HD Dang ky Smart OTP.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/dang-nhap": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Đăng nhập",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Dang nhap.jpg"
+    ]
+  },
+  "tin-tuc-san-pham/phan-phoi-ipo/phan-phoi-ipo-vpbs/faq-ipo-vpbs": {
+    "renderType": "template",
+    "templateKey": "FAQAccordion",
+    "title": "Bộ câu hỏi về phân phối cổ phiếu IPO VPBS",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "faqJsonPath": "faqs/faq-VPBS.json",
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ."
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/hd-lay-smart-otp": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Lấy Smart OTP",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Lay Smart OTP.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/hd-thay-doi-thong-tin-ca-nhan": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Thay đổi thông tin cá nhân",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Thay doi thong tin ca nhan.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/nop-tien": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn nộp tiền",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Nop tien.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/rut-tien": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Rút tiền",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Rut tien.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/ung-tien": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Tạm ứng tiền bán chứng khoán",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phá triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Ung tien.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/quen-mat-khau": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Lấy lại mật khẩu",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Quen mat khau.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/chuyen-tien-noi-bo": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Chuyển tiền nội bộ (trong tài khoản)",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Chuyen tien.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/nop-ky-quy": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn nộp tiền ký quỹ (lên VSDC)",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Nop ky quy.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/rut-ky-quy": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn rút tiền ký quỹ phái sinh",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Rut ky quy.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/them-tai-khoan-ngan-hang": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Thêm tài khoản ngân hàng",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Them tai khoan ngan hang.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/hd-chuyen-chung-khoan": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Chuyển chứng khoán nội bộ (trong tài khoản)",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Chuyen chung khoan.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tien-ich-mo-rong/xac-nhan-lenh": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Xác nhận lệnh",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Xac nhan lenh.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/quan-ly-no-vay/dang-ky-huy-thu-no-tu-dong": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Đăng ký/Hủy đăng ký thu nợ tự động",
+    "subtitle": "",
+    "bannerImg": "",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "Tính năng mới cho phép Khách hàng lựa chọn việc đăng ký/hủy đăng ký tiến trình thu nợ tự động vào cuối ngày đối với phần tiền dư trên tiểu khoản có nợ của mình."
+      },
+      {
+        "type": "paragraph",
+        "text": "Tuy nhiên việc hủy đăng ký này không có hiệu lực khi tiểu khoản thuộc một trong 04 trạng thái sau:"
+      },
+      {
+        "type": "paragraph",
+        "text": "1: Tồn tại nợ quá hạn cần thu hồi"
+      },
+      {
+        "type": "paragraph",
+        "text": "2: Vi phạm tỷ lệ giải chấp"
+      },
+      {
+        "type": "paragraph",
+        "text": "3: Thu hồi nợ theo chính sách của SHS tùy thời kỳ"
+      },
+      {
+        "type": "paragraph",
+        "text": "4: Thu hồi theo yêu cầu của cơ quan nhà nước"
+      }
+    ],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD DK-Huy DK Thu no tu dong.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/quan-ly-no-vay/tra-no-chu-dong": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Trả nợ chủ động",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "Tính năng mới cho phép khách hàng chủ động thực hiện việc trả nợ vay trong phiên với 02 hình thức thu nợ"
+      },
+      {
+        "type": "paragraph",
+        "text": "1: Thu theo món vay"
+      },
+      {
+        "type": "paragraph",
+        "text": "2: Thu theo số tiền"
+      },
+      {
+        "type": "paragraph",
+        "text": "----"
+      },
+      {
+        "type": "paragraph",
+        "text": "Các món vay quá hạn sẽ buộc phải tất toán trước khi khách hàng trả nợ các món vay chưa đến hạn"
+      }
+    ],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Tra no chu dong.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/quan-ly-no-vay/chi-tiet-no-vay": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Tra cứu chi tiết nợ vay",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Xem chi tiet no vay.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/dang-ky-dich-vu/dang-ky-dv-margin-phai-sinh": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Đăng ký dịch vụ Ký quỹ và Phái sinh",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD DK Ky quy - Phai sinh.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/dang-ky-dich-vu/dang-ky-san-pham-margin-tplus": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Đăng ký sản phẩm Margin TPLUS",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD DK Margin TPLUS.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/dang-ky-dich-vu/huy-doi-goi-margin-tplus": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Hủy/Đổi gói sản phẩm Margin TPLUS",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Huy-Doi goi Margin TPLUS.jpg"
+    ]
+  },
+  "huong-dan-su-dung/shsmart-mts-2-0/tien-ich-mo-rong/tao-bang-gia-tuy-chon": {
+    "renderType": "template",
+    "templateKey": "FeatureGuide",
+    "title": "Hướng dẫn Tạo bảng giá tùy chọn (watchlist)",
+    "subtitle": "Phát hành: 10/10/2025 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "",
+    "content": [],
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": [
+      "hdsd/HD Tao bang gia tuy chon.jpg"
+    ]
   }
 }

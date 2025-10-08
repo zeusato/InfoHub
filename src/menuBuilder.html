@@ -112,7 +112,11 @@
   let fileHandle = null;
   let menu = []; // MenuNode[]
   let expanded = new Set(); // for UI expand/collapse
-  let pendingAdd = null; // { parentId, level: 'mid'|'submid'|'leaf' }
+  // pendingAdd holds info for adding new nodes. For leaf we also store a
+  // `prefix` representing the ancestor slug path (e.g. "top/mid" or
+  // "top/mid/sub"). This prefix is used to build the full slug without
+  // duplicating the ancestor segments.
+  let pendingAdd = null; // { parentId, level: 'mid'|'submid'|'leaf', prefix?: string }
 
   const byId = new Map();
 
@@ -130,9 +134,18 @@
   const fileLabel = $('#fileLabel');
 
   // Helpers
-  const slug = (s)=> s.toLowerCase().trim()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  // Convert a label to a URL-friendly slug. This function lowers the case,
+  // transliterates Vietnamese characters (including "đ" → "d") and removes
+  // diacritics before replacing non-alphanumeric characters with hyphens.
+  const slug = (s) => s.toLowerCase().trim()
+    // replace the special Vietnamese letter đ with d
+    .replace(/đ/g, 'd')
+    // decompose combined accents and remove the accent marks
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    // replace any non a-z or 0-9 with hyphen
+    .replace(/[^a-z0-9]+/g, '-')
+    // remove leading or trailing hyphens
+    .replace(/(^-|-$)/g, '');
 
   const deepClone = (obj)=> JSON.parse(JSON.stringify(obj));
 
@@ -160,7 +173,8 @@
       const [h] = await window.showOpenFilePicker({
         types: [{ description:'TypeScript', accept:{ 'text/typescript':['.ts'] } }],
         excludeAcceptAllOption: false,
-        multiple: false
+        multiple: false,
+        startIn: fileHandle || undefined
       });
       fileHandle = h;
       fileLabel.textContent = h.name;
@@ -256,6 +270,9 @@
     }
 
     function composeLeafPath(parentMidId, slugPart){
+    // If slugPart already contains a slash, assume it is a full path and
+    // return it unchanged. This avoids duplicating ancestor segments.
+    if (slugPart && slugPart.includes('/')) return slugPart;
     // Build full path from ancestor labels (top→...→parent) plus slugified slugPart
     const slugPartSafe = slug(slugPart || '');
     const parts = [];
@@ -348,18 +365,18 @@
     addLeafBtn.className = 'btn small';
     addLeafBtn.textContent = '＋ Leaf';
     addLeafBtn.onclick = ()=>{
-      pendingAdd = { parentId: mid.id, level:'leaf' };
-      // build slug suggestion from ancestor slugs including this mid
+      // Build a prefix from ancestor slugs including this mid.
       const anc = [];
       let node = mid;
-      while(node){
+      while (node) {
         anc.unshift(slug(node.label));
         node = findParent(menu, node.id);
       }
-      const dt = new Date();
-      const ym = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
-      const defaultSlug = `${anc.join('/')}/${ym}`;
-      openForm({label:'', slug: defaultSlug}, 'Add Leaf under: '+mid.label);
+      const prefix = anc.join('/');
+      pendingAdd = { parentId: mid.id, level:'leaf', prefix };
+      // Prefill the slug field with the prefix. The user’s label will append
+      // the final segment automatically as they type.
+      openForm({ label:'', slug: prefix }, 'Add Leaf under: ' + mid.label);
     };
 
     // button to add a sub-mid (third-level) under this mid-level
@@ -511,18 +528,16 @@
     addLeafBtn.className = 'btn small';
     addLeafBtn.textContent = '＋ Leaf';
     addLeafBtn.onclick = () => {
-      pendingAdd = { parentId: sub.id, level: 'leaf' };
-      // gather ancestor slugs including this sub
+      // Build a prefix from ancestor slugs including this sub-mid.
       const anc = [];
       let node = sub;
-      while(node){
+      while(node) {
         anc.unshift(slug(node.label));
         node = findParent(menu, node.id);
       }
-      const dt = new Date();
-      const ym = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
-      const defaultSlug = `${anc.join('/')}/${ym}`;
-      openForm({label:'', slug: defaultSlug}, 'Add Leaf under: ' + sub.label);
+      const prefix = anc.join('/');
+      pendingAdd = { parentId: sub.id, level: 'leaf', prefix };
+      openForm({ label:'', slug: prefix }, 'Add Leaf under: ' + sub.label);
       ensureExpanded(sub.id);
     };
 
@@ -603,10 +618,9 @@
     fSlug.value  = init.slug || '';
     idPreview.textContent = fLabel.value ? slug(fLabel.value) : '(auto id)';
     slugRow.style.display = (pendingAdd && pendingAdd.level==='leaf') ? 'flex' : 'none';
-    // preview path full nếu đang thêm leaf
+    // Preview path: when adding a leaf we use the slug field directly as the full path.
     if (pendingAdd && pendingAdd.level==='leaf') {
-        const full = composeLeafPath(pendingAdd.parentId, fSlug.value || fLabel.value);
-        if (pathPreview) pathPreview.textContent = full;
+        if (pathPreview) pathPreview.textContent = fSlug.value || '';
     } else {
         if (pathPreview) pathPreview.textContent = '';
     }
@@ -622,16 +636,22 @@
   fLabel.addEventListener('input', ()=>{
     idPreview.textContent = fLabel.value ? slug(fLabel.value) : '(auto id)';
     if (pendingAdd && pendingAdd.level==='leaf') {
-        if (!fSlug.value) fSlug.value = slug(fLabel.value);
-        const full = composeLeafPath(pendingAdd.parentId, fSlug.value || fLabel.value);
-        if (pathPreview) pathPreview.textContent = full;
+        // Automatically build the slug using the stored prefix and the slugified label.
+        const leafSlug = slug(fLabel.value);
+        if (pendingAdd.prefix) {
+          fSlug.value = pendingAdd.prefix + (leafSlug ? '/' + leafSlug : '');
+        } else {
+          fSlug.value = leafSlug;
+        }
+        // Display the full path preview equal to the slug value.
+        if (pathPreview) pathPreview.textContent = fSlug.value || '';
     }
   });
 
    fSlug.addEventListener('input', ()=>{
    if (pendingAdd && pendingAdd.level==='leaf') {
-     const full = composeLeafPath(pendingAdd.parentId, fSlug.value || fLabel.value);
-     if (pathPreview) pathPreview.textContent = full;
+     // When user edits the slug manually, treat it as the full path directly.
+     if (pathPreview) pathPreview.textContent = fSlug.value || '';
    }
  });
   $('#applyAddBtn').onclick = ()=>{
@@ -658,7 +678,8 @@
       const parent = byId.get(pendingAdd.parentId);
       const slugPart = (fSlug.value || fLabel.value || '').trim();
       if (!slugPart) return alert('Slug bắt buộc cho leaf.');
-      const path = composeLeafPath(pendingAdd.parentId, slugPart);
+      // Use the slugPart directly as the full path (prefix + leaf slug).
+      const path = slugPart;
       parent.children = parent.children || [];
       parent.children.push({ id, label, path });
       ensureExpanded(parent.id);

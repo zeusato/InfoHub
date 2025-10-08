@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <title>Update Content (leafContent.json + menuData.ts)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Quill editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark; --brand:#ff7a18;}
+    *{box-sizing:border-box}
+    body{margin:0;background:#0b0b0d;color:#e5e7eb;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .bar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .row{display:flex;gap:8px;align-items:center}
+    .col{display:flex;flex-direction:column;gap:8px}
+    .btn{border:1px solid #ffffff22;background:#ffffff12;color:#e5e7eb;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .btn:hover{border-color:#ffffff55;background:#ffffff1c}
+    .btn.brand{border-color:#ff7a1855;background:#ff7a181a;color:#ffd6c2}
+    .btn.brand:hover{background:#ff7a1828}
+    .btn.green{border-color:#10b98166;background:#10b98126}
+    .btn.green:hover{background:#10b9813a}
+    .btn.yellow{border-color:#f59e0b66;background:#f59e0b26}
+    .btn.yellow:hover{background:#f59e0b3a}
+    .btn.danger{border-color:#ef444466;background:#ef444426}
+    .btn.small{padding:6px 10px;font-size:13px}
+    .muted{color:#9ca3af;font-size:13px}
+    .glass{background:#ffffff08;border:1px solid #ffffff1a;border-radius:14px}
+    .panel{padding:12px}
+    .tree{display:grid;grid-template-columns:1fr 420px;gap:16px}
+    .lvlTop>.item{background:linear-gradient(180deg,#ffffff16,#ffffff08);padding:10px;border-radius:12px;border:1px solid #ffffff1a}
+    .lvlMid>.item{background:#ffffff0a;padding:8px;border-radius:10px;border:1px dashed #ffffff2a}
+    .lvlLeaf .item{background:#ffffff06;padding:6px;border-radius:8px;border:1px solid #ffffff14}
+    /* style for sub-mid level (3rd level) */
+    .lvlSub > .item{background:#ffffff06;padding:6px;border-radius:8px;border:1px dashed #ffffff22}
+    .tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #ffffff22;background:#ffffff12}
+    .tag.top{border-color:#ff7a1822;background:#ff7a180d;color:#ffd6c2}
+    .tag.mid{border-color:#10b98144;background:#10b9811a}
+    .tag.leaf{border-color:#22d3ee44;background:#22d3ee1a}
+    /* tag for sub-mid level */
+    .tag.sub{border-color:#3b82f644;background:#3b82f61a}
+    .grow{flex:1}
+    .sep{height:1px;background:#ffffff12;margin:8px 0}
+    input,select,textarea{background:#0e0f12;border:1px solid #ffffff22;border-radius:10px;color:#e5e7eb;padding:8px 10px}
+    input:focus,select:focus,textarea:focus{outline:2px solid #ff7a1833;border-color:#ff7a1866}
+    .small{font-size:12px}
+    .code{white-space:pre-wrap;background:#0e0f12;border:1px solid #ffffff22;padding:10px;border-radius:10px}
+    .label{font-size:12px;color:#9ca3af}
+    .pill{font-size:12px;padding:2px 8px;border:1px solid #ffffff22;border-radius:999px;background:#ffffff12}
+    .warn{color:#fbbf24}
+    img.preview{max-width:100%;border-radius:10px;border:1px solid #ffffff22}
+    .readonly{opacity:.8}
+    .note{font-size:12px;color:#9ca3af}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <div class="row" style="gap:12px">
+      <button id="openJsonBtn" class="btn brand">Open leafContent.json</button>
+      <button id="openMenuBtn" class="btn">Open menuData.ts</button>
+      <button id="pickAssetsBtn" class="btn">Pick assets folder</button>
+      <span id="fileLabels" class="muted">No files</span>
+    </div>
+    <div class="row muted">
+      <span>Leaf chưa có content → <span class="pill" style="border-color:#10b98166;background:#10b98114">Thêm nội dung</span>.
+        Đã có → <span class="pill" style="border-color:#f59e0b66;background:#f59e0b14">Chỉnh sửa</span>.</span>
+    </div>
+  </div>
+
+  <div id="status" class="muted"></div>
+
+  <div class="tree">
+    <!-- Menu -->
+    <div class="glass panel">
+      <div class="row" style="justify-content:space-between">
+        <h3>Menu</h3>
+        <button id="refreshBtn" class="btn small">Refresh</button>
+      </div>
+      <div id="menuRoot" class="col"></div>
+    </div>
+
+    <!-- Editor -->
+    <div class="glass panel">
+      <div class="row" style="justify-content:space-between">
+        <h3>Content Editor</h3>
+        <div class="row">
+          <button id="saveBtn" class="btn brand">Save</button>
+          <button id="cancelBtn" class="btn">Cancel</button>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="row">
+          <div class="col" style="flex:1">
+            <label class="label">Path (key, theo menu)</label>
+            <input id="fPath" class="readonly" readonly placeholder="auto from selected leaf"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col" style="flex:1">
+            <label class="label">Render Type</label>
+            <select id="fRenderType">
+              <option value="template">template</option>
+              <option value="component">component</option>
+            </select>
+          </div>
+          <div class="col" style="flex:1">
+            <label class="label">Template Key</label>
+            <select id="fTemplateKey">
+              <!-- có thể thêm sau -->
+              <option value="ProductNews">ProductNews</option>
+              <option value="FeatureGuide">FeatureGuide</option>
+              <option value="FAQAccordion">FAQAccordion</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col">
+          <label class="label">Title</label>
+          <input id="fTitle" placeholder="Nhập tiêu đề"/>
+        </div>
+
+        <div class="row">
+          <div class="col" style="flex:1">
+            <label class="label">Ngày phát hành</label>
+            <input id="fDate" type="date"/>
+          </div>
+          <div class="col" style="flex:1">
+            <label class="label">Bộ phận phát hành (tùy chọn)</label>
+            <input id="fDept" placeholder="Phát triển sản phẩm" value="Phát triển sản phẩm"/>
+          </div>
+        </div>
+        <div class="row small">
+          <span>Preview subtitle:</span>
+          <span id="subtitlePreview" class="muted"></span>
+        </div>
+
+        <div class="col">
+          <label class="label">Banner Image</label>
+          <div class="row">
+            <button id="pickImageBtn" class="btn small">Chọn ảnh nguồn</button>
+            <input id="destFileName" placeholder="Tên file lưu trong assets (vd: sh69-banner.jpg)" style="flex:1"/>
+          </div>
+          <div class="row small">
+            <span>Assets folder:</span>
+            <span id="assetsStatus" class="muted">Chưa chọn</span>
+          </div>
+          <img id="imgPreview" class="preview" style="display:none;margin-top:6px"/>
+        
+        <div class="col">
+          <label class="label">Gallery ảnh (HDSD)</label>
+          <div class="row">
+            <button id="pickGalleryBtn" class="btn small">Chọn ảnh (multi)</button>
+            <input id="galleryPrefix" placeholder="Folder/Prefix (vd: hdsd/hd-)" style="flex:1" />
+          </div>
+          <div id="galleryList" class="col small"></div>
+          <div class="note small muted">Ảnh A4 ngang, sẽ tự scale cho vừa khung. Có thể reorder, xoá, đổi tên file trước khi lưu.</div>
+        </div>
+</div>
+
+        <div class="col">
+          <label class="label">Content (Quill)</label>
+          <div id="quill" style="height:220px;background:#0e0f12;border:1px solid #ffffff22;border-radius:10px"></div>
+        </div>
+
+        <!-- FAQ fields -->
+        <div id="faqFields" class="col" style="display:none; margin-top:8px">
+          <label class="label">FAQ JSON path</label>
+          <input id="fFaqPath" placeholder="faqs/faq-giao-dich.json" />
+          <div class="note">Gợi ý: lưu file JSON tại <code>public/faqs/</code> rồi nhập đường dẫn tương đối (không có dấu / ở đầu).</div>
+        </div>
+
+        <div class="col">
+          <label class="label">Ending Note</label>
+          <input id="fEnding" placeholder="Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ." />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+<script>
+(() => {
+  // --------- State ---------
+  let jsonHandle = null;      // FileSystemFileHandle for leafContent.json
+  let menuHandle = null;      // FileSystemFileHandle for menuData.ts
+  let assetsDirHandle = null; // FileSystemDirectoryHandle (assets)
+  let imageFile = null;       // chosen banner image File
+  let galleryTemp = [];        // [{ file?:File, destName:string, preview:string }]
+  let contentMap = {};        // parsed leafContent.json
+  let menu = [];              // parsed MENU (from menuData.ts)
+  let expanded = new Set();   // expand UI
+  let currentPath = '';       // currently editing leaf path
+
+  const $ = (s) => document.querySelector(s);
+
+  // refs
+  const menuRoot = $('#menuRoot');
+  const status = $('#status');
+  const fileLabels = $('#fileLabels');
+
+  const fPath = $('#fPath');
+  const fRenderType = $('#fRenderType');
+  const fTemplateKey = $('#fTemplateKey');
+  const fTitle = $('#fTitle');
+  const fDate = $('#fDate');
+  const fDept = $('#fDept');
+  const subtitlePreview = $('#subtitlePreview');
+  const pickImageBtn = $('#pickImageBtn');
+  const destFileName = $('#destFileName');
+  const imgPreview = $('#imgPreview');
+  const pickGalleryBtn = $('#pickGalleryBtn');
+  const galleryPrefix = $('#galleryPrefix');
+  const galleryList = $('#galleryList');
+  const fEnding = $('#fEnding');
+
+  // Quill init
+  const quill = new Quill('#quill', {
+    theme: 'snow',
+    placeholder: 'Paste nội dung từ Word hoặc gõ trực tiếp...',
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'clean']
+      ]
+    }
+  });
+
+  // --------- Helpers ---------
+  const setStatus = (msg) => status.textContent = msg || '';
+
+  const rebuildIndex = () => {
+    // Just ensure expanded top-level open by default
+    expanded = new Set(menu.map(n => n.id));
+  };
+
+  // refs mới
+  const faqFields = document.getElementById('faqFields');
+  const fFaqPath  = document.getElementById('fFaqPath');
+
+  // nhóm các block nên ẩn khi chọn FAQ
+  const bannerBlock = pickImageBtn.closest('.col');          // block Banner Image
+  const galleryBlock = pickGalleryBtn.closest('.col');       // block Gallery
+  const quillBlock = document.getElementById('quill').closest('.col'); // block Quill editor
+
+  function toggleFieldsByTemplate() {
+    const key = fTemplateKey.value;
+
+    const isFAQ = key === 'FAQAccordion';
+    faqFields.style.display  = isFAQ ? 'flex' : 'none';
+
+    // FAQ không dùng các khối sau:
+    bannerBlock.style.display = isFAQ ? 'none' : 'flex';
+    galleryBlock.style.display = isFAQ ? 'none' : 'flex';
+    quillBlock.style.display   = isFAQ ? 'none' : 'flex';
+  }
+
+  fTemplateKey.addEventListener('change', toggleFieldsByTemplate);
+  
+  function tsToMenu(ts) {
+    // Strip types & exports → eval
+    let js = ts
+      .replace(/export\s+type[\s\S]*?\n}\s*\n/g, '')
+      .replace(/export\s+interface[\s\S]*?\n}\s*\n/g, '')
+      .replace(/satisfies\s+[^\n]+/g, '')
+      .replace(/export\s+const\s+(\w+)\s*:\s*[^=]+=/g, 'var $1 =')
+      .replace(/export\s+const\s+(\w+)\s*=/g, 'var $1 =')
+      .replace(/export\s+\{[\s\S]*?\};?/g, '');
+    try {
+      const fn = new Function(js + '; return { MENU, MENU_COLORS };');
+      const { MENU } = fn();
+      return MENU || [];
+    } catch (e) {
+      console.error(e);
+      throw new Error('Không parse được menuData.ts');
+    }
+  }
+
+  function countLeaves(nodes){
+    let c = 0;
+    const walk = (arr) => arr.forEach(n => {
+      if (!n.children || n.children.length === 0) c++;
+      else walk(n.children);
+    });
+    walk(nodes || []);
+    return c;
+  }
+
+  function getLeaves(nodes){
+    const out = [];
+    const walk = (arr) => arr.forEach(n => {
+      if (n.path) out.push(n);
+      if (n.children) walk(n.children);
+    });
+    walk(nodes || []);
+    return out;
+  }
+
+  const slugDateVN = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  };
+
+  function buildSubtitle(){
+    const d = slugDateVN(fDate.value);
+    const dept = (fDept.value || '').trim();
+    const parts = [];
+    if (d) parts.push(`Phát hành: ${d}`);
+    if (dept) parts.push(`Bộ phận ${dept}`);
+    subtitlePreview.textContent = parts.join(' — ');
+    return subtitlePreview.textContent;
+  }
+
+  function htmlFromContentBlocks(blocks){
+    // For edit: convert JSON blocks -> HTML to feed Quill
+    const div = document.createElement('div');
+    (blocks||[]).forEach(b => {
+      if (b.type === 'paragraph') {
+        const p = document.createElement('p');
+        p.textContent = b.text || '';
+        div.appendChild(p);
+      } else if (b.type === 'table') {
+        const table = document.createElement('table');
+        table.setAttribute('border','1');
+        const thead = document.createElement('thead');
+        const trh = document.createElement('tr');
+        (b.headers||[]).forEach(h=>{
+          const th = document.createElement('th');
+          th.textContent = h;
+          trh.appendChild(th);
+        });
+        thead.appendChild(trh);
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        (b.rows||[]).forEach(r=>{
+          const tr = document.createElement('tr');
+          r.forEach(cell=>{
+            const td = document.createElement('td');
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        div.appendChild(table);
+      }
+    });
+    return div.innerHTML;
+  }
+
+  function blocksFromHTML(html){
+    // Convert editor HTML -> JSON blocks {paragraph|table}
+    const out = [];
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const walkNodes = doc.body.children;
+    for (const el of walkNodes) {
+      if (el.tagName === 'P') {
+        const text = el.textContent.replace(/\u200B/g,'').trim();
+        if (text) out.push({ type: 'paragraph', text });
+      } else if (el.tagName === 'TABLE') {
+        const headers = [];
+        const rows = [];
+        const thead = el.querySelector('thead');
+        const tbody = el.querySelector('tbody') || el;
+        if (thead) {
+          const tr = thead.querySelector('tr');
+          if (tr) tr.querySelectorAll('th,td').forEach(th => headers.push(th.textContent.trim()));
+        } else {
+          // If no thead, take first row as headers
+          const first = el.querySelector('tr');
+          if (first) {
+            first.querySelectorAll('th,td').forEach(th => headers.push(th.textContent.trim()));
+          }
+        }
+        tbody.querySelectorAll('tr').forEach((tr,i) => {
+          // skip first if used as header and no thead
+          if (!thead && i===0) return;
+          const row = [];
+          tr.querySelectorAll('td,th').forEach(td => row.push(td.textContent.trim()));
+          if (row.length) rows.push(row);
+        });
+        if (headers.length || rows.length) {
+          out.push({ type:'table', headers, rows });
+        }
+      } else {
+        // fallback: treat as paragraph
+        const text = el.textContent?.trim();
+        if (text) out.push({ type: 'paragraph', text });
+      }
+    }
+    return out;
+  }
+
+  async function requestWritePerm(handle){
+    const q = await handle.queryPermission({ mode:'readwrite' });
+    if (q === 'granted') return true;
+    const r = await handle.requestPermission({ mode:'readwrite' });
+    return r === 'granted';
+  }
+
+  
+  function renderGalleryList(){
+    galleryList.innerHTML = '';
+    if (!galleryTemp.length){
+      const em = document.createElement('div');
+      em.className = 'muted';
+      em.textContent = 'Chưa có ảnh.';
+      galleryList.appendChild(em);
+      return;
+    }
+    galleryTemp.forEach((g, idx) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      const num = document.createElement('span');
+      num.textContent = String(idx+1).padStart(2,'0') + '.';
+      const nameInput = document.createElement('input');
+      nameInput.value = g.destName || (g.file ? g.file.name : '');
+      nameInput.style.flex = '1';
+      nameInput.oninput = () => { g.destName = nameInput.value.trim(); };
+
+      const up = document.createElement('button');
+      up.className = 'btn small'; up.textContent = '↑';
+      up.onclick = () => { if (idx>0){ [galleryTemp[idx-1], galleryTemp[idx]] = [galleryTemp[idx], galleryTemp[idx-1]]; renderGalleryList(); }};
+
+      const down = document.createElement('button');
+      down.className = 'btn small'; down.textContent = '↓';
+      down.onclick = () => { if (idx<galleryTemp.length-1){ [galleryTemp[idx+1], galleryTemp[idx]] = [galleryTemp[idx], galleryTemp[idx+1]]; renderGalleryList(); }};
+
+      const del = document.createElement('button');
+      del.className = 'btn small danger'; del.textContent = 'Xoá';
+      del.onclick = () => { galleryTemp.splice(idx,1); renderGalleryList(); };
+
+      row.append(num, nameInput, up, down, del);
+      galleryList.appendChild(row);
+
+      if (g.preview){
+        const prev = document.createElement('img');
+        prev.src = g.preview;
+        prev.style.maxWidth = '100%';
+        prev.style.border = '1px solid #ffffff22';
+        prev.style.borderRadius = '8px';
+        galleryList.appendChild(prev);
+      }
+    });
+  }
+
+  // --------- Open actions ---------
+  $('#openJsonBtn').onclick = async () => {
+    try {
+      const [h] = await window.showOpenFilePicker({
+        types:[{ description:'JSON', accept:{ 'application/json':['.json'] } }],
+        multiple:false
+      });
+      jsonHandle = h;
+      const file = await h.getFile();
+      const txt = await file.text();
+      try {
+        contentMap = JSON.parse(txt || '{}');
+      } catch {
+        contentMap = {};
+      }
+      fileLabels.textContent = `leafContent.json ✓ ${menuHandle ? ' + menuData.ts ✓' : ''}`;
+      setStatus('Loaded leafContent.json');
+      renderMenu();
+    } catch (e) { setStatus('Open JSON failed: ' + e.message); }
+  };
+
+  $('#openMenuBtn').onclick = async () => {
+    try {
+      const [h] = await window.showOpenFilePicker({
+        types:[{ description:'TypeScript', accept:{ 'text/typescript':['.ts'] } }],
+        multiple:false
+      });
+      menuHandle = h;
+      const file = await h.getFile();
+      const ts = await file.text();
+      menu = tsToMenu(ts);
+      rebuildIndex();
+      fileLabels.textContent = `${jsonHandle ? 'leafContent.json ✓ + ' : ''}menuData.ts ✓`;
+      setStatus(`Loaded menuData.ts (leaves: ${countLeaves(menu)})`);
+      renderMenu();
+    } catch (e) { setStatus('Open TS failed: ' + e.message); }
+  };
+
+  $('#pickAssetsBtn').onclick = async () => {
+    try {
+      assetsDirHandle = await window.showDirectoryPicker();
+      $('#assetsStatus').textContent = 'Đã chọn: ' + (assetsDirHandle.name || '(folder)');
+      setStatus('Assets folder selected');
+    } catch (e) { setStatus('Pick assets failed: ' + e.message); }
+  };
+
+  $('#refreshBtn').onclick = () => renderMenu();
+
+
+  pickGalleryBtn.onclick = async () => {
+    try {
+      const handles = await window.showOpenFilePicker({
+        multiple: true,
+        types:[{ description:'Images', accept:{ 'image/*':['.png','.jpg','.jpeg','.gif','.webp','.svg'] } }],
+      });
+      for (const h of handles){
+        const file = await h.getFile();
+        const prefix = (galleryPrefix.value || '').trim();
+        const destName = prefix ? (prefix + file.name) : file.name;
+        galleryTemp.push({ file, destName, preview: URL.createObjectURL(file) });
+      }
+      renderGalleryList();
+      setStatus(`Đã chọn ${handles.length} ảnh cho gallery.`);
+    } catch (e) { setStatus('Pick gallery failed: ' + e.message); }
+  };
+
+
+  // --------- Render menu with Add/Edit buttons ---------
+  function renderMenu(){
+    menuRoot.innerHTML = '';
+    if (!menu.length) { menuRoot.textContent = 'Chưa mở menuData.ts'; return; }
+    const root = document.createElement('div');
+    root.className = 'col lvlTop';
+
+    for (const top of menu){
+      const tItem = document.createElement('div');
+      tItem.className = 'item';
+
+      const head = document.createElement('div');
+      head.className = 'row';
+      const tag = document.createElement('span'); tag.className='tag top'; tag.textContent = 'TOP';
+      const title = document.createElement('div'); title.className='grow'; title.textContent = top.label + ` (${top.id})`;
+      const toggle = document.createElement('button'); toggle.className='btn small'; toggle.textContent = expanded.has(top.id)?'–':'+';
+      toggle.onclick = () => { expanded.has(top.id) ? expanded.delete(top.id) : expanded.add(top.id); renderMenu(); };
+      head.append(tag, title, toggle);
+      tItem.appendChild(head);
+
+      if (expanded.has(top.id)) {
+        const midWrap = document.createElement('div');
+        midWrap.className = 'col lvlMid';
+        (top.children||[]).forEach(mid => {
+          const mItem = document.createElement('div');
+          mItem.className = 'item';
+          const mHead = document.createElement('div');
+          mHead.className = 'row';
+          const mTag = document.createElement('span'); mTag.className='tag mid'; mTag.textContent='MID';
+          const mTitle = document.createElement('div'); mTitle.className='grow'; mTitle.textContent = mid.label + ` (${mid.id})`;
+          const mToggle = document.createElement('button'); mToggle.className='btn small'; mToggle.textContent = expanded.has(mid.id)?'–':'+';
+          mToggle.onclick = () => { expanded.has(mid.id) ? expanded.delete(mid.id) : expanded.add(mid.id); renderMenu(); };
+          mHead.append(mTag, mTitle, mToggle);
+          mItem.appendChild(mHead);
+
+          if (expanded.has(mid.id)) {
+            const childWrap = document.createElement('div');
+            childWrap.className = 'col lvlLeaf';
+            (mid.children||[]).forEach(child => {
+              // If child has its own children (sub-mid level), render a SUB row with nested leaves
+              if (child && Object.prototype.hasOwnProperty.call(child, 'children')) {
+                const sItem = document.createElement('div');
+                sItem.className = 'item';
+                // header row for sub-mid level
+                const sHead = document.createElement('div');
+                sHead.className = 'row';
+                const sTag = document.createElement('span'); sTag.className='tag sub'; sTag.textContent='SUB';
+                const sTitle = document.createElement('div'); sTitle.className='grow'; sTitle.textContent = child.label + ` (${child.id})`;
+                const sToggle = document.createElement('button'); sToggle.className='btn small'; sToggle.textContent = expanded.has(child.id)?'–':'+';
+                sToggle.onclick = () => { expanded.has(child.id) ? expanded.delete(child.id) : expanded.add(child.id); renderMenu(); };
+                sHead.append(sTag, sTitle, sToggle);
+                sItem.appendChild(sHead);
+                // render leaves of sub-mid level
+                if (expanded.has(child.id)) {
+                  const subLeafWrap = document.createElement('div');
+                  subLeafWrap.className = 'col lvlLeaf';
+                  (child.children||[]).forEach(leaf => {
+                    const lItem = document.createElement('div');
+                    lItem.className = 'item row';
+                    const lTag = document.createElement('span'); lTag.className='tag leaf'; lTag.textContent='LEAF';
+                    const lTitle = document.createElement('div'); lTitle.className='grow';
+                    lTitle.innerHTML = `<b>${leaf.label}</b> <span class="muted">(${leaf.id}) — ${leaf.path||''}</span>`;
+                    const hasContent = !!(contentMap && contentMap[leaf.path || '']);
+                    const btn = document.createElement('button');
+                    btn.className = 'btn small ' + (hasContent ? 'yellow' : 'green');
+                    btn.textContent = hasContent ? 'Chỉnh sửa nội dung' : 'Thêm nội dung';
+                    btn.onclick = () => openEditorForLeaf(leaf);
+                    lItem.append(lTag, lTitle, btn);
+                    subLeafWrap.appendChild(lItem);
+                  });
+                  sItem.appendChild(subLeafWrap);
+                }
+                childWrap.appendChild(sItem);
+              } else {
+                // leaf-level directly under mid
+                const lItem = document.createElement('div');
+                lItem.className = 'item row';
+                const lTag = document.createElement('span'); lTag.className='tag leaf'; lTag.textContent='LEAF';
+                const lTitle = document.createElement('div'); lTitle.className='grow';
+                lTitle.innerHTML = `<b>${child.label}</b> <span class="muted">(${child.id}) — ${child.path||''}</span>`;
+                const hasContent = !!(contentMap && contentMap[child.path || '']);
+                const btn = document.createElement('button');
+                btn.className = 'btn small ' + (hasContent ? 'yellow' : 'green');
+                btn.textContent = hasContent ? 'Chỉnh sửa nội dung' : 'Thêm nội dung';
+                btn.onclick = () => openEditorForLeaf(child);
+                lItem.append(lTag, lTitle, btn);
+                childWrap.appendChild(lItem);
+              }
+            });
+            mItem.appendChild(childWrap);
+          }
+          midWrap.appendChild(mItem);
+        });
+        tItem.appendChild(midWrap);
+      }
+
+      root.appendChild(tItem);
+    }
+
+    menuRoot.appendChild(root);
+  }
+
+  function openEditorForLeaf(leaf){
+    currentPath = leaf.path || '';
+    fPath.value = currentPath;
+    // Fill defaults
+    fRenderType.value = 'template';
+    fTemplateKey.value = 'ProductNews'
+    fTitle.value = '';
+    fDate.value = '';
+    fDept.value = 'Phát triển sản phẩm';
+    subtitlePreview.textContent = '';
+    destFileName.value = '';
+    imgPreview.style.display = 'none'; imgPreview.src = '';
+    imageFile = null;
+    galleryTemp = [];
+    renderGalleryList();
+    fEnding.value = 'Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.';
+    quill.setContents([]);
+
+    // If exists content, fill for edit
+    const entry = contentMap[currentPath];
+    if (entry) {
+      fRenderType.value = entry.renderType || 'template';
+      if (entry.templateKey) fTemplateKey.value = entry.templateKey;
+      fTitle.value = entry.title || '';
+      galleryTemp = Array.isArray(entry.gallery) ? entry.gallery.map(name => ({ file:null, destName: name, preview:'' })) : [];
+      renderGalleryList();
+      // try split subtitle
+      if (entry.subtitle) {
+        subtitlePreview.textContent = entry.subtitle;
+        // không parse ngược cứng nhắc; user có thể chỉnh lại
+      }
+      if (entry.bannerImg) {
+        destFileName.value = entry.bannerImg;
+      }
+      if (entry.content) {
+        const html = htmlFromContentBlocks(entry.content);
+        quill.root.innerHTML = html;
+      }
+        // --- nạp FAQ ---
+      if (entry.templateKey === 'FAQAccordion') {
+        fFaqPath.value = entry.faqJsonPath || '';
+        // FAQ không dùng banner/gallery/quill => form đã toggle ẩn
+      }
+      if (entry.endingNote) fEnding.value = entry.endingNote;
+    }
+    setStatus(`Editing ${leaf.label}`);
+    toggleFieldsByTemplate();
+  }
+
+  // live subtitle preview
+  fDate.addEventListener('input', buildSubtitle);
+  fDept.addEventListener('input', buildSubtitle);
+
+  // pick image source
+  pickImageBtn.onclick = async () => {
+    try {
+      const [h] = await window.showOpenFilePicker({
+        types:[{ description:'Images', accept:{ 'image/*':['.png','.jpg','.jpeg','.gif','.webp','.svg'] } }],
+        multiple:false
+      });
+      const file = await h.getFile();
+      imageFile = file;
+      imgPreview.src = URL.createObjectURL(file);
+      imgPreview.style.display = 'block';
+      if (!destFileName.value) destFileName.value = file.name;
+      setStatus('Image selected: ' + file.name);
+    } catch (e) { setStatus('Pick image failed: ' + e.message); }
+  };
+
+  // Save
+  $('#saveBtn').onclick = async () => {
+    try {
+      if (!jsonHandle) return alert('Mở leafContent.json trước đã.');
+      if (!currentPath) return alert('Chọn leaf để nhập nội dung.');
+      const renderType = fRenderType.value || 'template';
+      const templateKey = fTemplateKey.value || 'ProductNews';
+
+    let entry;
+
+    if (templateKey === 'FAQAccordion') {
+      // ---- entry cho FAQ ----
+      const faqPath = (fFaqPath.value || '').trim();
+      if (!faqPath) return alert('Nhập FAQ JSON path.');
+
+      entry = {
+        renderType,
+        templateKey: 'FAQAccordion',
+        title: (fTitle.value || '').trim(),
+        subtitle: buildSubtitle(),               // vẫn build từ Date + Dept
+        faqJsonPath: faqPath,                    // <— quan trọng
+        endingNote: (fEnding.value || '').trim() // dùng chung field Ending Note
+      };
+
+    } else {
+      // ---- entry cho ProductNews / FeatureGuide như cũ ----
+      const galleryNames = [];
+      for (const g of galleryTemp){
+        const name = (g.destName || '').trim();
+        if (name) galleryNames.push(name);
+      }
+      // Prefix gallery names with selected assets folder if not already present
+      let finalGallery = galleryNames;
+      const folderPrefix = assetsDirHandle && assetsDirHandle.name ? (assetsDirHandle.name + '/') : '';
+      if (folderPrefix) {
+        finalGallery = galleryNames.map(n => n.startsWith(folderPrefix) ? n : folderPrefix + n);
+      }
+
+      entry = {
+        renderType,
+        templateKey,
+        title: (fTitle.value || '').trim(),
+        subtitle: buildSubtitle(),
+        bannerImg: (destFileName.value || '').trim(),
+        content: blocksFromHTML(quill.root.innerHTML),
+        endingNote: (fEnding.value || '').trim(),
+        gallery: finalGallery,
+      };
+
+      // Copy banner and gallery files into selected assets folder when using FeatureGuide template
+      if (templateKey === 'FeatureGuide') {
+        // Ensure assets directory selected
+        if (imageFile || galleryTemp.some(g => g.file)) {
+          if (!assetsDirHandle) {
+            return alert('Chưa chọn thư mục assets. Hãy dùng "Pick assets folder" trước khi lưu.');
+          }
+          // Request write permission for assets dir
+          const perm = await requestWritePerm(assetsDirHandle);
+          if (!perm) {
+            return alert('Không có quyền ghi vào thư mục assets.');
+          }
+        }
+        // Helper to copy a File to nested destination in assetsDirHandle
+        async function copyToAssets(file, destPath) {
+          const parts = destPath.split('/').filter(p=>p);
+          let dir = assetsDirHandle;
+          // create nested directories except last part
+          for (let i=0; i<parts.length-1; i++) {
+            const dirName = parts[i];
+            dir = await dir.getDirectoryHandle(dirName, { create: true });
+          }
+          const fname = parts[parts.length-1];
+          const fHandle = await dir.getFileHandle(fname, { create: true });
+          const writable = await fHandle.createWritable();
+          await writable.write(await file.arrayBuffer());
+          await writable.close();
+        }
+        // Copy banner image if provided and a dest file name exists
+        const bannerName = (destFileName.value || '').trim();
+        if (imageFile && bannerName) {
+          try {
+            await copyToAssets(imageFile, bannerName);
+          } catch (e) {
+            console.error('Copy banner failed', e);
+            return alert('Sao chép banner thất bại: ' + e.message);
+          }
+        }
+        // Copy gallery files
+        for (const g of galleryTemp) {
+          if (g.file && g.destName) {
+            try {
+              await copyToAssets(g.file, g.destName);
+            } catch (e) {
+              console.error('Copy gallery file failed', e);
+              return alert('Sao chép ảnh gallery thất bại: ' + e.message);
+            }
+          }
+        }
+      }
+    }
+
+    // --- ghi vào contentMap và lưu file ---
+    contentMap[currentPath] = entry;
+
+    const ok = await requestWritePerm(jsonHandle);
+    if (!ok) return alert('Không có quyền ghi leafContent.json');
+    if (!confirm('Ghi đè leafContent.json?')) return;
+
+    const writable = await jsonHandle.createWritable();
+    const pretty = JSON.stringify(contentMap, null, 2);
+    await writable.write(pretty);
+    await writable.close();
+
+    setStatus('Saved content for ' + currentPath);
+    renderMenu();
+  } catch (e) {
+    console.error(e);
+    setStatus('Save failed: ' + e.message);
+  }
+};
+
+  $('#cancelBtn').onclick = () => {
+    currentPath = '';
+    fPath.value = '';
+    quill.setContents([]);
+    setStatus('Canceled.');
+  };
+
+})();
+</script>
+</body>
+</html>

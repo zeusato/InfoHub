@@ -47,7 +47,7 @@ export default function Intro() {
             Cổng thông tin của <span className="text-brand">SHS</span>
           </h1>
           <p className="mt-5 max-w-2xl text-zinc-400">
-            Nơi tập trung tin tức, hướng dẫn sử dụng, và các nội dung vận hành.
+            Nơi tập trung tin tức, hướng dẫn sử dụng và các nội dung vận hành.
           </p>
 
           {/* Single primary CTA button in center */}

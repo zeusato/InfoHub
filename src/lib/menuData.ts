@@ -35,6 +35,11 @@ export const MENU: MenuNode[] = [
                 label: 'HD Đăng ký đặt mua',
                 path: 'tin-tuc-san-pham/phan-phoi-ipo/phan-phoi-ipo-vpbs/tin-tuc-san-pham-phan-phoi-ipo-phan-phoi-ipo-vpbs-2025-10',
               },
+              {
+                id: 'faq-ipo-vpbs',
+                label: 'FAQ - IPO VPBS',
+                path: 'tin-tuc-san-pham/phan-phoi-ipo/phan-phoi-ipo-vpbs/faq-ipo-vpbs',
+              },
             ],
           },
         ],
@@ -71,8 +76,148 @@ export const MENU: MenuNode[] = [
             children: [
               {
                 id: 'hd-mo-tk-bang-ekyc',
-                label: 'HD Mở TK bằng eKYC',
+                label: 'Mở TK bằng eKYC',
                 path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/huong-dan-su-dung-shsmart-mts-2-0-tai-khoan-2025-10',
+              },
+              {
+                id: 'dang-nhap',
+                label: 'Đăng nhập',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/dang-nhap',
+              },
+              {
+                id: 'hd-dang-ky-smart-otp',
+                label: 'Đăng ký Smart OTP',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/hd-dang-ky-smart-otp',
+              },
+              {
+                id: 'hd-lay-smart-otp',
+                label: 'Lấy Smart OTP',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/hd-lay-smart-otp',
+              },
+              {
+                id: 'hd-thay-doi-thong-tin-ca-nhan',
+                label: 'Thay đổi thông tin cá nhân',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/hd-thay-doi-thong-tin-ca-nhan',
+              },
+              {
+                id: 'quen-mat-khau',
+                label: 'Quên mật khẩu',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-khoan/quen-mat-khau',
+              },
+            ],
+          },
+          {
+            id: 'giao-dich',
+            label: 'Giao dịch',
+            children: [
+              {
+                id: 'dat-lenh-ck-co-so',
+                label: 'Đặt lệnh CK cơ sở',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/giao-dich/dat-lenh-ck-co-so',
+              },
+            ],
+          },
+          {
+            id: 'chuyen-tien-chung-khoan',
+            label: 'Chuyển tiền/chứng khoán',
+            children: [
+              {
+                id: 'nop-tien',
+                label: 'Nộp tiền',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/nop-tien',
+              },
+              {
+                id: 'rut-tien',
+                label: 'Rút tiền',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/rut-tien',
+              },
+              {
+                id: 'ung-tien',
+                label: 'Ứng tiền',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/ung-tien',
+              },
+              {
+                id: 'chuyen-tien-noi-bo',
+                label: 'Chuyển tiền nội bộ',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/chuyen-tien-noi-bo',
+              },
+              {
+                id: 'nop-ky-quy',
+                label: 'Nộp ký quỹ',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/nop-ky-quy',
+              },
+              {
+                id: 'rut-ky-quy',
+                label: 'Rút ký quỹ',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/rut-ky-quy',
+              },
+              {
+                id: 'them-tai-khoan-ngan-hang',
+                label: 'Thêm tài khoản ngân hàng',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/them-tai-khoan-ngan-hang',
+              },
+              {
+                id: 'hd-chuyen-chung-khoan',
+                label: 'Chuyển chứng khoán',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/chuyen-tien-chung-khoan/hd-chuyen-chung-khoan',
+              },
+            ],
+          },
+          {
+            id: 'dang-ky-dich-vu',
+            label: 'Đăng ký dịch vụ',
+            children: [
+              {
+                id: 'dang-ky-dv-margin-phai-sinh',
+                label: 'Đăng ký DV Margin/Phái sinh',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/dang-ky-dich-vu/dang-ky-dv-margin-phai-sinh',
+              },
+              {
+                id: 'dang-ky-san-pham-margin-tplus',
+                label: 'Đăng ký sản phẩm Margin TPLUS',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/dang-ky-dich-vu/dang-ky-san-pham-margin-tplus',
+              },
+              {
+                id: 'huy-doi-goi-margin-tplus',
+                label: 'Hủy/Đổi gói Margin TPLUS',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/dang-ky-dich-vu/huy-doi-goi-margin-tplus',
+              },
+            ],
+          },
+          {
+            id: 'quan-ly-no-vay',
+            label: 'Quản lý nợ vay',
+            children: [
+              {
+                id: 'dang-ky-huy-thu-no-tu-dong',
+                label: 'Đăng ký/Hủy thu nợ tự động',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/quan-ly-no-vay/dang-ky-huy-thu-no-tu-dong',
+              },
+              {
+                id: 'tra-no-chu-dong',
+                label: 'Trả nợ chủ động',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/quan-ly-no-vay/tra-no-chu-dong',
+              },
+              {
+                id: 'chi-tiet-no-vay',
+                label: 'Chi tiết nợ vay',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/quan-ly-no-vay/chi-tiet-no-vay',
+              },
+            ],
+          },
+          {
+            id: 'tien-ich-mo-rong',
+            label: 'Tiện ích mở rộng',
+            children: [
+              {
+                id: 'xac-nhan-lenh',
+                label: 'Xác nhận lệnh',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tien-ich-mo-rong/xac-nhan-lenh',
+              },
+              {
+                id: 'tao-bang-gia-tuy-chon',
+                label: 'Tạo bảng giá tùy chọn',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tien-ich-mo-rong/tao-bang-gia-tuy-chon',
               },
             ],
           },
@@ -80,7 +225,7 @@ export const MENU: MenuNode[] = [
       },
       {
         id: 'features',
-        label: 'Tính năng',
+        label: 'WebTrading 2.0',
         children: [
           {
             id: 'feature-a',
