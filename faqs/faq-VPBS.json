@@ -1,0 +1,174 @@
+{
+  "faqs": [
+    {
+      "qNo": 1,
+      "question": "Ai có thể đăng ký mua cổ phiếu IPO của VPBankS phát hành lần đầu ra công chúng?",
+      "answer": "Tất cả các tổ chức, cá nhân trong và ngoài nước, không thuộc đối tượng bị cấm hoặc hạn chế quyền mua theo quy định của pháp luật, Điều lệ VPBankS và Phương án phát hành."
+    },
+    {
+      "qNo": 2,
+      "question": "Có phải là Nhà đầu tư chuyên nghiệp mới được mua không?",
+      "answer": "Khách hàng không yêu cầu phải là Nhà đầu tư chuyên nghiệp để đăng ký mua cổ phiếu IPO của VPBankS."
+    },
+    {
+      "qNo": 3,
+      "question": "Tôi đăng ký mua cổ phiếu IPO của VPBankS bằng cách nào?",
+      "answer": "Bạn có thể thực hiện đăng ký mua cổ phiếu VPBankS thông qua đại lý chính là SHS. Tại SHS có hai hình thức đăng ký mua cổ phiếu IPO: Trực tiếp tại quầy (Hội Sở/ Chi nhánh/ Phòng Giao dịch của SHS) và Online."
+    },
+    {
+      "qNo": 4,
+      "question": "Thời gian đăng ký mua IPO cổ phiếu VPBankS?",
+      "answer": "Trong thời hạn đăng kí mua, bắt đầu từ ngày 10/10/2025 đến muộn nhất vào 16h ngày 31/10/2025. Tiền đặt cọc được NĐT nộp/chuyển đến tài khoản phong tỏa của VPBankS đúng yêu cầu"
+    },
+    {
+      "qNo": 5,
+      "question": "Tôi chưa có tài khoản SHS có thể đăng ký mua IPO cổ phiếu VPankS không?",
+      "answer": "NĐT chưa có tài khoản tại SHS vẫn có thể đăng ký mua cổ phiếu IPO của VPBankS"
+    },
+    {
+      "qNo": 6,
+      "question": "Có phí giao dịch khi đăng ký mua Cổ phiếu IPO của VPBankS không?",
+      "answer": "Không có. Tuy nhiên khi đăng ký mua cổ phiếu IPO của VPBankS, NĐT cần nộp số Tiền Đặt Cọc là 10% tổng giá trị đăng ký mua để ghi nhận đăng ký thành công."
+    },
+    {
+      "qNo": 7,
+      "question": "Quy định về số lượng đăng ký mua?",
+      "answer": "Số lượng đăng ký mua cổ phiếu IPO của VPBankS được quy định như sau:\r\nSố lượng mua tối thiểu và bước khối lượng: 100 cổ phiếu.\r\nSố lượng mua tối đa: 93.750.000 cổ phiếu (không quá 5% tổng vốn điều lệ của VPBankS dự kiến sau đợt chào bán)."
+    },
+    {
+      "qNo": 8,
+      "question": "Tôi có được hủy, sửa hoặc đăng ký nhiều lần tại cùng một công ty chứng khoán không?",
+      "answer": "NĐT có thể đăng ký mua nhiều lần, nhưng không được sửa hoặc hủy số lượng đã đăng ký mua thành công (lệnh đăng ký mua chỉ thành công khi NĐT đã thanh toán cọc 10%)."
+    },
+    {
+      "qNo": 9,
+      "question": "Nhà đầu tư có thể đăng ký mua nhiều lần tại cùng 1 công ty không?",
+      "answer": "NĐT có thể đăng ký mua nhiều lần tại cùng một Đại lý phân phối."
+    },
+    {
+      "qNo": 10,
+      "question": "Nhà đầu tư có thể đăng ký mua nhiều lần tại nhiều công ty không?",
+      "answer": "NĐT có thể đăng ký mua nhiều lần tại nhiều Đại lý phân phối."
+    },
+    {
+      "qNo": 11,
+      "question": "Nhà đầu tư có bắt buộc phải có tài khoản chứng khoán tại VPBankS để mua không?",
+      "answer": "NĐT không cần phải có tài khoản chứng khoán tại VPBankS để mua IPO cổ phiếu VPBankS."
+    },
+    {
+      "qNo": 12,
+      "question": "Nhà đầu tư có bắt buộc phải nộp 100% tiền khi đăng ký mua không?",
+      "answer": "NĐT sẽ chỉ đặt cọc 10% tiền khi đăng ký mua. NĐT nộp toàn bộ số tiền còn lại sau khi được phân bổ cổ phiếu. Thời gian nộp tiền: 03/11/2025 đến 17h00 ngày 07/11/2025"
+    },
+    {
+      "qNo": 13,
+      "question": "Nộp Tiền Đặt Cọc như thế nào? Tối thiểu là bao nhiêu?",
+      "answer": "Bạn cần chuyển Tiền Đặt Cọc vào …\r\nMức Tiền Đặt Cọc là 10% tổng giá trị đăng ký mua.\r\nTiền Đặt Cọc = Giá chào bán × Số lượng đăng ký × 10%\r\nVí dụ: NĐT đăng ký mua 10.000 CP với giá chào bán ấn định là 33.900 VND\r\nTổng giá trị đăng ký mua: 33.900 x 10.000 = 339.000.000 VND\r\nTiền đặt cọc = 10% x 339.000.000 = 33.900.000 VND"
+    },
+    {
+      "qNo": 14,
+      "question": "Thời điểm nộp cọc 10% sau khi đăng ký mua?",
+      "answer": "Nộp cọc 10% ngay tại thời điểm đăng ký mua"
+    },
+    {
+      "qNo": 15,
+      "question": "Thời điểm nộp 100% tiền sau khi đăng ký mua?",
+      "answer": "Trong thời gian nộp tiền mua, bắt đầu từ ngày 03/11/2025 đến trước 16h00 ngày 07/11/2025"
+    },
+    {
+      "qNo": 16,
+      "question": "Tôi có thể nhờ người khác thực hiện đăng ký mua hộ được không?",
+      "answer": "Trong trường hợp này, NĐT phải có ủy quyền công chứng cho người đứng ra thực hiện việc đăng ký để tránh các sai sót và tranh chấp sau này."
+    },
+    {
+      "qNo": 17,
+      "question": "Tôi có thể dùng hộ chiếu để đăng ký mua cổ phiếu IPO được không?",
+      "answer": "Hộ chiếu chỉ áp dụng với NĐT nước ngoài. NĐT cá nhân trong nước cần dùng CCCD/CC còn hiệu lực để đăng ký đặt mua."
+    },
+    {
+      "qNo": 18,
+      "question": "Nguyên tắc phân bổ cổ phiếu là gì?",
+      "answer": "Trong trường hợp số Cổ Phiếu đăng ký mua nhiều hơn số lượng Cổ Phiếu mà VPBankS được phép chào bán theo Giấy Phép Chào Bán, Cổ Phiếu sẽ được phân bổ cho các NĐT tương ứng theo tỷ lệ đăng ký mua của từng NĐT. Số cổ phiếu NĐT được phân phối sẽ được làm tròn đến hàng đơn vị theo nguyên tắc làm tròn xuống."
+    },
+    {
+      "qNo": 19,
+      "question": "Giá mua của cổ phiếu?",
+      "answer": "Giá IPO theo VPBankS công bố là 33.900 đồng/cp."
+    },
+    {
+      "qNo": 20,
+      "question": "Khối lượng mua tối thiểu và tối đa của cổ phiếu?",
+      "answer": "Số lượng mua tối thiểu và bước khối lượng: 100 cổ phiếu.\r\nSố lượng mua tối đa: 93.750.000 cổ phiếu (không quá 5% tổng vốn điều lệ của VPBankS dự kiến sau đợt chào bán)."
+    },
+    {
+      "qNo": 21,
+      "question": "Hoàn trả tiền cọc cho NĐT không được phân bổ quyền mua và NĐT Đặt Mua thanh toán dư tiền mua cổ phiếu (nếu có) như thế nào?",
+      "answer": "VPBankS sẽ hoàn trả lại số tiền NĐT đã thanh toán tương ứng với phần cổ phiếu đã đăng ký nhưng không được phân bổ hoặc trong các trường hợp NĐT thanh toán dư tiền mua cổ phiếu (nếu có).\r\nVPBankS thực hiện hoàn trả tiền cọc, tiền nộp thừa (nếu có) cho NĐT theo danh sách NĐT được hoàn trả tiền đã được SHS kiểm tra. \r\nTrong vòng 06 ngày làm việc kể từ ngày có công văn của Ủy ban Chứng khoán Nhà nước về việc đã nhận được hồ sơ báo cáo kết quả chào bán cổ phiếu ra công chúng của VPBankS"
+    },
+    {
+      "qNo": 22,
+      "question": "Khi đăng ký mua tôi phải nộp tiền vào tài khoản chứng khoán của tôi tại công ty chứng khoán tôi đăng ký mua?",
+      "answer": "Nhà đầu tư không nộp tiền vào tài khoản chứng khoán mà nộp tiền vào tài khoản phong tỏa:\r\n\r\n- NĐT nộp tiền “ĐẶT CỌC”\r\nTên người thụ hưởng: Công ty Cổ phần chứng khoán Vpbank\r\n Số tài khoản: 6890666888\r\n Ngân hàng: BIDV - chi nhánh Hà Thành\r\n Nội dung: [SHS] [Tên NĐT] [Số GCNĐKDN/CCCD/CC/MSGD] nop tien dang ky mua [Số lượng cổ phiếu] cp VPX\r\nVí dụ: SHS Nguyen Van A 012568000068 nop tien dang ky mua 10000 cp VPX\r\nLưu ý: GCNĐKDN/CCCD/CC/HC/Trading code theo thông tin trên Giấy đăng ký\r\n\r\n\r\n- NĐT nộp tiền “MUA CỔ PHIẾU ĐÃ ĐƯỢC PHÂN BỔ”\r\nTên người thụ hưởng: Công ty Cổ phần chứng khoán Vpbank\r\n Số tài khoản: 6890666888\r\n Ngân hàng: BIDV - chi nhánh Hà Thành\r\n Nội dung: [SHS] ma ho so [Mã hồ sơ] [Tên NĐT] [Số GCNĐKDN/CCCD/CC/MSGD] nop tien dang ky mua [Số lượng cổ phiếu] cp VPX\r\nVí dụ: SHS ma ho so xxxxyyyyy Ncguyen Van A 012568000068 nop tien mua 10000 cp VPX\r\n\r\nLưu ý: \r\nMỗi đơn đăng ký hợp lệ sẽ  được gán 1 mã hồ sơ đặt mua theo thông báo của VPBankS.\r\n-        Thông tin GCNĐKDN/ CCCD/ CC/HC/ Trading code trong nội dung nộp tiền phải khớp với thông tin trên Hồ Sơ Đăng Ký"
+    },
+    {
+      "qNo": 23,
+      "question": "Bao lâu thì có kết quả thực hiện phân bổ?",
+      "answer": "Chậm nhất vào 15h00 ngày 02/11/2025."
+    },
+    {
+      "qNo": 24,
+      "question": "Bao lâu thì cổ phiếu mua mới được giao dịch?",
+      "answer": "Phụ thuộc vào tổ chức phát hành là VPBankS. Điểm mới của Đợt IPO này là rút ngắn được thời gian thực hiện thủ tục niêm yết cổ phiếu so với các Đơn vị đã làm IPO trước đây do VPBankS là đơn vị đầu tiên được xử lý hồ sơ theo quy định mới ban hành của Chính Phủ là làm song song vừa Phát hành IPO vừa Niêm yết"
+    },
+    {
+      "qNo": 25,
+      "question": "Tôi có thể không thực hiện lưu ký cổ phiếu không?",
+      "answer": "Có. Tuy nhiên, do SHS là ĐLPP chính thức của VPBankS nên các vấn đề liên quan nếu cần phải phối hợp với VPBankS sẽ được xử lý thuận lợi hơn nếu NĐT lưu ký cổ phiếu tại SHS trong thời gian gần nhất để SHS thuận tiện hỗ trợ."
+    },
+    {
+      "qNo": 26,
+      "question": "Tôi có thể không lưu ký cổ phiếu tại SHS không?",
+      "answer": "NĐT có thể lựa chọn không lưu ký cổ phiếu tại SHS. Tuy nhiên, do SHS là ĐLPP chính thức của VPBankS nên các vấn đề liên quan nếu cần phải phối hợp với VPBankS sẽ được xử lý thuận lợi hơn nếu NĐT lưu ký cổ phiếu tại SHS."
+    },
+    {
+      "qNo": 27,
+      "question": "Tôi có được nhận giấy tờ gì chứng minh mình sở hữu cổ phiếu không?",
+      "answer": "Có. Khi đăng ký mua cổ phiếu IPO VPBankS, NĐT cần tích chọn giấy Chứng nhận sở hữu (CNSH). Sau đó NĐT cần trực tiếp đến VPBankS để nhận giấy CNSH."
+    },
+    {
+      "qNo": 28,
+      "question": "Khi mua tôi nộp tiền vào đâu?",
+      "answer": "- NĐT nộp tiền “ĐẶT CỌC”\r\nTên người thụ hưởng: Công ty Cổ phần chứng khoán Vpbank\r\n Số tài khoản: 6890666888\r\n Ngân hàng: BIDV - chi nhánh Hà Thành\r\n Nội dung: [SHS] [Tên NĐT] [Số GCNĐKDN/CCCD/CC/MSGD] nop tien dang ky mua [Số lượng cổ phiếu] cp VPX\r\nVí dụ: SHS Nguyen Van A 012568000068 nop tien dang ky mua 10000 cp VPX\r\nLưu ý: GCNĐKDN/CCCD/CC/HC/Trading code theo thông tin trên Giấy đăng ký\r\n\r\n\r\n- NĐT nộp tiền “MUA CỔ PHIẾU ĐÃ ĐƯỢC PHÂN BỔ”\r\nTên người thụ hưởng: Công ty Cổ phần chứng khoán Vpbank\r\n Số tài khoản: 6890666888\r\n Ngân hàng: BIDV - chi nhánh Hà Thành\r\n Nội dung: [SHS] ma ho so [Mã hồ sơ] [Tên NĐT] [Số GCNĐKDN/CCCD/CC/MSGD] nop tien dang ky mua [Số lượng cổ phiếu] cp VPX\r\nVí dụ: SHS ma ho so xxxxyyyyy Ncguyen Van A 012568000068 nop tien mua 10000 cp VPX\r\n\r\nLưu ý: \r\nMỗi đơn đăng ký hợp lệ sẽ  được gán 1 mã hồ sơ đặt mua theo thông báo của VPBankS.\r\n-        Thông tin GCNĐKDN/ CCCD/ CC/HC/ Trading code trong nội dung nộp tiền phải khớp với thông tin trên Hồ Sơ Đăng Ký"
+    },
+    {
+      "qNo": 29,
+      "question": "Tôi có đăng ký mua online được không?",
+      "answer": "NĐT có thể đăng ký online theo đường link…"
+    },
+    {
+      "qNo": 30,
+      "question": "Tôi có bị mất chi phí giao dịch cho công ty chứng khoán khi đăng ký mua cổ phiếu hay không?",
+      "answer": "Nhà đầu tư không mất chi phí giao dịch khi đăng ký mua cổ phiếu IPO VPBankS."
+    },
+    {
+      "qNo": 31,
+      "question": "Nếu tôi đặt ít hơn 100 cổ phiếu thì có hợp lệ không?",
+      "answer": "Khối lượng đặt mua tối thiểu là 100 cổ phiếu nên trường hợp này được tính là không hợp lệ."
+    },
+    {
+      "qNo": 32,
+      "question": "Nếu hồ sơ của tôi được gửi đến sau thời hạn cuối cùng thì có hợp lệ không?",
+      "answer": "Thời hạn chốt đăng ký đặt mua là 16h00 ngày 31/10/2025 nên các hồ sơ gửi tới SHS và khoản tiền cọc nộp sau thời hạn trên được tính là không hợp lệ."
+    },
+    {
+      "qNo": 33,
+      "question": "Trường hợp tôi có sai sót trong việc thao tác đánh máy khi thực hiện đăng ký, thông tin lệch so với trên CCCD/CC thì sao?",
+      "answer": "Nếu phát hiện sai sót, NĐT có thể chủ động thực hiện thao tác sửa thông tin đơn theo hướng dẫn hoặc liên hệ với Phòng Dịch vụ khách hàng SHS để được hỗ trợ sửa đổi/bổ sung đơn kịp thời, đảm bảo quyền lợi của NĐT khi đăng ký đặt mua IPO."
+    },
+    {
+      "qNo": 34,
+      "question": "Làm thế nào để biết hồ sơ của tôi là hợp lệ trước ngày chốt đăng ký?",
+      "answer": "SHS sẽ kiểm tra và xét duyệt đơn đăng ký của NĐT liên tục và thực hiện đối soát với các đại lý phụ. Kết quả sẽ được thông báo về tình trạng hồ sơ qua email, điện thoại... sau 5 ngày kể từ ngày đăng ký. NĐT cần theo dõi và cập nhật thông báo từ SHS để điều chỉnh kịp thời nếu cần thiết."
+    }
+  ]
+}
