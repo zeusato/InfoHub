@@ -32,6 +32,15 @@ export default {
       },
       backgroundSize: {
         'grid-dots': '24px 24px'
+      },
+      animation: {
+        'shimmer': 'shimmer 5s ease-in-out infinite',
+      },
+      keyframes: {
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
       }
     },
   },

@@ -26,11 +26,6 @@ export const MENU: MenuNode[] = [
             label: 'Phân phối IPO - VPBS',
             children: [
               {
-                id: 'Huong-dan-dang-ky',
-                label: 'HD đăng ký CTV',
-                path: 'tin-tuc-san-pham/phan-phoi-ipo/tin-tuc-san-pham-phan-phoi-ipo-2025-10',
-              },
-              {
                 id: 'huong-dan-ang-ky-at-mua',
                 label: 'HD Đăng ký đặt mua',
                 path: 'tin-tuc-san-pham/phan-phoi-ipo/phan-phoi-ipo-vpbs/tin-tuc-san-pham-phan-phoi-ipo-phan-phoi-ipo-vpbs-2025-10',
@@ -46,17 +41,18 @@ export const MENU: MenuNode[] = [
       },
       {
         id: 'promotions',
-        label: 'Ưu đãi',
+        label: 'Sản phẩm - Dịch vụ',
         children: [
           {
-            id: 'promo-sh69',
-            label: 'Gói SH69',
-            path: 'news/promotions/sh69',
-          },
-          {
-            id: 'test',
-            label: 'test',
-            path: 'tin-tuc-san-pham/uu-ai/test4',
+            id: 'san-pham-margin',
+            label: 'Sản phẩm Margin',
+            children: [
+              {
+                id: 'goi-vay-margin-t30',
+                label: 'Gói vay Margin T30',
+                path: 'tin-tuc-san-pham/san-pham-dich-vu/san-pham-margin/goi-vay-margin-t30',
+              },
+            ],
           },
         ],
       },
@@ -111,9 +107,55 @@ export const MENU: MenuNode[] = [
             label: 'Giao dịch',
             children: [
               {
+                id: 'lenh-dieu-kien',
+                label: 'Lệnh điều kiện',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/giao-dich/lenh-dieu-kien',
+              },
+              {
                 id: 'dat-lenh-ck-co-so',
-                label: 'Đặt lệnh CK cơ sở',
+                label: 'Giao diện đặt lệnh dọc',
                 path: 'huong-dan-su-dung/shsmart-mts-2-0/giao-dich/dat-lenh-ck-co-so',
+              },
+              {
+                id: 'giao-dien-dat-lenh-ngang',
+                label: 'Giao diện đặt lệnh ngang',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/giao-dich/giao-dien-dat-lenh-ngang',
+              },
+              {
+                id: 'huy-sua-lenh-cho-khop',
+                label: 'Hủy/sửa lệnh chờ khớp',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/giao-dich/huy-sua-lenh-cho-khop',
+              },
+              {
+                id: 'huy-toan-bo-lenh-cho-khop',
+                label: 'Hủy toàn bộ lệnh chờ khớp',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/giao-dich/huy-toan-bo-lenh-cho-khop',
+              },
+              {
+                id: 'ban-tat-ca-danh-muc-nam-giu',
+                label: 'Bán tất cả danh mục nắm giữ',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/giao-dich/ban-tat-ca-danh-muc-nam-giu',
+              },
+            ],
+          },
+          {
+            id: 'tai-san',
+            label: 'Tài sản',
+            children: [
+              {
+                id: 'bo-cuc-man-hinh-tai-san',
+                label: 'Bố cục màn hình Tài sản',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-san/bo-cuc-man-hinh-tai-san',
+              },
+              {
+                id: 'hd-dat-lenh-ban-ma-nam-giu',
+                label: 'HD đặt lệnh Bán mã nắm giữ',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-san/hd-dat-lenh-ban-ma-nam-giu',
+              },
+              {
+                id: 'hd-ban-tat-ca-danh-muc-nam-giu',
+                label: 'HD Bán tất cả danh mục nắm giữ',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tai-san/hd-ban-tat-ca-danh-muc-nam-giu',
               },
             ],
           },
@@ -218,6 +260,16 @@ export const MENU: MenuNode[] = [
                 id: 'tao-bang-gia-tuy-chon',
                 label: 'Tạo bảng giá tùy chọn',
                 path: 'huong-dan-su-dung/shsmart-mts-2-0/tien-ich-mo-rong/tao-bang-gia-tuy-chon',
+              },
+              {
+                id: 'notification',
+                label: 'Notification',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tien-ich-mo-rong/notification',
+              },
+              {
+                id: 'hd-tao-canh-bao-gia',
+                label: 'HD Tạo cảnh báo giá',
+                path: 'huong-dan-su-dung/shsmart-mts-2-0/tien-ich-mo-rong/hd-tao-canh-bao-gia',
               },
             ],
           },

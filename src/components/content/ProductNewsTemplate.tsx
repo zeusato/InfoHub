@@ -8,6 +8,13 @@ type Props = {
   subtitle?: string
   bannerImg?: string
   content: ContentBlock[]
+  /**
+   * Raw HTML content from Quill editor. When provided, this field will be
+   * rendered directly as HTML inside the article. This allows rich
+   * formatting such as links and images to be preserved. When absent,
+   * the component falls back to rendering the structured `content` array.
+   */
+  contentHtml?: string
   endingNote?: string
 }
 
@@ -16,6 +23,7 @@ export default function ProductNewsTemplate({
   subtitle,
   bannerImg,
   content,
+  contentHtml,
   endingNote,
 }: Props) {
   return (
@@ -34,46 +42,56 @@ export default function ProductNewsTemplate({
       )}
 
       {/* Main content */}
-      {content.map((block, i) => {
-        if (block.type === 'paragraph') {
-          return <p key={i}>{block.text}</p>
-        }
-        if (block.type === 'table') {
-          return (
-            <div key={i} className="overflow-x-auto my-4">
-              <table className="table-auto border-collapse w-full text-sm">
-                <thead>
-                  <tr>
-                    {block.headers.map((h, j) => (
-                      <th
-                        key={j}
-                        className="border border-white/20 px-3 py-2 text-left bg-white/5"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {block.rows.map((row, r) => (
-                    <tr key={r}>
-                      {row.map((cell, c) => (
-                        <td
-                          key={c}
-                          className="border border-white/10 px-3 py-2 text-zinc-200"
+      {/* If contentHtml provided, render it directly. Otherwise, iterate through the
+          structured content blocks. */}
+      {contentHtml ? (
+        /* eslint-disable react/no-danger */
+        <div
+          className="prose prose-invert max-w-none"
+          dangerouslySetInnerHTML={{ __html: contentHtml }}
+        />
+      ) : (
+        content.map((block, i) => {
+          if (block.type === 'paragraph') {
+            return <p key={i}>{block.text}</p>
+          }
+          if (block.type === 'table') {
+            return (
+              <div key={i} className="overflow-x-auto my-4">
+                <table className="table-auto border-collapse w-full text-sm">
+                  <thead>
+                    <tr>
+                      {block.headers.map((h, j) => (
+                        <th
+                          key={j}
+                          className="border border-white/20 px-3 py-2 text-left bg-white/5"
                         >
-                          {cell}
-                        </td>
+                          {h}
+                        </th>
                       ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )
-        }
-        return null
-      })}
+                  </thead>
+                  <tbody>
+                    {block.rows.map((row, r) => (
+                      <tr key={r}>
+                        {row.map((cell, c) => (
+                          <td
+                            key={c}
+                            className="border border-white/10 px-3 py-2 text-zinc-200"
+                          >
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          }
+          return null
+        })
+      )}
 
       {/* Ending note */}
       {endingNote && (

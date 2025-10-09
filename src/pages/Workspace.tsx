@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { BorderBeam } from "@/components/lightswind/border-beam";
 import RotateOverlay from "@/components/RotateOverlay";
 import { GlowingCards, GlowingCard } from "@/components/lightswind/glowing-cards";
+import ShinyText from "@/components/lightswind/shiny-text";
 import MGReferralQRCard from "@/components/tools/MGReferralQRCard";
 import QrApp from "@/assets/qr-app.jpg";
 import NeonAnimatedButton from "@/components/tools/NeonAnimatedButton";
@@ -80,8 +81,8 @@ export default function Workspace() {
               <GlowingCard glowColor="#8b5cf6" className="text-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition">
                 <img src={IPO} alt="IPO" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 flex flex-col items-end justify-center p-4 mr-5">
-                  <p className="text-[#f59e0b] text-xl mb-2 text-right font-bold drop-shadow-lg">SHS là đại lý chính<br/>phân phối cổ phiếu VPBS</p>
-                  <NeonAnimatedButton label="Đăng ký ngay"/>
+                  <p className="text-[#F76F08] text-xl mb-2 text-right font-bold drop-shadow-lg">SHS là đại lý chính<br/>phân phối cổ phiếu VPBS</p>
+                  <NeonAnimatedButton label="Đăng ký ngay" onClick={() => window.open('https://ipo.shs.com.vn/', '_blank')}/>
                 </div>
               </GlowingCard>
               <GlowingCard
@@ -91,7 +92,16 @@ export default function Workspace() {
               >
                 <MGReferralQRCard />
               </GlowingCard>
-              <GlowingCard children glowColor="#8b5cf6" className="text-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition"></GlowingCard>
+              <GlowingCard glowColor="#8b5cf6" className="flex items-center justify-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition">
+                <ShinyText
+                  baseColor="rgba(255, 255, 255, 0.8)"
+                  size="2xl"
+                  shineColor="rgba(255, 255, 255, 1)"
+                  speed={5}
+                >
+                  Coming soon...
+                </ShinyText>
+              </GlowingCard>
               <GlowingCard
                 hoverEffect={false}
                 glowColor="#10b981"

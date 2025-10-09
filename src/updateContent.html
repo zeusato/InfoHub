@@ -129,7 +129,7 @@
           </div>
           <div class="col" style="flex:1">
             <label class="label">Bộ phận phát hành (tùy chọn)</label>
-            <input id="fDept" placeholder="Phát triển sản phẩm" value="Phát triển sản phẩm"/>
+            <input id="fDept" placeholder="Bộ phận Sản phẩm"/>
           </div>
         </div>
         <div class="row small">
@@ -630,7 +630,7 @@
     fTemplateKey.value = 'ProductNews'
     fTitle.value = '';
     fDate.value = '';
-    fDept.value = 'Phát triển sản phẩm';
+    fDept.value = '';
     subtitlePreview.textContent = '';
     destFileName.value = '';
     imgPreview.style.display = 'none'; imgPreview.src = '';
@@ -656,7 +656,10 @@
       if (entry.bannerImg) {
         destFileName.value = entry.bannerImg;
       }
-      if (entry.content) {
+    // Prefer contentHtml (rich HTML) when available; fallback to structured content blocks
+      if (entry.contentHtml) {
+        quill.root.innerHTML = entry.contentHtml;
+      } else if (entry.content) {
         const html = htmlFromContentBlocks(entry.content);
         quill.root.innerHTML = html;
       }
@@ -722,23 +725,23 @@
         const name = (g.destName || '').trim();
         if (name) galleryNames.push(name);
       }
-      // Prefix gallery names with selected assets folder if not already present
-      let finalGallery = galleryNames;
-      const folderPrefix = assetsDirHandle && assetsDirHandle.name ? (assetsDirHandle.name + '/') : '';
-      if (folderPrefix) {
-        finalGallery = galleryNames.map(n => n.startsWith(folderPrefix) ? n : folderPrefix + n);
-      }
 
-      entry = {
-        renderType,
-        templateKey,
-        title: (fTitle.value || '').trim(),
-        subtitle: buildSubtitle(),
-        bannerImg: (destFileName.value || '').trim(),
-        content: blocksFromHTML(quill.root.innerHTML),
-        endingNote: (fEnding.value || '').trim(),
-        gallery: finalGallery,
-      };
+      {
+        // Capture rich HTML from Quill editor
+        const html = quill.root.innerHTML;
+        entry = {
+          renderType,
+          templateKey,
+          title: (fTitle.value || '').trim(),
+          subtitle: buildSubtitle(),
+          bannerImg: (destFileName.value || '').trim(),
+          content: blocksFromHTML(html),
+          // Save raw HTML for rich formatting (links, images)
+          contentHtml: html,
+          endingNote: (fEnding.value || '').trim(),
+          gallery: galleryNames,
+        };
+      }
 
       // Copy banner and gallery files into selected assets folder when using FeatureGuide template
       if (templateKey === 'FeatureGuide') {
