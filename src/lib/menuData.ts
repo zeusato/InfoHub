@@ -281,13 +281,18 @@ export const MENU: MenuNode[] = [
         children: [
           {
             id: 'feature-a',
-            label: 'Tính năng A',
+            label: 'Tài sản',
             path: 'guides/features/a',
           },
           {
             id: 'feature-b',
             label: 'Tính năng B',
             path: 'guides/features/b',
+          },
+          {
+            id: 'man-hinh-tai-san',
+            label: 'Màn hình tài sản',
+            path: 'huong-dan-su-dung/webtrading-2-0/man-hinh-tai-san',
           },
         ],
       },
