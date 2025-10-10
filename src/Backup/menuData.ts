@@ -280,184 +280,19 @@ export const MENU: MenuNode[] = [
         label: 'WebTrading 2.0',
         children: [
           {
-            id: 'tai-khoan-1',
-            label: 'Tài khoản',
-            children: [
-              {
-                id: 'mo-tai-khoan',
-                label: 'Mở tài khoản',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-khoan/mo-tai-khoan',
-              },
-              {
-                id: 'dang-nhap-1',
-                label: 'Đăng nhập',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-khoan/dang-nhap',
-              },
-              {
-                id: 'quen-mat-khau-1',
-                label: 'Quên mật khẩu',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-khoan/quen-mat-khau',
-              },
-              {
-                id: 'thong-tin-ca-nhan',
-                label: 'Thông tin cá nhân',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-khoan/thong-tin-ca-nhan',
-              },
-            ],
-          },
-          {
-            id: 'giao-dich-1',
-            label: 'Giao dịch',
-            children: [
-              {
-                id: 'man-hinh-giao-dich-co-so',
-                label: 'Màn hình giao dịch Cơ sở',
-                path: 'huong-dan-su-dung/webtrading-2-0/giao-dich/man-hinh-giao-dich-co-so',
-              },
-              {
-                id: 'man-hinh-giao-dich-phai-sinh',
-                label: 'Màn hình giao dịch Phái sinh',
-                path: 'huong-dan-su-dung/webtrading-2-0/giao-dich/man-hinh-giao-dich-phai-sinh',
-              },
-              {
-                id: 'lenh-cho-khop',
-                label: 'Theo dõi lệnh trong ngày',
-                path: 'huong-dan-su-dung/webtrading-2-0/giao-dich/lenh-cho-khop',
-              },
-              {
-                id: 'so-lenh-lich-su',
-                label: 'Sổ lệnh lịch sử',
-                path: 'huong-dan-su-dung/webtrading-2-0/giao-dich/so-lenh-lich-su',
-              },
-              {
-                id: 'xac-nhan-lenh-1',
-                label: 'Xác nhận lệnh',
-                path: 'huong-dan-su-dung/webtrading-2-0/giao-dich/xac-nhan-lenh',
-              },
-              {
-                id: 'chi-tiet-ma-chung-khoan',
-                label: 'Chi tiết mã chứng khoán',
-                path: 'huong-dan-su-dung/webtrading-2-0/giao-dich/chi-tiet-ma-chung-khoan',
-              },
-              {
-                id: 'tong-quan-thi-truong',
-                label: 'Tổng quan thị trường',
-                path: 'huong-dan-su-dung/webtrading-2-0/giao-dich/tong-quan-thi-truong',
-              },
-            ],
-          },
-          {
-            id: 'tai-san-1',
+            id: 'feature-a',
             label: 'Tài sản',
-            children: [
-              {
-                id: 'thong-tin-tai-san',
-                label: 'Thông tin tài sản',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-san/thong-tin-tai-san',
-              },
-              {
-                id: 'danh-muc-nam-giu',
-                label: 'Danh mục nắm giữ',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-san/danh-muc-nam-giu',
-              },
-              {
-                id: 'ban-tat-ca-danh-muc-nam-giu-1',
-                label: 'Bán tất cả danh mục nắm giữ',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-san/ban-tat-ca-danh-muc-nam-giu',
-              },
-              {
-                id: 'hieu-suat-dau-tu',
-                label: 'Hiệu suất đầu tư',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-san/hieu-suat-dau-tu',
-              },
-              {
-                id: 'su-kien-quyen',
-                label: 'Sự kiện quyền',
-                path: 'huong-dan-su-dung/webtrading-2-0/tai-san/su-kien-quyen',
-              },
-            ],
+            path: 'guides/features/a',
           },
           {
-            id: 'quan-ly-tien',
-            label: 'Quản lý tiền',
-            children: [
-              {
-                id: 'nop-tien-1',
-                label: 'Nộp tiền',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/nop-tien',
-              },
-              {
-                id: 'rut-tien-1',
-                label: 'Rút tiền',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/rut-tien',
-              },
-              {
-                id: 'ung-tien-1',
-                label: 'Ứng tiền',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/ung-tien',
-              },
-              {
-                id: 'chuyen-tien-noi-bo-1',
-                label: 'Chuyển tiền nội bộ',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/chuyen-tien-noi-bo',
-              },
-              {
-                id: 'chuyen-khoan-chung-khoan',
-                label: 'Chuyển khoản chứng khoán',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/chuyen-khoan-chung-khoan',
-              },
-              {
-                id: 'nop-ky-quy-1',
-                label: 'Nộp ký quỹ',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/nop-ky-quy',
-              },
-              {
-                id: 'rut-ky-quy-1',
-                label: 'Rút ký quỹ',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/rut-ky-quy',
-              },
-              {
-                id: 'tra-no-chu-dong-1',
-                label: 'Trả nợ chủ động',
-                path: 'huong-dan-su-dung/webtrading-2-0/quan-ly-tien/tra-no-chu-dong',
-              },
-            ],
+            id: 'feature-b',
+            label: 'Tính năng B',
+            path: 'guides/features/b',
           },
           {
-            id: 'tien-ich-khac',
-            label: 'Tiện ích khác',
-            children: [
-              {
-                id: 'cai-dat',
-                label: 'Cài đặt',
-                path: 'huong-dan-su-dung/webtrading-2-0/tien-ich-khac/cai-dat',
-              },
-              {
-                id: 'cai-dat-khac',
-                label: 'Cài đặt khác',
-                path: 'huong-dan-su-dung/webtrading-2-0/tien-ich-khac/cai-dat-khac',
-              },
-              {
-                id: 'tao-canh-bao-gia',
-                label: 'Tạo cảnh báo giá',
-                path: 'huong-dan-su-dung/webtrading-2-0/tien-ich-khac/tao-canh-bao-gia',
-              },
-              {
-                id: 'he-thong-bao-cao',
-                label: 'Hệ thống báo cáo',
-                path: 'huong-dan-su-dung/webtrading-2-0/tien-ich-khac/he-thong-bao-cao',
-              },
-              {
-                id: 'quan-ly-dich-vu',
-                label: 'Quản lý dịch vụ',
-                path: 'huong-dan-su-dung/webtrading-2-0/tien-ich-khac/quan-ly-dich-vu',
-              },
-              {
-                id: 'he-thong-thong-bao',
-                label: 'Hệ thống thông báo',
-                path: 'huong-dan-su-dung/webtrading-2-0/tien-ich-khac/he-thong-thong-bao',
-              },
-            ],
+            id: 'man-hinh-tai-san',
+            label: 'Màn hình tài sản',
+            path: 'huong-dan-su-dung/webtrading-2-0/man-hinh-tai-san',
           },
         ],
       },

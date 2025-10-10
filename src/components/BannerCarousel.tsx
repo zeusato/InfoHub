@@ -1,8 +1,9 @@
 // src/components/BannerCarousel.tsx
 import { useEffect, useMemo, useState } from "react";
 import slidesJson from "@/data/slides.json";
-import { DynamicNavigation } from "@/components/lightswind/dynamic-navigation";
-import { Home, CandlestickChart, BarChart, LayoutGrid} from "lucide-react";
+// DynamicNavigation is no longer used because the banner menu is now collapsible.
+// import { DynamicNavigation } from "@/components/lightswind/dynamic-navigation";
+import { Home, CandlestickChart, BarChart, LayoutGrid, Menu as MenuIcon, ChevronRight } from "lucide-react";
 
 type Slide = {
   id: string;
@@ -21,6 +22,10 @@ const links = [
 
 export default function BannerCarousel() {
   const [idx, setIdx] = useState(0);
+
+  // State to control the collapsible navigation in the banner.
+  // When `menuOpen` is true the navigation items are shown, otherwise only the menu button is visible.
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const slides: (Slide & { imgUrl: string })[] = useMemo(() => {
     return (slidesJson as Slide[]).map((s) => ({
@@ -108,44 +113,105 @@ export default function BannerCarousel() {
         ))}
       </div>
 
-      {/* ======= EFFECT “KHOÉT GÓC” + DOCK ======= */}
+      {/* ======= COLLAPSIBLE NAVIGATION ======= */}
 
-      {/* 1) CUT-OUT: khối cùng màu nền trang để “cắt” banner, bo tròn mép còn lại */}
+      {/* Collapsible navigation: show a single menu button with a chevron by default.
+          When the user hovers over the menu area or clicks on the button,
+          the navigation items expand horizontally.  The container grows to fit
+          its contents rather than using a fixed width so it adapts to varying
+          viewport sizes and number of links. */}
       <div
-        aria-hidden
-        className="absolute z-10 rounded-2xl pointer-events-none"
-        style={{
-          left: "0px",
-          bottom: "0px",
-          width: "var(--cut-w)",
-          height: "var(--cut-h)",
-          background: "var(--tw-prose-bg, #111214)", // đổi cho khớp theme nền
-          boxShadow:
-            "inset 0 0 0 1px rgba(255,255,255,0.06), 0 2px 12px rgba(0,0,0,0.35)",
-        }}
-      />
-
-      {/* 2) DOCK: thanh menu thật, bo tròn 4 góc, nổi tách rời */}
-      <div
-        className="absolute z-20 rounded-2xl flex items-center gap-5 bg-white/8 backdrop-blur shadow-[0_16px_36px_-18px_rgba(0,0,0,0.8)]"
+        className="absolute z-20 flex items-center bg-black/10 backdrop-blur shadow-[0_16px_36px_-18px_rgba(0,0,0,0.8)] rounded-2xl transition-all"
         style={{
           left: `calc(0px + var(--gap))`,
           bottom: `calc(0px + var(--gap))`,
-          width: `calc(var(--cut-w) - var(--gap)*2)`,
           height: "var(--dock-h)",
+          // The container width is driven by its contents.  No fixed width is set.
         }}
+        // Expand the menu on hover.  Collapse it when the pointer leaves.
+        onMouseEnter={() => setMenuOpen(true)}
+        onMouseLeave={() => setMenuOpen(false)}
       >
-        {/* ví dụ 1 nút */}
-      <DynamicNavigation 
-        links={links}      
-        glowIntensity={5}
-        onLinkClick={(id) => console.log("Clicked:", id)}
-        />
-        {/* thêm các nút khác ở đây */}
+        {/* Menu toggle button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setMenuOpen((v) => !v);
+          }}
+          /*
+           * The menu toggle now consists of a hamburger icon and three right-pointing
+           * chevron icons.  Each chevron has a slight animation delay so they
+           * sequentially brighten, inviting the user to open the menu.  The icons
+           * are scaled up (~1.5×) compared to their default size to improve
+           * visibility.  The wrapper uses gap and padding for spacing.
+           */
+          className="flex items-center gap-1 h-full px-4 py-1.5 focus:outline-none hover:text-brand transition-colors"
+          type="button"
+        >
+          <MenuIcon size={24} />
+          <div className="flex items-center">
+            {[0, 1, 2].map((i) => (
+              <ChevronRight
+                key={i}
+                size={24}
+                className={`arrow-step-${i}`}
+              />
+            ))}
+          </div>
+        </button>
+        {/* Navigation items container.  When collapsed it has zero width and is fully transparent.
+            When expanded it gains margin and opacity so items appear smoothly. */}
+        <ul
+          className={`flex items-center overflow-hidden transition-all duration-300 ${
+            menuOpen
+              ? "ml-3 opacity-100 max-w-none"
+              : "ml-0 opacity-0 max-w-0"
+          }`}
+        >
+          {links.map((link) => (
+            <li key={link.id} className="px-2">
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-xs md:text-sm text-current hover:text-brand transition-colors"
+              >
+                {link.icon && (
+                  <span className="text-current text-xs">{link.icon}</span>
+                )}
+                <span className="hidden sm:inline">{link.label}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* Container height */}
       <div style={{ height: "var(--banner-h)" }} />
+
+      {/* Animated arrow CSS.  We embed our keyframes and classes here so
+          the three ChevronRight icons in the menu button pulse sequentially.
+          Each arrow has a delayed animation to create a flowing CTA effect. */}
+      <style>
+        {`
+        @keyframes arrowPulse {
+          0%, 20% { opacity: 0.3; }
+          40% { opacity: 1; }
+          60%, 100% { opacity: 0.3; }
+        }
+        .arrow-step-0 {
+          animation: arrowPulse 1.5s infinite;
+        }
+        .arrow-step-1 {
+          animation: arrowPulse 1.5s infinite;
+          animation-delay: 0.3s;
+        }
+        .arrow-step-2 {
+          animation: arrowPulse 1.5s infinite;
+          animation-delay: 0.6s;
+        }
+        `}
+      </style>
     </div>
   );
 }
