@@ -1048,5 +1048,16 @@
       "hdsd/Tổng quan thị trường.png",
       "hdsd/Nhiệt đồ ngành.png"
     ]
+  },
+  "tin-tuc-san-pham/san-pham-dich-vu/san-pham-margin/san-pham-margin-tplus": {
+    "renderType": "template",
+    "templateKey": "ProductNews",
+    "title": "Thông báo thay đổi chính sách sản phẩm Margin TPLUS",
+    "subtitle": "Phát hành: 30/10/2024 — Bộ phận Phát triển sản phẩm",
+    "bannerImg": "z7017319613581_8be88b5d8a4002bc760b209de57e1e72.jpg",
+    "content": [],
+    "contentHtml": "<p class=\"ql-align-center\"><img src=\"https://www.shs.com.vn/Sites/QuoteVN/SiteRoot/image_2024_10_31T09_26_15_611Z.png\" height=\"1428\" width=\"750\"></p>",
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
+    "gallery": []
   }
 }

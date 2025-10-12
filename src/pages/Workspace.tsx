@@ -20,6 +20,7 @@ import RssFetcher from "@/components/news/RssFetcher";
 import RssSourcesPanel from "@/components/news/RssSourcesPanel";
 import cafebizLogo from "@/assets/cafebiz.jpg";
 import vietstockLogo from "@/assets/vietstock.jpg";
+import SymbolChart from '@/components/Index/SymbolChart';
 
 type LeafPayload = Parameters<typeof ContentHost>[0]["activeLeaf"];
 
@@ -177,6 +178,7 @@ export default function Workspace() {
                 >
                   Coming soon...
                 </ShinyText>
+                {/* <SymbolChart symbol="VN" height={300} colorTheme="dark" /> */}
               </GlowingCard>
               <GlowingCard
                 hoverEffect={false}

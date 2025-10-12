@@ -52,6 +52,11 @@ export const MENU: MenuNode[] = [
                 label: 'Gói vay Margin T30',
                 path: 'tin-tuc-san-pham/san-pham-dich-vu/san-pham-margin/goi-vay-margin-t30',
               },
+              {
+                id: 'san-pham-margin-tplus',
+                label: 'Sản phẩm Margin TPLUS',
+                path: 'tin-tuc-san-pham/san-pham-dich-vu/san-pham-margin/san-pham-margin-tplus',
+              },
             ],
           },
         ],
