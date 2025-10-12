@@ -176,7 +176,7 @@ export default function Workspace() {
                   shineColor="rgba(255, 255, 255, 1)"
                   speed={5}
                 >
-                  Coming soon...
+                  SHAdvisor coming soon...
                 </ShinyText>
                 {/* <SymbolChart symbol="VN" height={300} colorTheme="dark" /> */}
               </GlowingCard>
