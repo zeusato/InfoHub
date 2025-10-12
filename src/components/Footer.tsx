@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="flex-1 min-w-0">
         {/* tuỳ chiều cao ticker */}
         <div className="flex-1 min-w-0 flex items-center h-[46px]">
-          <TradingViewWidget />
+          <TradingViewWidget refreshMs={1000}/>
         </div>
       </div>
 

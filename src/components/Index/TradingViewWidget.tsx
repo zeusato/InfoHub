@@ -1,180 +1,126 @@
-// src/components/TradingViewWidget.tsx
-import React, { memo, useEffect, useRef, useState, useMemo } from "react";
+import React, {
+  memo,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  MouseEvent,
+} from "react";
+import { createPortal } from "react-dom";
 import clsx from "clsx";
 
-/**
- * TickerSymbol describes the shape of each ticker entry passed into the widget.
- * In the original TradingView implementation the proName included a vendor
- * prefix (e.g. "SPREADEX:DJI").  For our purposes we only care about the
- * symbol code itself (the part after the colon).  If you supply plain
- * strings instead of objects the value will be treated as the symbol code
- * directly.  The optional `title` field is retained for compatibility but
- * unused in our custom rendering.
- */
+// Cho phép truyền string hoặc object kiểu TradingView
 type TickerSymbol = { proName: string; title?: string } | string;
 
 type Props = {
   symbols?: TickerSymbol[];
   colorTheme?: "light" | "dark";
-  locale?: string;
-  largeChartUrl?: string;
   isTransparent?: boolean;
-  showSymbolLogo?: boolean;
-  displayMode?: "adaptive" | "regular";
-  /** Cho widget dùng kích thước của container (rộng 100%, cao theo container) */
-  useContainerSize?: boolean;
-  /** Chiều cao của vùng widget; vd 46, '48px', '3rem'... */
   height?: number | string;
-  /** Tràn mép ngang (âm margin) để full-bleed trong footer */
   bleed?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  /** Chu kỳ làm mới dữ liệu (ms). Mặc định 10_000ms */
+  refreshMs?: number;
 };
 
-function TradingViewWidget({
-  /**
-   * Danh sách các symbol cần lấy dữ liệu.  Bạn có thể truyền vào một mảng
-   * string (ví dụ ["VN", "VN30"]) hoặc mảng các object có trường proName.
-   * Nếu để trống sẽ dùng các mã chỉ số phổ biến của thị trường Việt Nam.
-   */
-  symbols = ["VN", "VN100", "VN30", "HNX", "UPCOM", "VNXALLSHARE", "VNDIAMOND", "VNMIDCAP"],
-  /** Chủ đề màu: dark hoặc light. Ảnh hưởng tới màu chữ. */
+type Row = {
+  symbol: string;
+  displayName: string;
+  current: number | null; // c
+  change: number | null; // ch
+  percent: number | null; // r (%)
+  vo?: number | null; // KLGD
+  va?: number | null; // GTGD (VND)
+  ic?: { ce?: number; fl?: number; up?: number; dw?: number; uc?: number } | null;
+};
+
+// Ánh xạ mã chỉ số → symbol của TradingView
+const tradingViewMap: Record<string, string> = {
+  VN: "HOSE%3AVNindex",
+  VN30: "HOSE%3AVN30",
+  VN100: "HOSE%3AVN100",
+  VNALLSHARE: "HOSE%3AVNallshare",
+  VNXALLSHARE: "HOSE%3AVNallshare",
+  VNDIAMOND: "HOSE%3AVNdiamond",
+  VNMIDCAP: "HOSE%3AVNmidcap",
+  HNX: "HNX%3AHNXINDEX",
+  UPCOM: "HNX%3A301",
+};
+
+// Helpers format số
+const fmt = (n: number | null | undefined) =>
+  typeof n === "number" && isFinite(n) ? n.toLocaleString() : "-";
+
+const fmtBillion = (vnd: number | null | undefined) =>
+  typeof vnd === "number" && isFinite(vnd)
+    ? (vnd / 1_000_000_000).toLocaleString(undefined, {
+        maximumFractionDigits: 3,
+        minimumFractionDigits: 0,
+      })
+    : "-";
+
+// Tooltip render ra body (vượt mọi overflow), neo theo con trỏ
+function PortalTooltip({
+  open,
+  x,
+  y,
+  theme,
+  content,
+}: {
+  open: boolean;
+  x: number;
+  y: number;
+  theme: "light" | "dark";
+  content: React.ReactNode;
+}) {
+  if (!open) return null;
+  return createPortal(
+    <div
+      style={{
+        position: "fixed",
+        left: x,
+        top: y - 10,
+        transform: "translate(-50%, -100%)", // vị trí tooltip nằm phía trên con trỏ 10px
+        zIndex: 9999,
+        pointerEvents: "none",
+      }}
+      className={clsx(
+        "rounded-xl px-3 py-2 border backdrop-blur-md shadow-lg",
+        theme === "dark"
+          ? "bg-white/10 text-white border-white/20"
+          : "bg-black/10 text-gray-900 border-black/15"
+      )}
+    >
+      {content}
+    </div>,
+    document.body
+  );
+}
+
+export default memo(function TradingViewWidget({
+  symbols = [
+    "VN",
+    "VN100",
+    "VN30",
+    "HNX",
+    "UPCOM",
+    "VNXALLSHARE",
+    "VNDIAMOND",
+    "VNMIDCAP",
+  ],
   colorTheme = "dark",
-  /**
-   * Tùy chọn hiển thị liệu nền widget có trong suốt hay không.  Hiện tại
-   * chúng tôi chỉ dùng để tính màu nền; TradingView yêu cầu tham số này
-   * nên giữ lại để tương thích API.  Khi isTransparent=true sẽ không đặt
-   * màu nền, ngược lại đặt màu nền phù hợp với theme.
-   */
   isTransparent = true,
-  /** Chiều cao của widget, nhận vào số hoặc chuỗi. */
   height = 46,
-  /** Nếu đặt bleed=true thì widget sẽ có margin âm để tràn cạnh ngang. */
   bleed = false,
   className,
   style,
+  refreshMs,
 }: Props) {
-  // Bản đồ ánh xạ mã chỉ số sang symbol sử dụng cho đường dẫn TradingView.  Khi
-  // click vào một item trong ticker, chúng ta sẽ dùng bản đồ này để mở
-  // chart TradingView ở tab mới theo cú pháp:
-  // https://www.tradingview.com/chart/HXqbgYu4/?symbol=[Symbol on tradingview]
-  // Chú ý: một số mã có thể được viết theo nhiều cách, vì vậy chúng ta lưu
-  // cả phiên bản viết hoa và viết thường (nếu cần) vào đây.  Bạn có thể
-  // mở rộng danh sách này khi cần thêm chỉ số mới.
-  const tradingViewMap: Record<string, string> = {
-    VN: 'HOSE%3AVNindex',
-    VN30: 'HOSE%3AVN30',
-    VN100: 'HOSE%3AVN100',
-    VNALLSHARE: 'HOSE%3AVNallshare',
-    VNXALLSHARE: 'HOSE%3AVNallshare',
-    VNDIAMOND: 'HOSE%3AVNdiamond',
-    VNMIDCAP: 'HOSE%3AVNmidcap',
-    HNX: 'HNX%3AHNXINDEX',
-    UPCOM: 'HNX%3A301',
-  };
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  // Nội dung scrollable sẽ được tham chiếu để áp dụng hiệu ứng dịch chuyển.
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  // Trạng thái dừng/chạy khi hover vào slider.
-  const [isPaused, setIsPaused] = useState(false);
-  // Lưu trạng thái dữ liệu ticker sau khi fetch từ API.
-  const [tickerData, setTickerData] = useState<
-    {
-      symbol: string;
-      displayName: string;
-      current: number | null;
-      change: number | null;
-      percent: number | null;
-    }[]
-  >([]);
-
-  /**
-   * Từ danh sách symbols nhận vào (có thể là string hoặc object), trích xuất
-   * mã (code) để gọi API.  Nếu phần tử là chuỗi sẽ dùng trực tiếp, nếu là
-   * object và có tiền tố trước dấu ":" thì lấy phần phía sau dấu ":".
-   */
-  const symbolCodes = useMemo(() => {
-    return (symbols as TickerSymbol[]).map((item) => {
-      if (typeof item === "string") return item;
-      const proName = item.proName || "";
-      const parts = proName.split(":");
-      return parts[parts.length - 1] || proName;
-    });
-  }, [symbols]);
-
-  useEffect(() => {
-    // Nếu không có symbol nào thì không cần fetch.
-    if (!symbolCodes || symbolCodes.length === 0) {
-      setTickerData([]);
-      return;
-    }
-    const controller = new AbortController();
-    const fetchData = async () => {
-      try {
-        const query = symbolCodes.join(",");
-        const url = `https://sboard.shs.com.vn/api/v1/market/symbolLatest?symbolList=${encodeURIComponent(
-          query
-        )}`;
-        const resp = await fetch(url, { signal: controller.signal });
-        if (!resp.ok) {
-          throw new Error(`HTTP error ${resp.status}`);
-        }
-        const json: any = await resp.json();
-        // Xử lý response. API có thể trả về mảng hoặc object.  Chúng ta
-        // chuyển thành mảng các item.
-        let items: any[] = [];
-        if (Array.isArray(json)) {
-          items = json;
-        } else if (json && typeof json === "object") {
-          // Một số API trả về dạng { data: {...} }
-          if (Array.isArray(json.data)) {
-            items = json.data;
-          } else {
-            // Lấy mọi giá trị của object.  Bỏ qua các khóa không phải item.
-            items = Object.values(json).filter((v) => v && typeof v === "object");
-          }
-        }
-        const processed = items.map((item: any) => {
-          const symbol: string = item.s || item.symbol || "";
-          // Hiển thị VN thành VNIndex, các symbol khác giữ nguyên.
-          const displayName = symbol === "VN" ? "VNIndex" : symbol;
-          const current: number | null =
-            typeof item.c === "number"
-              ? item.c
-              : item.last ?? item.close ?? null;
-          const change: number | null =
-            typeof item.ch === "number"
-              ? item.ch
-              : item.change ?? null;
-          // Tỷ lệ biến động r được nhân 100 để thành phần trăm. Nếu không có r
-          // nhưng có giá mở cửa (o) và thay đổi tuyệt đối, ta có thể tính.
-          let percent: number | null = null;
-          if (typeof item.r === "number") {
-            percent = item.r * 100;
-          } else if (typeof change === "number" && typeof item.o === "number" && item.o !== 0) {
-            percent = (change / item.o) * 100;
-          }
-          return { symbol, displayName, current, change, percent };
-        });
-        setTickerData(processed);
-      } catch (err) {
-        // Nếu có lỗi (có thể do CORS hoặc đường mạng), giữ nguyên dữ liệu cũ
-        console.error(err);
-      }
-    };
-    fetchData();
-    return () => {
-      controller.abort();
-    };
-  }, [symbolCodes]);
-
-  // Chuẩn hoá height: nếu là số thì chuyển sang px.
   const h = typeof height === "number" ? `${height}px` : height;
+  const refresh = typeof refreshMs === "number" ? refreshMs : 10_000; // 10s mặc định
 
-  /**
-   * Tính toán các lớp màu sắc dựa trên theme và mức độ trong suốt.  Nếu
-   * isTransparent=true thì chỉ set màu chữ; nếu false thì gán màu nền.
-   */
   const baseTextClass = colorTheme === "dark" ? "text-white" : "text-gray-800";
   const baseBgClass = !isTransparent
     ? colorTheme === "dark"
@@ -182,163 +128,308 @@ function TradingViewWidget({
       : "bg-white"
     : "";
 
-  // Không gian chừa bên phải để hiển thị phần text "made with love" nằm ngoài widget.
-  const reservedSpace = "8rem";
+  const [rows, setRows] = useState<Row[]>([]);
 
-  // Data hiển thị nhân đôi để tạo hiệu ứng lặp liên tục.
-  const displayData = useMemo(() => {
-    return tickerData.length > 0 ? tickerData.concat(tickerData) : [];
-  }, [tickerData]);
+  // Rút mã symbol gọi API (từ string hoặc từ proName: "VENDOR:CODE")
+  const symbolCodes = useMemo(() => {
+    return (symbols as TickerSymbol[]).map((item) => {
+      if (typeof item === "string") return item;
+      const p = (item.proName || "").split(":");
+      return p[p.length - 1] || item.proName;
+    });
+  }, [symbols]);
 
-  // Hiệu ứng ticker chạy từ phải sang trái liên tục.
+  // Fetch + polling
   useEffect(() => {
-    const el = contentRef.current;
-    if (!el || displayData.length === 0) return;
-    let startX = 0;
-    let lastTime: number | null = null;
-    let frameId: number;
-    // Vận tốc dịch chuyển (px mỗi giây). Chỉnh thông số nhỏ để chậm rãi.
-    const speed = 30;
-    const step = (timestamp: number) => {
-      if (lastTime === null) lastTime = timestamp;
-      const delta = timestamp - (lastTime as number);
-      lastTime = timestamp;
-      if (!isPaused) {
-        startX -= (speed * delta) / 1000;
-        const halfWidth = el.scrollWidth / 2;
-        if (-startX >= halfWidth) {
-          // Khi đã dịch hết chiều rộng một nửa (một vòng), reset về 0 để lặp.
-          startX = 0;
-        }
-        el.style.transform = `translateX(${startX}px)`;
+    if (!symbolCodes.length) return;
+    let destroyed = false;
+    let fetching = false;
+    let timer: number | undefined;
+
+    const load = async () => {
+      if (destroyed || fetching || document.hidden) return;
+      fetching = true;
+      try {
+        const url = `https://sboard.shs.com.vn/api/v1/market/symbolLatest?symbolList=${encodeURIComponent(
+          symbolCodes.join(",")
+        )}`;
+        const resp = await fetch(url, { cache: "no-store" });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const json: any = await resp.json();
+
+        const list: any[] = Array.isArray(json)
+          ? json
+          : Array.isArray(json?.data)
+          ? json.data
+          : Object.values(json || {}).filter(
+              (v) => v && typeof v === "object"
+            );
+
+        const next: Row[] = list.map((it) => {
+          const s: string = it.s || it.symbol || "";
+          const displayName = s === "VN" ? "VNIndex" : s;
+          const c: number | null =
+            typeof it.c === "number" ? it.c : it.last ?? it.close ?? null;
+          const ch: number | null =
+            typeof it.ch === "number" ? it.ch : it.change ?? null;
+          let r: number | null = null;
+          if (typeof it.r === "number") r = it.r * 100;
+          else if (
+            typeof ch === "number" &&
+            typeof it.o === "number" &&
+            it.o !== 0
+          )
+            r = (ch / it.o) * 100;
+          const vo: number | null = typeof it.vo === "number" ? it.vo : null;
+          const va: number | null = typeof it.va === "number" ? it.va : null;
+          const ic = it.ic || null;
+          return {
+            symbol: s,
+            displayName,
+            current: c,
+            change: ch,
+            percent: r,
+            vo,
+            va,
+            ic,
+          };
+        });
+
+        if (!destroyed) setRows(next);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        fetching = false;
       }
-      frameId = requestAnimationFrame(step);
     };
-    frameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frameId);
-  }, [displayData, isPaused]);
+
+    load();
+    timer = window.setInterval(load, refresh) as unknown as number;
+
+    const onVis = () => !document.hidden && load();
+    document.addEventListener("visibilitychange", onVis);
+
+    return () => {
+      destroyed = true;
+      if (timer) clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [symbolCodes, refresh]);
+
+  // Màu toàn item theo biến động (null → xám, >0 xanh, <0 đỏ, =0 vàng)
+  const colorByChange = (ch: number | null) =>
+    ch == null
+      ? "text-gray-400"
+      : ch > 0
+      ? "text-green-500"
+      : ch < 0
+      ? "text-red-500"
+      : "text-yellow-400";
+
+  // --- State & handlers cho tooltip portal theo con trỏ ---
+  const [ttOpen, setTtOpen] = useState(false);
+  const [ttX, setTtX] = useState(0);
+  const [ttY, setTtY] = useState(0);
+  const [ttNode, setTtNode] = useState<React.ReactNode>(null);
+
+  const renderTooltipContent = (r: Row) => (
+    <div>
+      <div className="font-semibold mb-1">
+        <span>{r.displayName}</span>{" "}
+        <span className="text-emerald-400">{fmt(r.current)}</span>{" "}
+        {typeof r.change === "number" && typeof r.percent === "number" && (
+          <span>
+            {" ("}
+            <span
+              className={
+                r.change > 0
+                  ? "text-emerald-400"
+                  : r.change < 0
+                  ? "text-red-500"
+                  : "text-yellow-400"
+              }
+            >
+              {r.change > 0 ? "+" : ""}
+              {r.change.toFixed(2)}
+            </span>
+            {" | "}
+            <span
+              className={
+                r.change > 0
+                  ? "text-emerald-400"
+                  : r.change < 0
+                  ? "text-red-500"
+                  : "text-yellow-400"
+              }
+            >
+              {r.percent.toFixed(2)}%
+            </span>
+            {")"}
+          </span>
+        )}
+      </div>
+      {typeof r.vo === "number" && (
+        <div>
+          KLGD: <span className="font-semibold">{fmt(r.vo)}</span>{" "}
+          <span className="opacity-75">CP</span>
+        </div>
+      )}
+      {typeof r.va === "number" && (
+        <div>
+          GTGD: <span className="font-semibold">{fmtBillion(r.va)}</span>{" "}
+          <span className="opacity-75">Tỷ</span>
+        </div>
+      )}
+      {r.ic && (
+        <div className="mt-1 flex items-center gap-4">
+          <span className="text-green-500">
+            {fmt(r.ic.up)}{" "}
+            <span className="text-purple-400">({fmt(r.ic.ce)})</span>
+          </span>
+          <span className="text-yellow-400">{fmt(r.ic.uc)}</span>
+          <span className="text-red-500">
+            {fmt(r.ic.dw)}{" "}
+            <span className="text-cyan-400">({fmt(r.ic.fl)})</span>
+          </span>
+        </div>
+      )}
+    </div>
+  );
+
+  const showTooltip = (e: MouseEvent<HTMLDivElement>, r: Row) => {
+    setTtNode(renderTooltipContent(r));
+    setTtX(e.clientX);
+    setTtY(e.clientY);
+    setTtOpen(true);
+  };
+  const moveTooltip = (e: MouseEvent<HTMLDivElement>) => {
+    setTtX(e.clientX);
+    setTtY(e.clientY);
+  };
+  const hideTooltip = () => setTtOpen(false);
 
   return (
     <div
       ref={wrapperRef}
-      className={clsx("tradingview-widget-container w-full", className, bleed && "-mx-4 md:-mx-6")}
-      // Dùng padding-right để chừa chỗ bên phải cho "made with love"
-      style={{ ...(style || {})}}
+      className={clsx(
+        "tradingview-widget-container w-full",
+        className,
+        bleed && "-mx-4 md:-mx-6"
+      )}
+      style={{ ...(style || {}) }}
     >
-      {/* CSS keyframes cho ticker – loop mượt, pause on hover */}
+      {/* CSS ticker: double-track, pause on hover */}
       <style>{`
         .ticker { position: relative; }
         .ticker__viewport {
           overflow: hidden; width: 100%; height: 100%;
-          /* thêm: biến viewport thành flex để căn giữa dọc */
-          display: flex; align-items: center;
+          display: flex; align-items: center; /* căn giữa dọc */
         }
         .ticker__track {
           display: inline-flex;
           white-space: nowrap;
           will-change: transform;
           animation: ticker-scroll var(--ticker-duration, 60s) linear infinite;
-          transform: translateX(0);
-          /* thêm: căn giữa dọc các item trong track */
-          align-items: center;
-          line-height: 1;
+          align-items: center; line-height: 1;
         }
         .ticker:hover .ticker__track { animation-play-state: paused; }
-        @keyframes ticker-scroll {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
-        }
+        @keyframes ticker-scroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }
       `}</style>
 
-      <div
-        className={clsx(
-          "ticker",
-          baseTextClass,
-          baseBgClass
-        )}
-        style={{ height: h }}
-      >
+      {/* Tooltip vượt khung, bám theo con trỏ */}
+      <PortalTooltip
+        open={ttOpen}
+        x={ttX}
+        y={ttY}
+        theme={colorTheme}
+        content={ttNode}
+      />
+
+      <div className={clsx("ticker", baseTextClass, baseBgClass)} style={{ height: h }}>
         <div className="ticker__viewport">
           <div
             className="ticker__track"
-            // có thể chỉnh tốc độ ở đây: 60s, 45s, 90s...
             style={{ ["--ticker-duration" as any]: "60s" }}
           >
             {/* Track 1 */}
-            {tickerData.map(({ symbol, displayName, current, change, percent }) => {
-              const changePositive = typeof change === "number" && change > 0;
-              const changeNegative = typeof change === "number" && change < 0;
-              const changeColorClass = changePositive
-                ? "text-green-500"
-                : changeNegative
-                ? "text-red-500"
-                : "text-gray-400";
+            {rows.map((r) => {
+              const col = colorByChange(r.change);
+              const tvSym = tradingViewMap[r.symbol.toUpperCase()];
               return (
                 <div
-                  key={`a-${symbol}`}
-                  className="flex items-center gap-1 px-3 py-1 border-r border-gray-600 cursor-pointer "
+                  key={`a-${r.symbol}`}
+                  className={clsx(
+                    "relative group flex items-center gap-1 px-3 py-1 border-r border-gray-600 cursor-pointer hover:opacity-90",
+                    col
+                  )}
+                  onMouseEnter={(e) => showTooltip(e, r)}
+                  onMouseMove={moveTooltip}
+                  onMouseLeave={hideTooltip}
                   onClick={() => {
-                    // Khi click vào một mã chỉ số, nếu có ánh xạ tới TradingView
-                    // thì mở tab mới chứa biểu đồ của mã đó.  Bỏ qua nếu không có.
-                    const code = symbol.toUpperCase();
-                    const tvSym = tradingViewMap[code];
-                    if (tvSym) {
-                      const url = `https://www.tradingview.com/chart/HXqbgYu4/?symbol=${tvSym}`;
-                      window.open(url, '_blank');
-                    }
+                    if (tvSym)
+                      window.open(
+                        `https://www.tradingview.com/chart/?symbol=${tvSym}`,
+                        "_blank"
+                      );
                   }}
                 >
-                  <span className="font-medium">{displayName}</span>
-                  {current !== null && <span>{Number(current).toLocaleString()}</span>}
-                  {change !== null && percent !== null && (
-                    <span className={clsx("ml-1", changeColorClass)}>
-                      {change > 0 ? "+" : change < 0 ? "" : ""}
-                      {typeof change === "number" ? change.toFixed(2) : change}
-                      {` (`}
-                      {typeof percent === "number" ? percent.toFixed(2) : percent}
-                      {`%)`}
+                  <span className="font-medium">{r.displayName}</span>
+                  {r.current !== null && <span>{fmt(r.current)}</span>}
+                  {r.change !== null && r.percent !== null && (
+                    <span>
+                      {r.change > 0 ? "+" : r.change < 0 ? "" : ""}
+                      {typeof r.change === "number"
+                        ? r.change.toFixed(2)
+                        : r.change}
+                      {" ("}
+                      {typeof r.percent === "number"
+                        ? r.percent.toFixed(2)
+                        : r.percent}
+                      {"%)"}
                     </span>
                   )}
                 </div>
               );
             })}
 
-            {/* 👇 Thêm khoảng trống giữa hai track */}
+            {/* Spacer giữa 2 track (≈ 1 item) */}
             <div className="w-[140px]" aria-hidden="true" />
 
             {/* Track 2 (nhân đôi để loop liền mạch) */}
-            {tickerData.map(({ symbol, displayName, current, change, percent }) => {
-              const changePositive = typeof change === "number" && change > 0;
-              const changeNegative = typeof change === "number" && change < 0;
-              const changeColorClass = changePositive
-                ? "text-green-500"
-                : changeNegative
-                ? "text-red-500"
-                : "text-gray-400";
+            {rows.map((r) => {
+              const col = colorByChange(r.change);
+              const tvSym = tradingViewMap[r.symbol.toUpperCase()];
               return (
                 <div
-                  key={`b-${symbol}`}
-                  className="flex items-center gap-1 px-3 py-1 border-r border-gray-600 cursor-pointer "
-                                    onClick={() => {
-                    // Khi click vào một mã chỉ số, nếu có ánh xạ tới TradingView
-                    // thì mở tab mới chứa biểu đồ của mã đó.  Bỏ qua nếu không có.
-                    const code = symbol.toUpperCase();
-                    const tvSym = tradingViewMap[code];
-                    if (tvSym) {
-                      const url = `https://www.tradingview.com/chart/HXqbgYu4/?symbol=${tvSym}`;
-                      window.open(url, '_blank');
-                    }
+                  key={`b-${r.symbol}`}
+                  className={clsx(
+                    "relative group flex items-center gap-1 px-3 py-1 border-r border-gray-600 cursor-pointer hover:opacity-90",
+                    col
+                  )}
+                  onMouseEnter={(e) => showTooltip(e, r)}
+                  onMouseMove={moveTooltip}
+                  onMouseLeave={hideTooltip}
+                  onClick={() => {
+                    if (tvSym)
+                      window.open(
+                        `https://www.tradingview.com/chart/HXqbgYu4/?symbol=${tvSym}`,
+                        "_blank"
+                      );
                   }}
                 >
-                  <span className="font-medium">{displayName}</span>
-                  {current !== null && <span>{Number(current).toLocaleString()}</span>}
-                  {change !== null && percent !== null && (
-                    <span className={clsx("ml-1", changeColorClass)}>
-                      {change > 0 ? "+" : change < 0 ? "" : ""}
-                      {typeof change === "number" ? change.toFixed(2) : change}
-                      {` (`}
-                      {typeof percent === "number" ? percent.toFixed(2) : percent}
-                      {`%)`}
+                  <span className="font-medium">{r.displayName}</span>
+                  {r.current !== null && <span>{fmt(r.current)}</span>}
+                  {r.change !== null && r.percent !== null && (
+                    <span>
+                      {r.change > 0 ? "+" : r.change < 0 ? "" : ""}
+                      {typeof r.change === "number"
+                        ? r.change.toFixed(2)
+                        : r.change}
+                      {" ("}
+                      {typeof r.percent === "number"
+                        ? r.percent.toFixed(2)
+                        : r.percent}
+                      {"%)"}
                     </span>
                   )}
                 </div>
@@ -349,6 +440,4 @@ function TradingViewWidget({
       </div>
     </div>
   );
-}
-
-export default memo(TradingViewWidget);
+});
