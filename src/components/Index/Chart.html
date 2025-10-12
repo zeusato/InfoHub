@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VN Intraday — Baseline + Compressed Volume + Tooltip</title>
+  <style>
+    html,body {height:100%;margin:0;background:#0b0d10;color:#cfd8dc;font:14px system-ui,sans-serif}
+    .wrap {height:100%;display:flex;flex-direction:column}
+    .head {padding:8px 12px;border-bottom:1px solid #1e272e;font-size:13px;display:flex;gap:12px;align-items:center}
+    .chart {flex:1;position:relative}
+    .badge {background:#162027;border:1px solid #28333b;border-radius:6px;padding:4px 8px}
+    .shade {position:absolute;top:0;bottom:0;background:rgba(128,128,128,.08);pointer-events:none}
+    .marks {position:absolute;inset:0;pointer-events:none}
+    .mark {position:absolute;top:0;bottom:0;border-left:1px dashed #304554;color:#90a4ae;font-size:10px;transform:translateX(-50%)}
+    .mark span{position:absolute;top:2px;left:2px;background:#0f1317;padding:0 4px}
+    .tooltip {
+      position:absolute; pointer-events:none; z-index:10;
+      background:rgba(0,0,0,.85); color:#fff; border:1px solid #2a3a44; border-radius:6px;
+      padding:8px 10px; font-size:12px; min-width:170px; display:none;
+      box-shadow:0 8px 18px rgba(0,0,0,.35);
+    }
+  </style>
+  <script src="https://unpkg.com/lightweight-charts@4.2.1/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <span id="title" class="badge">Loading…</span>
+      <span id="info"  class="badge"></span>
+    </div>
+    <div id="chartWrap" class="chart">
+      <div id="marks" class="marks"></div>
+      <div id="lunch" class="shade" style="display:none"></div>
+      <div id="tooltip" class="tooltip"></div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const $ = id => document.getElementById(id);
+    const setText = (id, t) => { const el = $(id); if (el) el.textContent = t; };
+
+    const SYM = new URLSearchParams(location.search).get('symbol') || 'VN';
+    const API_MINUTE = s => `https://sboard.shs.com.vn/api/v1/market/minuteChart?symbol=${encodeURIComponent(s)}`;
+    const API_LATEST = s => `https://sboard.shs.com.vn/api/v1/market/symbolLatest?symbolList=${encodeURIComponent(s)}`;
+
+    // === TUNE: tỉ lệ vùng volume & nén chiều cao bar ===
+    const BAND = 0.22;      // volume band chiếm 22% chiều cao (đáy)
+    const VOL_RATE = 0.35;  // nén bar volume xuống 35% (tooltip vẫn show số gốc)
+    // ===================================================
+
+    const toMs = t => t < 2000000000 ? t*1000 : t;
+    const hhmm = ts => { const d=new Date(ts); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+    const dayAnchors = (ts) => {
+      const d=new Date(ts), y=d.getFullYear(), m=d.getMonth(), dd=d.getDate();
+      const mk=(h,mi=0)=> new Date(y,m,dd,h,mi,0,0).getTime();
+      return { open: mk(9,0), lunchS: mk(11,30), lunchE: mk(13,0), atcE: mk(14,45) };
+    };
+    const colorUp   = '#2ec4a6';
+    const colorDown = '#ef5350';
+
+    const container = $('chartWrap');
+    const chart = LightweightCharts.createChart(container, {
+      layout: { background: { type: 'solid', color: '#0b0d10' }, textColor: '#cfd8dc' },
+      grid:   { vertLines: { color:'#1b242b' }, horzLines: { color:'#1b242b' } },
+      rightPriceScale: {
+        borderColor: '#25323b',
+        // ✅ chừa đáy cho volume để phần giá KHÔNG tràn vào band volume
+        scaleMargins: { top: 0.02, bottom: BAND },
+      },
+      timeScale: { borderColor: '#25323b', timeVisible: true, secondsVisible: false },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal,
+        vertLine: { color:'#8aa6c1', width:1 }, horzLine: { color:'#2d3d4a' } },
+      autoSize: true,
+    });
+
+    // Baseline series để tô xanh/đỏ theo giá tham chiếu 'o'
+    const baseline = chart.addBaselineSeries({
+      baseValue: { type: 'price', price: 0 }, // tạm, set sau khi fetch 'o'
+      topLineColor:  colorUp,
+      topFillColor1: 'rgba(46,196,166,0.28)',
+      topFillColor2: 'rgba(46,196,166,0.05)',
+      bottomLineColor:  colorDown,
+      bottomFillColor1: 'rgba(239,83,80,0.28)',
+      bottomFillColor2: 'rgba(239,83,80,0.05)',
+      priceLineVisible: false,
+      lineWidth: 2,
+    });
+
+    // Volume (histogram) nằm trong band đáy
+    const volume = chart.addHistogramSeries({
+      priceScaleId: '', // scale riêng cho volume
+      base: 0,
+      priceFormat: { type: 'volume' },
+      scaleMargins: { top: (1 - BAND), bottom: 0.02 }, // ✅ bó trong dải đáy
+    });
+
+    const tooltip = $('tooltip');
+
+    function layoutSessionOverlays(tms){
+      if (!tms.length) return;
+      const { open, lunchS, lunchE, atcE } = dayAnchors(tms[0]);
+      const marks = $('marks'); marks.innerHTML = '';
+      [open, lunchS, lunchE, atcE].forEach(x=>{
+        const div=document.createElement('div');
+        div.className='mark';
+        const pct = (x - tms[0]) / (tms[tms.length-1] - tms[0]) * 100;
+        div.style.left = pct + '%';
+        const label=document.createElement('span'); label.textContent = hhmm(x);
+        div.appendChild(label); marks.appendChild(div);
+      });
+      const shade = $('lunch');
+      const left = (lunchS - tms[0]) / (tms[tms.length-1] - tms[0]) * 100;
+      const right = (lunchE - tms[0]) / (tms[tms.length-1] - tms[0]) * 100;
+      shade.style.left = left + '%';
+      shade.style.right = (100 - right) + '%';
+      shade.style.display = 'block';
+    }
+
+    function showTooltip(x, y, html){
+      const pad = 8;
+      tooltip.innerHTML = html;
+      tooltip.style.display = 'block';
+      const rect = container.getBoundingClientRect();
+      const tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+      let left = x + 12, top = y + 12;
+      if (left + tw + pad > rect.width)  left = x - tw - 12;
+      if (top  + th + pad > rect.height) top  = y - th - 12;
+      if (left < pad) left = pad;
+      if (top  < pad) top  = pad;
+      tooltip.style.left = left + 'px';
+      tooltip.style.top  = top  + 'px';
+    }
+    function hideTooltip(){ tooltip.style.display = 'none'; }
+
+    async function load(symbol){
+      setText('title', `${symbol} — Intraday`);
+      // setText('info', 'Asia/Bangkok • VNSE sessions');
+
+      // Fetch song song: minuteChart + symbolLatest (o)
+      const [r1, r2] = await Promise.all([
+        fetch(API_MINUTE(symbol), { cache: 'no-store' }),
+        fetch(API_LATEST(symbol), { cache: 'no-store' }),
+      ]);
+      if (!r1.ok) throw new Error('HTTP ' + r1.status);
+      if (!r2.ok) throw new Error('HTTP ' + r2.status);
+
+      const j  = await r1.json(); // {t,c,v,vo,va,...}
+      const jl = await r2.json(); // kỳ vọng dạng { data: [{ symbol:'VN', o: ... , ...}] } hoặc mảng
+      // Lấy 'o'
+      let refO;
+      if (Array.isArray(jl?.data)) {
+        refO = jl.data[0]?.o;
+      } else if (Array.isArray(jl)) {
+        refO = jl[0]?.o;
+      } else {
+        refO = jl?.o ?? jl?.[symbol]?.o;
+      }
+      if (typeof refO !== 'number') {
+        // fallback: dùng close đầu tiên làm baseline nếu không có 'o'
+        refO = j.c?.[0] ?? 0;
+      }
+
+      // Dữ liệu
+      const tms = j.t.map(toMs);
+      const priceData = j.c.map((c,i)=>({ time: Math.floor(tms[i]/1000), value: c }));
+
+      // Volume: nén bằng VOL_RATE nhưng giữ màu theo biến động giá
+      const volData = j.v.map((vv,i)=>{
+        const color = (i===0 || j.c[i] >= j.c[i-1]) ? colorUp : colorDown;
+        return { time: Math.floor(tms[i]/1000), value: vv * VOL_RATE, color, original: vv };
+      });
+
+      // Render
+      baseline.setData(priceData);
+      baseline.applyOptions({ baseValue: { type: 'price', price: refO } });
+      // kẻ line tham chiếu
+      const refLine = baseline.createPriceLine({
+        price: refO, color: '#9aa6b2', lineWidth: 1, lineStyle: 2, axisLabelVisible: true,
+        title: 'Ref (o)',
+      });
+
+      volume.setData(volData);
+      layoutSessionOverlays(tms);
+      chart.timeScale().fitContent();
+
+      // Tooltip
+      chart.subscribeCrosshairMove((param) => {
+        if (!param || !param.time || !param.point) { hideTooltip(); return; }
+        const sec = (typeof param.time === 'object' ? param.time.timestamp : param.time);
+        const tsMs = sec * 1000;
+        const idx = tms.indexOf(tsMs);
+        if (idx < 0) { hideTooltip(); return; }
+
+        const price = j.c[idx];
+        const vol   = j.v[idx];           // số gốc (không nén)
+        const vo    = j.vo ? j.vo[idx] : undefined;
+        const va    = j.va ? j.va[idx] : undefined;
+
+        const html = `
+          <div><b>${hhmm(tsMs)}</b></div>
+          <div>Price: <b>${price}</b></div>
+          <div>Volume: <b>${(vol??'').toLocaleString?.() ?? vol}</b></div>
+          ${vo!==undefined ? `<div>Vol (cum): <b>${vo.toLocaleString()}</b></div>` : ''}
+          ${va!==undefined ? `<div>Value (cum): <b>${va.toLocaleString()}</b></div>` : ''}
+          <div class="muted">Ref (o): <b>${refO}</b></div>
+        `;
+        showTooltip(param.point.x, param.point.y, html);
+      });
+
+      chart.subscribeCrosshairMove((p)=>{ if (!p?.point) hideTooltip(); });
+      container.addEventListener('mouseleave', hideTooltip);
+      window.addEventListener('resize', ()=> chart.timeScale().fitContent());
+    }
+
+    load(SYM).catch(err=>{
+      console.error(err);
+      setText('title', `Load failed for ${SYM}`);
+    });
+  })();
+  </script>
+</body>
+</html>
