@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { ContentHost } from "@/components/content/ContentHost";
 import { MENU } from "@/lib/menuData";
 import logo from "@/assets/LOGO.png";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { BorderBeam } from "@/components/lightswind/border-beam";
 import RotateOverlay from "@/components/RotateOverlay";
 import { GlowingCards, GlowingCard } from "@/components/lightswind/glowing-cards";
@@ -20,88 +20,11 @@ import RssFetcher from "@/components/news/RssFetcher";
 import RssSourcesPanel from "@/components/news/RssSourcesPanel";
 import cafebizLogo from "@/assets/cafebiz.jpg";
 import vietstockLogo from "@/assets/vietstock.jpg";
-import SymbolChart from '@/components/Index/SymbolChart';
 
 type LeafPayload = Parameters<typeof ContentHost>[0]["activeLeaf"];
 
 export default function Workspace() {
-  // Manage URL search parameters to enable deep linking to a specific leaf.
-  // We will use a single query param "leaf" that stores the path of the
-  // selected leaf. When the page loads with this parameter present, the
-  // corresponding content will be displayed automatically. When the user
-  // selects a leaf or navigates back, we update this param to reflect
-  // the current state.
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  /**
-   * Recursively search the menu tree for a leaf node matching the given
-   * path. Returns the node if found, otherwise null.
-   */
-  function findLeafByPath(nodes: typeof MENU, targetPath: string): any {
-    for (const node of nodes) {
-      const children: any = (node as any).children;
-      if (Array.isArray(children) && children.length) {
-        const found = findLeafByPath(children, targetPath);
-        if (found) return found;
-      }
-      if ((node as any).path && (node as any).path === targetPath) {
-        return node;
-      }
-    }
-    return null;
-  }
-
-  // Determine the initial active leaf based on the current query param. Doing
-  // this in the initializer avoids an initial render with null, which can
-  // cause a brief flash of the default workspace before the content loads.
-  const initialLeaf: LeafPayload | null = (() => {
-    const initialPath = searchParams.get('leaf');
-    if (initialPath) {
-      const node = findLeafByPath(MENU, initialPath);
-      if (node) {
-        return { id: node.id, label: node.label, path: node.path ?? node.id } as any;
-      }
-      return { id: initialPath, label: initialPath, path: initialPath } as any;
-    }
-    return null;
-  })();
-
-  const [activeLeaf, setActiveLeaf] = useState<LeafPayload | null>(initialLeaf);
-
-  // Effect: When the `leaf` query param changes, sync it into activeLeaf.
-  useEffect(() => {
-    const param = searchParams.get('leaf');
-    if (param) {
-      if (!activeLeaf || activeLeaf.path !== param) {
-        const node = findLeafByPath(MENU, param);
-        if (node) {
-          setActiveLeaf({ id: node.id, label: node.label, path: node.path ?? node.id } as any);
-        } else {
-          setActiveLeaf({ id: param, label: param, path: param } as any);
-        }
-      }
-    } else {
-      if (activeLeaf) setActiveLeaf(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
-
-  // Effect: When activeLeaf changes, push the value into the URL. This
-  // ensures that copyable links reflect the current leaf. We avoid
-  // unnecessary updates by checking the existing parameter value.
-  useEffect(() => {
-    if (activeLeaf && activeLeaf.path) {
-      const current = searchParams.get('leaf');
-      if (current !== activeLeaf.path) {
-        setSearchParams({ leaf: activeLeaf.path });
-      }
-    } else {
-      if (searchParams.has('leaf')) {
-        setSearchParams({});
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeLeaf]);
+  const [activeLeaf, setActiveLeaf] = useState<LeafPayload | null>(null);
 
   // Khi ở màn default (activeLeaf === null) → check RSS TTL
   const checkToken = activeLeaf === null ? Date.now() : 0;
@@ -176,9 +99,8 @@ export default function Workspace() {
                   shineColor="rgba(255, 255, 255, 1)"
                   speed={5}
                 >
-                  SHAdvisor coming soon...
+                  Coming soon...
                 </ShinyText>
-                {/* <SymbolChart symbol="VN" height={300} colorTheme="dark" /> */}
               </GlowingCard>
               <GlowingCard
                 hoverEffect={false}
