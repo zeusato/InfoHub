@@ -236,7 +236,7 @@ export default memo(function TradingViewWidget({
     <div>
       <div className="font-semibold mb-1">
         <span>{r.displayName}</span>{" "}
-        <span className="text-emerald-400">{fmt(r.current)}</span>{" "}
+        <span className={colorByChange(r.change)}>{fmt(r.current)}</span>{" "}
         {typeof r.change === "number" && typeof r.percent === "number" && (
           <span>
             {" ("}
