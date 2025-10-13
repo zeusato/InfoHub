@@ -129,6 +129,12 @@ export default memo(function TradingViewWidget({
     : "";
 
   const [rows, setRows] = useState<Row[]>([]);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [scrollX, setScrollX] = useState(0);
+  const [isAutoScroll, setIsAutoScroll] = useState(true);
+  const [width, setWidth] = useState(0);
+  const resumeTimer = useRef<number>();
+  const autoScrollSpeed = 0.5; // pixels per frame
 
   // Rút mã symbol gọi API (từ string hoặc từ proName: "VENDOR:CODE")
   const symbolCodes = useMemo(() => {
@@ -215,6 +221,49 @@ export default memo(function TradingViewWidget({
       document.removeEventListener("visibilitychange", onVis);
     };
   }, [symbolCodes, refresh]);
+
+  // Calculate track width and set up auto-scroll
+  useEffect(() => {
+    if (trackRef.current) {
+      const trackWidth = trackRef.current.scrollWidth / 2; // since we have two tracks
+      setWidth(trackWidth);
+    }
+  }, [rows]);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!isAutoScroll || width === 0) return;
+
+    const animate = () => {
+      setScrollX((prev) => {
+        const next = prev - autoScrollSpeed;
+        return next <= -width ? 0 : next;
+      });
+    };
+
+    const interval = setInterval(animate, 16); // ~60fps
+
+    return () => clearInterval(interval);
+  }, [isAutoScroll, width, autoScrollSpeed]);
+
+  // Handle wheel event for manual scrolling
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    setIsAutoScroll(false);
+    const delta = e.deltaY > 0 ? 50 : -50; // scroll speed
+    setScrollX((prev) => {
+      const next = prev + delta;
+      if (next > 0) return 0;
+      if (next < -width) return -width;
+      return next;
+    });
+
+    // Resume auto-scroll after 3 seconds of inactivity
+    if (resumeTimer.current) clearTimeout(resumeTimer.current);
+    resumeTimer.current = window.setTimeout(() => {
+      setIsAutoScroll(true);
+    }, 3000);
+  };
 
   // Màu toàn item theo biến động (null → xám, >0 xanh, <0 đỏ, =0 vàng)
   const colorByChange = (ch: number | null) =>
@@ -317,6 +366,7 @@ export default memo(function TradingViewWidget({
         bleed && "-mx-4 md:-mx-6"
       )}
       style={{ ...(style || {}) }}
+      onWheel={handleWheel}
     >
       {/* CSS ticker: double-track, pause on hover */}
       <style>{`
@@ -329,11 +379,11 @@ export default memo(function TradingViewWidget({
           display: inline-flex;
           white-space: nowrap;
           will-change: transform;
-          animation: ticker-scroll var(--ticker-duration, 60s) linear infinite;
+          /* animation removed, controlled by JS */
           align-items: center; line-height: 1;
         }
-        .ticker:hover .ticker__track { animation-play-state: paused; }
-        @keyframes ticker-scroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+        .ticker:hover .ticker__track { /* remove pause on hover for manual control */ }
+        /* @keyframes ticker-scroll removed since we use JS control */
       `}</style>
 
       {/* Tooltip vượt khung, bám theo con trỏ */}
@@ -348,8 +398,12 @@ export default memo(function TradingViewWidget({
       <div className={clsx("ticker", baseTextClass, baseBgClass)} style={{ height: h }}>
         <div className="ticker__viewport">
           <div
+            ref={trackRef}
             className="ticker__track"
-            style={{ ["--ticker-duration" as any]: "60s" }}
+            style={{
+              transform: `translateX(${scrollX}px)`,
+              transition: isAutoScroll ? 'none' : 'transform 0.1s ease-out'
+            }}
           >
             {/* Track 1 */}
             {rows.map((r) => {
