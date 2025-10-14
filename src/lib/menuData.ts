@@ -14,8 +14,8 @@ export const MENU_COLORS: Record<number, string> = {
 
 export const MENU: MenuNode[] = [
   {
-    id: 'news',
-    label: 'Tin tức sản phẩm',
+    id: 'product_news',
+    label: 'Thông tin sản phẩm',
     children: [
       {
         id: 'release-notes',
@@ -461,6 +461,43 @@ export const MENU: MenuNode[] = [
                 id: 'he-thong-thong-bao',
                 label: 'Hệ thống thông báo',
                 path: 'huong-dan-su-dung/webtrading-2-0/tien-ich-khac/he-thong-thong-bao',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'news',
+    label: 'Tin tức',
+    children: [
+      {
+        id: 'SHSnews',
+        label: 'Tin tức SHS',
+        children: [
+          {
+            id: 'van-hoa-doanh-nghiep',
+            label: 'Văn hóa doanh nghiệp',
+          },
+          {
+            id: 'thong-tin-cong-bo',
+            label: 'Thông tin công bố',
+          },
+        ],
+      },
+      {
+        id: 'tin-thi-truong',
+        label: 'Tin thị trường',
+        children: [
+          {
+            id: 'tong-quan-thi-truong-1',
+            label: 'Tổng quan thị trường',
+            children: [
+              {
+                id: 'nang-hang-thi-truong',
+                label: 'Nâng hạng thị trường',
+                path: 'tin-tuc/tin-thi-truong/tong-quan-thi-truong/nang-hang-thi-truong',
               },
             ],
           },

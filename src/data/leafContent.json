@@ -1059,5 +1059,23 @@
     "contentHtml": "<p class=\"ql-align-center\"><img src=\"https://www.shs.com.vn/Sites/QuoteVN/SiteRoot/image_2024_10_31T09_26_15_611Z.png\" height=\"1428\" width=\"750\"></p>",
     "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.",
     "gallery": []
+  },
+  "thong-tin-khac/chinh-sach/video-demo": {
+    "renderType": "template",
+    "templateKey": "VideoEmbed",
+    "title": "Test Video leaf",
+    "subtitle": "Phát hành: 14/10/2025 — Bộ phận Phát triển sản phẩm",
+    "videoUrl": "https://www.youtube.com/watch?v=Bl8eFYRYI0M&list=RDBl8eFYRYI0M&start_radio=1",
+    "contentHtml": "<p>Đây là nội dung thử nghiệm</p>",
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ."
+  },
+  "tin-tuc/tin-thi-truong/tong-quan-thi-truong/nang-hang-thi-truong": {
+    "renderType": "template",
+    "templateKey": "VideoEmbed",
+    "title": "Thị trường chứng khoán Việt Nam được nâng hạng | VTV24",
+    "subtitle": "Phát hành: 08/10/2025 — Bộ phận Phát triển sản phẩm",
+    "videoUrl": "https://www.youtube.com/watch?v=iIhfKJvx2Jw",
+    "contentHtml": "<p><span>FTSE Russell thông báo nâng hạng chứng khoán Việt Nam từ thị trường cận biên thành thị trường mới nổi thứ cấp vào đầu tháng 9/2026.</span></p>",
+    "endingNote": "Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ."
   }
 }
