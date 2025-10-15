@@ -477,12 +477,23 @@ export const MENU: MenuNode[] = [
         label: 'Tin tức SHS',
         children: [
           {
-            id: 'van-hoa-doanh-nghiep',
+            id: 'van-hoa-doanh-nghiep-1',
             label: 'Văn hóa doanh nghiệp',
           },
           {
             id: 'thong-tin-cong-bo',
             label: 'Thông tin công bố',
+          },
+          {
+            id: 'tin-tuc-khac',
+            label: 'Tin tức khác',
+            children: [
+              {
+                id: 'shs-bao-lai-qusy-iii-2025',
+                label: 'SHS báo lãi qusy III/2025',
+                path: 'tin-tuc/tin-tuc-shs/tin-tuc-khac/shs-bao-lai-qusy-iii-2025',
+              },
+            ],
           },
         ],
       },
