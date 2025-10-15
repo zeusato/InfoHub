@@ -5,6 +5,7 @@ import ProductNewsTemplate from './ProductNewsTemplate'
 import Placeholder from './Placeholder'
 import TemplateFeatureGuide from './TemplateFeatureGuide'
 import FAQAccordionTemplate from './FAQAccordionTemplate'
+import TemplateVideoEmbed from './TemplateVideoEmbed'
 
 // === NEW: generic RSS components ===
 import RssList from '@/components/news/RssList'
@@ -125,6 +126,18 @@ export function ContentHost({
             title={entry.title}
             subtitle={entry.subtitle}
             gallery={(entry.gallery || []).map((src: string) => ({ src }))}
+            contentBlocks={Array.isArray(entry.content) ? entry.content : undefined}
+            contentHtml={typeof entry.contentHtml === 'string' ? entry.contentHtml : undefined}
+            endingNote={entry.endingNote}
+          />
+        )
+
+      case 'VideoEmbed':
+        return (
+          <TemplateVideoEmbed
+            title={entry.title}
+            subtitle={entry.subtitle}
+            videoUrl={entry.videoUrl}
             contentBlocks={Array.isArray(entry.content) ? entry.content : undefined}
             contentHtml={typeof entry.contentHtml === 'string' ? entry.contentHtml : undefined}
             endingNote={entry.endingNote}

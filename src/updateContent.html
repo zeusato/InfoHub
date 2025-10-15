@@ -31,13 +31,11 @@
     .lvlTop>.item{background:linear-gradient(180deg,#ffffff16,#ffffff08);padding:10px;border-radius:12px;border:1px solid #ffffff1a}
     .lvlMid>.item{background:#ffffff0a;padding:8px;border-radius:10px;border:1px dashed #ffffff2a}
     .lvlLeaf .item{background:#ffffff06;padding:6px;border-radius:8px;border:1px solid #ffffff14}
-    /* style for sub-mid level (3rd level) */
     .lvlSub > .item{background:#ffffff06;padding:6px;border-radius:8px;border:1px dashed #ffffff22}
     .tag{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid #ffffff22;background:#ffffff12}
     .tag.top{border-color:#ff7a1822;background:#ff7a180d;color:#ffd6c2}
     .tag.mid{border-color:#10b98144;background:#10b9811a}
     .tag.leaf{border-color:#22d3ee44;background:#22d3ee1a}
-    /* tag for sub-mid level */
     .tag.sub{border-color:#3b82f644;background:#3b82f61a}
     .grow{flex:1}
     .sep{height:1px;background:#ffffff12;margin:8px 0}
@@ -109,10 +107,11 @@
           <div class="col" style="flex:1">
             <label class="label">Template Key</label>
             <select id="fTemplateKey">
-              <!-- có thể thêm sau -->
               <option value="ProductNews">ProductNews</option>
               <option value="FeatureGuide">FeatureGuide</option>
               <option value="FAQAccordion">FAQAccordion</option>
+              <!-- NEW -->
+              <option value="VideoEmbed">VideoEmbed</option>
             </select>
           </div>
         </div>
@@ -137,7 +136,8 @@
           <span id="subtitlePreview" class="muted"></span>
         </div>
 
-        <div class="col">
+        <!-- Banner -->
+        <div class="col" id="bannerBlock">
           <label class="label">Banner Image</label>
           <div class="row">
             <button id="pickImageBtn" class="btn small">Chọn ảnh nguồn</button>
@@ -148,8 +148,10 @@
             <span id="assetsStatus" class="muted">Chưa chọn</span>
           </div>
           <img id="imgPreview" class="preview" style="display:none;margin-top:6px"/>
-        
-        <div class="col">
+        </div>
+
+        <!-- Gallery -->
+        <div class="col" id="galleryBlock">
           <label class="label">Gallery ảnh (HDSD)</label>
           <div class="row">
             <button id="pickGalleryBtn" class="btn small">Chọn ảnh (multi)</button>
@@ -158,9 +160,16 @@
           <div id="galleryList" class="col small"></div>
           <div class="note small muted">Ảnh A4 ngang, sẽ tự scale cho vừa khung. Có thể reorder, xoá, đổi tên file trước khi lưu.</div>
         </div>
-</div>
 
-        <div class="col">
+        <!-- NEW: Video URL (chỉ dùng cho VideoEmbed) -->
+        <div class="col" id="videoUrlBlock" style="display:none">
+          <label class="label">YouTube Video URL</label>
+          <input id="fVideoUrl" placeholder="https://www.youtube.com/watch?v=... hoặc https://youtu.be/..."/>
+          <div class="note">Hỗ trợ watch, youtu.be, shorts; giữ start time nếu có.</div>
+        </div>
+
+        <!-- Quill -->
+        <div class="col" id="quillBlock">
           <label class="label">Content (Quill)</label>
           <div id="quill" style="height:220px;background:#0e0f12;border:1px solid #ffffff22;border-radius:10px"></div>
         </div>
@@ -185,15 +194,15 @@
 <script>
 (() => {
   // --------- State ---------
-  let jsonHandle = null;      // FileSystemFileHandle for leafContent.json
-  let menuHandle = null;      // FileSystemFileHandle for menuData.ts
-  let assetsDirHandle = null; // FileSystemDirectoryHandle (assets)
-  let imageFile = null;       // chosen banner image File
-  let galleryTemp = [];        // [{ file?:File, destName:string, preview:string }]
-  let contentMap = {};        // parsed leafContent.json
-  let menu = [];              // parsed MENU (from menuData.ts)
-  let expanded = new Set();   // expand UI
-  let currentPath = '';       // currently editing leaf path
+  let jsonHandle = null;
+  let menuHandle = null;
+  let assetsDirHandle = null;
+  let imageFile = null;
+  let galleryTemp = [];
+  let contentMap = {};
+  let menu = [];
+  let expanded = new Set();
+  let currentPath = '';
 
   const $ = (s) => document.querySelector(s);
 
@@ -209,13 +218,23 @@
   const fDate = $('#fDate');
   const fDept = $('#fDept');
   const subtitlePreview = $('#subtitlePreview');
+
+  const bannerBlock = document.getElementById('bannerBlock');
   const pickImageBtn = $('#pickImageBtn');
   const destFileName = $('#destFileName');
   const imgPreview = $('#imgPreview');
+
+  const galleryBlock = document.getElementById('galleryBlock');
   const pickGalleryBtn = $('#pickGalleryBtn');
   const galleryPrefix = $('#galleryPrefix');
   const galleryList = $('#galleryList');
+
+  const quillBlock = document.getElementById('quillBlock');
   const fEnding = $('#fEnding');
+
+  // NEW video fields
+  const videoUrlBlock = document.getElementById('videoUrlBlock');
+  const fVideoUrl = document.getElementById('fVideoUrl');
 
   // Quill init
   const quill = new Quill('#quill', {
@@ -235,35 +254,33 @@
   const setStatus = (msg) => status.textContent = msg || '';
 
   const rebuildIndex = () => {
-    // Just ensure expanded top-level open by default
     expanded = new Set(menu.map(n => n.id));
   };
 
-  // refs mới
+  // refs FAQ
   const faqFields = document.getElementById('faqFields');
   const fFaqPath  = document.getElementById('fFaqPath');
 
-  // nhóm các block nên ẩn khi chọn FAQ
-  const bannerBlock = pickImageBtn.closest('.col');          // block Banner Image
-  const galleryBlock = pickGalleryBtn.closest('.col');       // block Gallery
-  const quillBlock = document.getElementById('quill').closest('.col'); // block Quill editor
-
+  // Toggle UI theo template
   function toggleFieldsByTemplate() {
     const key = fTemplateKey.value;
 
     const isFAQ = key === 'FAQAccordion';
+    const isVideo = key === 'VideoEmbed';
+
+    // FAQ: chỉ hiện FAQ path
     faqFields.style.display  = isFAQ ? 'flex' : 'none';
 
-    // FAQ không dùng các khối sau:
-    bannerBlock.style.display = isFAQ ? 'none' : 'flex';
-    galleryBlock.style.display = isFAQ ? 'none' : 'flex';
-    quillBlock.style.display   = isFAQ ? 'none' : 'flex';
+    // Video: hiện Video URL + Quill, ẩn banner/gallery
+    videoUrlBlock.style.display = isVideo ? 'flex' : 'none';
+    quillBlock.style.display    = isFAQ ? 'none' : 'flex'; // FAQ ẩn Quill
+    bannerBlock.style.display   = (isFAQ || isVideo) ? 'none' : 'flex';
+    galleryBlock.style.display  = (isFAQ || isVideo) ? 'none' : 'flex';
   }
 
   fTemplateKey.addEventListener('change', toggleFieldsByTemplate);
-  
+
   function tsToMenu(ts) {
-    // Strip types & exports → eval
     let js = ts
       .replace(/export\s+type[\s\S]*?\n}\s*\n/g, '')
       .replace(/export\s+interface[\s\S]*?\n}\s*\n/g, '')
@@ -321,7 +338,6 @@
   }
 
   function htmlFromContentBlocks(blocks){
-    // For edit: convert JSON blocks -> HTML to feed Quill
     const div = document.createElement('div');
     (blocks||[]).forEach(b => {
       if (b.type === 'paragraph') {
@@ -358,7 +374,6 @@
   }
 
   function blocksFromHTML(html){
-    // Convert editor HTML -> JSON blocks {paragraph|table}
     const out = [];
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const walkNodes = doc.body.children;
@@ -375,14 +390,12 @@
           const tr = thead.querySelector('tr');
           if (tr) tr.querySelectorAll('th,td').forEach(th => headers.push(th.textContent.trim()));
         } else {
-          // If no thead, take first row as headers
           const first = el.querySelector('tr');
           if (first) {
             first.querySelectorAll('th,td').forEach(th => headers.push(th.textContent.trim()));
           }
         }
         tbody.querySelectorAll('tr').forEach((tr,i) => {
-          // skip first if used as header and no thead
           if (!thead && i===0) return;
           const row = [];
           tr.querySelectorAll('td,th').forEach(td => row.push(td.textContent.trim()));
@@ -392,7 +405,6 @@
           out.push({ type:'table', headers, rows });
         }
       } else {
-        // fallback: treat as paragraph
         const text = el.textContent?.trim();
         if (text) out.push({ type: 'paragraph', text });
       }
@@ -407,7 +419,6 @@
     return r === 'granted';
   }
 
-  
   function renderGalleryList(){
     galleryList.innerHTML = '';
     if (!galleryTemp.length){
@@ -501,7 +512,6 @@
 
   $('#refreshBtn').onclick = () => renderMenu();
 
-
   pickGalleryBtn.onclick = async () => {
     try {
       const handles = await window.showOpenFilePicker({
@@ -518,7 +528,6 @@
       setStatus(`Đã chọn ${handles.length} ảnh cho gallery.`);
     } catch (e) { setStatus('Pick gallery failed: ' + e.message); }
   };
-
 
   // --------- Render menu with Add/Edit buttons ---------
   function renderMenu(){
@@ -559,11 +568,9 @@
             const childWrap = document.createElement('div');
             childWrap.className = 'col lvlLeaf';
             (mid.children||[]).forEach(child => {
-              // If child has its own children (sub-mid level), render a SUB row with nested leaves
               if (child && Object.prototype.hasOwnProperty.call(child, 'children')) {
                 const sItem = document.createElement('div');
                 sItem.className = 'item';
-                // header row for sub-mid level
                 const sHead = document.createElement('div');
                 sHead.className = 'row';
                 const sTag = document.createElement('span'); sTag.className='tag sub'; sTag.textContent='SUB';
@@ -572,7 +579,6 @@
                 sToggle.onclick = () => { expanded.has(child.id) ? expanded.delete(child.id) : expanded.add(child.id); renderMenu(); };
                 sHead.append(sTag, sTitle, sToggle);
                 sItem.appendChild(sHead);
-                // render leaves of sub-mid level
                 if (expanded.has(child.id)) {
                   const subLeafWrap = document.createElement('div');
                   subLeafWrap.className = 'col lvlLeaf';
@@ -594,7 +600,6 @@
                 }
                 childWrap.appendChild(sItem);
               } else {
-                // leaf-level directly under mid
                 const lItem = document.createElement('div');
                 lItem.className = 'item row';
                 const lTag = document.createElement('span'); lTag.className='tag leaf'; lTag.textContent='LEAF';
@@ -625,9 +630,10 @@
   function openEditorForLeaf(leaf){
     currentPath = leaf.path || '';
     fPath.value = currentPath;
-    // Fill defaults
+
+    // defaults
     fRenderType.value = 'template';
-    fTemplateKey.value = 'ProductNews'
+    fTemplateKey.value = 'ProductNews';
     fTitle.value = '';
     fDate.value = '';
     fDept.value = 'Phát triển sản phẩm';
@@ -639,8 +645,8 @@
     renderGalleryList();
     fEnding.value = 'Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.';
     quill.setContents([]);
+    fVideoUrl.value = '';
 
-    // If exists content, fill for edit
     const entry = contentMap[currentPath];
     if (entry) {
       fRenderType.value = entry.renderType || 'template';
@@ -648,26 +654,24 @@
       fTitle.value = entry.title || '';
       galleryTemp = Array.isArray(entry.gallery) ? entry.gallery.map(name => ({ file:null, destName: name, preview:'' })) : [];
       renderGalleryList();
-      // try split subtitle
-      if (entry.subtitle) {
-        subtitlePreview.textContent = entry.subtitle;
-        // không parse ngược cứng nhắc; user có thể chỉnh lại
-      }
-      if (entry.bannerImg) {
-        destFileName.value = entry.bannerImg;
-      }
-    // Prefer contentHtml (rich HTML) when available; fallback to structured content blocks
+      if (entry.subtitle) subtitlePreview.textContent = entry.subtitle;
+      if (entry.bannerImg) destFileName.value = entry.bannerImg;
+
       if (entry.contentHtml) {
         quill.root.innerHTML = entry.contentHtml;
       } else if (entry.content) {
-        const html = htmlFromContentBlocks(entry.content);
-        quill.root.innerHTML = html;
+        quill.root.innerHTML = htmlFromContentBlocks(entry.content);
       }
-        // --- nạp FAQ ---
+
       if (entry.templateKey === 'FAQAccordion') {
         fFaqPath.value = entry.faqJsonPath || '';
-        // FAQ không dùng banner/gallery/quill => form đã toggle ẩn
       }
+
+      // NEW: preload video url
+      if (entry.templateKey === 'VideoEmbed') {
+        fVideoUrl.value = entry.videoUrl || '';
+      }
+
       if (entry.endingNote) fEnding.value = entry.endingNote;
     }
     setStatus(`Editing ${leaf.label}`);
@@ -702,32 +706,43 @@
       const renderType = fRenderType.value || 'template';
       const templateKey = fTemplateKey.value || 'ProductNews';
 
-    let entry;
+      let entry;
 
-    if (templateKey === 'FAQAccordion') {
-      // ---- entry cho FAQ ----
-      const faqPath = (fFaqPath.value || '').trim();
-      if (!faqPath) return alert('Nhập FAQ JSON path.');
+      if (templateKey === 'FAQAccordion') {
+        // ---- FAQ ----
+        const faqPath = (fFaqPath.value || '').trim();
+        if (!faqPath) return alert('Nhập FAQ JSON path.');
+        entry = {
+          renderType,
+          templateKey: 'FAQAccordion',
+          title: (fTitle.value || '').trim(),
+          subtitle: buildSubtitle(),
+          faqJsonPath: faqPath,
+          endingNote: (fEnding.value || '').trim()
+        };
 
-      entry = {
-        renderType,
-        templateKey: 'FAQAccordion',
-        title: (fTitle.value || '').trim(),
-        subtitle: buildSubtitle(),               // vẫn build từ Date + Dept
-        faqJsonPath: faqPath,                    // <— quan trọng
-        endingNote: (fEnding.value || '').trim() // dùng chung field Ending Note
-      };
+      } else if (templateKey === 'VideoEmbed') {
+        // ---- Video Embed (YouTube) ----
+        const videoUrl = (fVideoUrl.value || '').trim();
+        if (!videoUrl) return alert('Nhập YouTube Video URL.');
+        const html = quill.root.innerHTML;
+        entry = {
+          renderType,
+          templateKey: 'VideoEmbed',
+          title: (fTitle.value || '').trim(),
+          subtitle: buildSubtitle(),
+          videoUrl,
+          contentHtml: html,
+          endingNote: (fEnding.value || '').trim()
+        };
 
-    } else {
-      // ---- entry cho ProductNews / FeatureGuide như cũ ----
-      const galleryNames = [];
-      for (const g of galleryTemp){
-        const name = (g.destName || '').trim();
-        if (name) galleryNames.push(name);
-      }
-
-      {
-        // Capture rich HTML from Quill editor
+      } else {
+        // ---- ProductNews / FeatureGuide ----
+        const galleryNames = [];
+        for (const g of galleryTemp){
+          const name = (g.destName || '').trim();
+          if (name) galleryNames.push(name);
+        }
         const html = quill.root.innerHTML;
         entry = {
           renderType,
@@ -736,84 +751,75 @@
           subtitle: buildSubtitle(),
           bannerImg: (destFileName.value || '').trim(),
           content: blocksFromHTML(html),
-          // Save raw HTML for rich formatting (links, images)
           contentHtml: html,
           endingNote: (fEnding.value || '').trim(),
           gallery: galleryNames,
         };
-      }
 
-      // Copy banner and gallery files into selected assets folder when using FeatureGuide template
-      if (templateKey === 'FeatureGuide') {
-        // Ensure assets directory selected
-        if (imageFile || galleryTemp.some(g => g.file)) {
-          if (!assetsDirHandle) {
-            return alert('Chưa chọn thư mục assets. Hãy dùng "Pick assets folder" trước khi lưu.');
+        if (templateKey === 'FeatureGuide') {
+          if (imageFile || galleryTemp.some(g => g.file)) {
+            if (!assetsDirHandle) {
+              return alert('Chưa chọn thư mục assets. Hãy dùng "Pick assets folder" trước khi lưu.');
+            }
+            const perm = await requestWritePerm(assetsDirHandle);
+            if (!perm) {
+              return alert('Không có quyền ghi vào thư mục assets.');
+            }
           }
-          // Request write permission for assets dir
-          const perm = await requestWritePerm(assetsDirHandle);
-          if (!perm) {
-            return alert('Không có quyền ghi vào thư mục assets.');
+          async function copyToAssets(file, destPath) {
+            const parts = destPath.split('/').filter(p=>p);
+            let dir = assetsDirHandle;
+            for (let i=0; i<parts.length-1; i++) {
+              const dirName = parts[i];
+              dir = await dir.getDirectoryHandle(dirName, { create: true });
+            }
+            const fname = parts[parts.length-1];
+            const fHandle = await dir.getFileHandle(fname, { create: true });
+            const writable = await fHandle.createWritable();
+            await writable.write(await file.arrayBuffer());
+            await writable.close();
           }
-        }
-        // Helper to copy a File to nested destination in assetsDirHandle
-        async function copyToAssets(file, destPath) {
-          const parts = destPath.split('/').filter(p=>p);
-          let dir = assetsDirHandle;
-          // create nested directories except last part
-          for (let i=0; i<parts.length-1; i++) {
-            const dirName = parts[i];
-            dir = await dir.getDirectoryHandle(dirName, { create: true });
-          }
-          const fname = parts[parts.length-1];
-          const fHandle = await dir.getFileHandle(fname, { create: true });
-          const writable = await fHandle.createWritable();
-          await writable.write(await file.arrayBuffer());
-          await writable.close();
-        }
-        // Copy banner image if provided and a dest file name exists
-        const bannerName = (destFileName.value || '').trim();
-        if (imageFile && bannerName) {
-          try {
-            await copyToAssets(imageFile, bannerName);
-          } catch (e) {
-            console.error('Copy banner failed', e);
-            return alert('Sao chép banner thất bại: ' + e.message);
-          }
-        }
-        // Copy gallery files
-        for (const g of galleryTemp) {
-          if (g.file && g.destName) {
+          const bannerName = (destFileName.value || '').trim();
+          if (imageFile && bannerName) {
             try {
-              await copyToAssets(g.file, g.destName);
+              await copyToAssets(imageFile, bannerName);
             } catch (e) {
-              console.error('Copy gallery file failed', e);
-              return alert('Sao chép ảnh gallery thất bại: ' + e.message);
+              console.error('Copy banner failed', e);
+              return alert('Sao chép banner thất bại: ' + e.message);
+            }
+          }
+          for (const g of galleryTemp) {
+            if (g.file && g.destName) {
+              try {
+                await copyToAssets(g.file, g.destName);
+              } catch (e) {
+                console.error('Copy gallery file failed', e);
+                return alert('Sao chép ảnh gallery thất bại: ' + e.message);
+              }
             }
           }
         }
       }
+
+      // --- write file ---
+      contentMap[currentPath] = entry;
+
+      const ok = await requestWritePerm(jsonHandle);
+      if (!ok) return alert('Không có quyền ghi leafContent.json');
+      if (!confirm('Ghi đè leafContent.json?')) return;
+
+      const writable = await jsonHandle.createWritable();
+      const pretty = JSON.stringify(contentMap, null, 2);
+      await writable.write(pretty);
+      await writable.close();
+
+      setStatus('Saved content for ' + currentPath);
+      renderMenu();
+    } catch (e) {
+      console.error(e);
+      setStatus('Save failed: ' + e.message);
     }
-
-    // --- ghi vào contentMap và lưu file ---
-    contentMap[currentPath] = entry;
-
-    const ok = await requestWritePerm(jsonHandle);
-    if (!ok) return alert('Không có quyền ghi leafContent.json');
-    if (!confirm('Ghi đè leafContent.json?')) return;
-
-    const writable = await jsonHandle.createWritable();
-    const pretty = JSON.stringify(contentMap, null, 2);
-    await writable.write(pretty);
-    await writable.close();
-
-    setStatus('Saved content for ' + currentPath);
-    renderMenu();
-  } catch (e) {
-    console.error(e);
-    setStatus('Save failed: ' + e.message);
-  }
-};
+  };
 
   $('#cancelBtn').onclick = () => {
     currentPath = '';
