@@ -57,6 +57,11 @@ export const MENU: MenuNode[] = [
                 label: 'Sản phẩm Margin TPLUS',
                 path: 'tin-tuc-san-pham/san-pham-dich-vu/san-pham-margin/san-pham-margin-tplus',
               },
+              {
+                id: 'uu-dai-margin-s79',
+                label: 'Ưu đãi Margin S79',
+                path: 'thong-tin-san-pham/san-pham-dich-vu/san-pham-margin/uu-dai-margin-s79',
+              },
             ],
           },
         ],
@@ -492,6 +497,11 @@ export const MENU: MenuNode[] = [
                 id: 'shs-bao-lai-qusy-iii-2025',
                 label: 'SHS báo lãi qusy III/2025',
                 path: 'tin-tuc/tin-tuc-shs/tin-tuc-khac/shs-bao-lai-qusy-iii-2025',
+              },
+              {
+                id: 'shs-khai-truong-tru-so-moi',
+                label: 'SHS khai trương trụ sở mới',
+                path: 'tin-tuc/tin-tuc-shs/tin-tuc-khac/shs-khai-truong-tru-so-moi',
               },
             ],
           },
