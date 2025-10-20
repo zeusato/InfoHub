@@ -21,6 +21,7 @@ import RssSourcesPanel from "@/components/news/RssSourcesPanel";
 import cafebizLogo from "@/assets/cafebiz.jpg";
 import vietstockLogo from "@/assets/vietstock.jpg";
 import SymbolChart from '@/components/Index/SymbolChart';
+import shaQR from '@/assets/SH Advisor.png'
 
 type LeafPayload = Parameters<typeof ContentHost>[0]["activeLeaf"];
 
@@ -169,15 +170,39 @@ export default function Workspace() {
               >
                 <MGReferralQRCard />
               </GlowingCard>
-              <GlowingCard glowColor="#8b5cf6" className="flex items-center justify-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition">
-                <ShinyText
-                  baseColor="rgba(255, 255, 255, 0.8)"
-                  size="2xl"
-                  shineColor="rgba(255, 255, 255, 1)"
-                  speed={5}
-                >
-                  SHAdvisor coming soon...
-                </ShinyText>
+              <GlowingCard glowColor="#8b5cf6" className="flex items-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition p-4">
+                <div className="flex-1 flex justify-end pr-4">
+                  <div className="flex flex-col items-end">
+                    <ShinyText
+                      baseColor="rgba(255, 255, 255, 0.8)"
+                      size="4xl"
+                      shineColor="rgba(255, 255, 255, 1)"
+                      speed={5}
+                    >
+                      SHAdvisor
+                    </ShinyText>
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 transition duration-300"
+                        onClick={() => window.open('https://q.me-qr.com/Zb80ouRe', '_blank')}
+                      >
+                        Truy cập ngay
+                      </button>
+                      <ShinyText
+                        baseColor="rgba(255, 255, 255, 0.8)"
+                        size="lg"
+                        shineColor="rgba(255, 255, 255, 1)"
+                        speed={5}
+                      >
+                        hoặc quét QR
+                      </ShinyText>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-px bg-white/20 h-full"></div>
+                <div className="flex-1 flex justify-start pl-4">
+                  <img src={shaQR} alt="shaQR" className="h-48 w-auto object-contain" />
+                </div>
                 {/* <SymbolChart symbol="VN" height={300} colorTheme="dark" /> */}
               </GlowingCard>
               <GlowingCard
@@ -215,3 +240,4 @@ export default function Workspace() {
     </div>
   );
 }
+
