@@ -4,7 +4,7 @@ import QRCode from "react-qr-code";
 // chỉnh import này theo project của đại ca nếu khác đường dẫn
 import GlowingCard from "@/components/lightswind/glowing-cards";
 
-const BASE_URL = "https://shtrading.onelink.me/4ox6/y4yk4heu?remNo=";
+const BASE_URL = "https://shsmart.onelink.me/Odsh/3wr4issy?remNo=";
 
 export default function MGReferralQRCard() {
   const [input, setInput] = useState("");
