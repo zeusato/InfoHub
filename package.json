@@ -15,6 +15,7 @@
     "clsx": "^2.1.1",
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
+    "html2canvas": "^1.4.1",
     "lightswind": "^3.1.16",
     "lightweight-charts": "^4.0.0",
     "lucide-react": "^0.544.0",

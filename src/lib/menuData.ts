@@ -27,7 +27,7 @@ export const MENU: MenuNode[] = [
             children: [
               {
                 id: 'huong-dan-ang-ky-at-mua',
-                label: 'HD Đăng ký đặt mua',
+                label: 'SHS hợp tác PP VPBS',
                 path: 'tin-tuc-san-pham/phan-phoi-ipo/phan-phoi-ipo-vpbs/tin-tuc-san-pham-phan-phoi-ipo-phan-phoi-ipo-vpbs-2025-10',
               },
               {

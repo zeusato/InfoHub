@@ -15,6 +15,7 @@ import MGReferralQRCard from "@/components/tools/MGReferralQRCard";
 import QrApp from "@/assets/qr-app.jpg";
 import NeonAnimatedButton from "@/components/tools/NeonAnimatedButton";
 import IPO from "@/assets/IPO.png";
+import SHSmartQR from "@/assets/QR SHSmart.jpg";
 
 import RssFetcher from "@/components/news/RssFetcher";
 import RssSourcesPanel from "@/components/news/RssSourcesPanel";
@@ -156,11 +157,38 @@ export default function Workspace() {
             >
               {/* News sources panel (bên trái, row-span-2).
                   BẤM chọn nguồn → mở LIST full-width ở ContentHost */}
-              <GlowingCard glowColor="#8b5cf6" className="text-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition">
-                <img src={IPO} alt="IPO" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 flex flex-col items-end justify-center p-4 mr-5">
-                  <p className="text-[#F76F08] text-xl mb-2 text-right font-bold drop-shadow-lg">SHS là đại lý chính<br/>phân phối cổ phiếu VPBS</p>
-                  <NeonAnimatedButton label="Đăng ký ngay" onClick={() => window.open('https://ipo.shs.com.vn/', '_blank')}/>
+              <GlowingCard glowColor="#8b5cf6" className="flex items-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition p-4">
+                <div className="flex-1 flex justify-end pr-4">
+                  <div className="flex flex-col items-end">
+                    <ShinyText
+                      baseColor="rgba(251, 146, 60, 0.8)"
+                      size="4xl"
+                      shineColor="rgba(251, 146, 60, 1)"
+                      speed={5}
+                    >
+                      SH Smart
+                    </ShinyText>
+                    <div className="flex items-center gap-2 mt-2">
+                      <button
+                        className="px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-400 text-white font-semibold rounded-lg shadow-md hover:from-orange-700 hover:to-orange-500 transition duration-300 whitespace-nowrap"
+                        onClick={() => window.open('https://q.me-qr.com/l/SHSmart', '_blank')}
+                      >
+                        Giao dịch ngay
+                      </button>
+                      <ShinyText
+                        baseColor="rgba(251, 146, 60, 0.8)"
+                        size="base"
+                        shineColor="rgba(251, 146, 60, 1)"
+                        speed={5}
+                      >
+                        hoặc quét QR
+                      </ShinyText>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-px bg-white/20 h-full"></div>
+                <div className="flex-1 flex justify-start pl-4">
+                  <img src={SHSmartQR} alt="shaQR" className="h-48 w-auto object-contain" />
                 </div>
               </GlowingCard>
               <GlowingCard
@@ -190,7 +218,7 @@ export default function Workspace() {
                       </button>
                       <ShinyText
                         baseColor="rgba(255, 255, 255, 0.8)"
-                        size="lg"
+                        size="base"
                         shineColor="rgba(255, 255, 255, 1)"
                         speed={5}
                       >

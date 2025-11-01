@@ -16,7 +16,7 @@ type Slide = {
 const links = [
   { id: 'home', label: 'Homepage', href: 'https://www.shs.com.vn/', icon: <Home /> },
   { id: 'ChartCandlestick', label: 'Sboard', href: 'https://sboard.shs.com.vn/', icon: <CandlestickChart /> },
-  { id: 'Trading', label: 'Trading_System', href: 'https://qr.me-qr.com/KIuncOL4', icon: <BarChart /> },
+  { id: 'Trading', label: 'Trading_System', href: 'https://q.me-qr.com/l/SHSmart', icon: <BarChart /> },
   { id: 'Utilities', label: 'Utilities', href: 'https://zeusato.github.io/Z-Utilities/', icon: <LayoutGrid /> }
 ];
 

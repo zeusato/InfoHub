@@ -1,6 +1,7 @@
 // src/components/tools/MGReferralQRCard.tsx
 import { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
+import html2canvas from "html2canvas";
 // chỉnh import này theo project của đại ca nếu khác đường dẫn
 import GlowingCard from "@/components/lightswind/glowing-cards";
 
@@ -9,9 +10,11 @@ const BASE_URL = "https://shsmart.onelink.me/Odsh/3wr4issy?remNo=";
 export default function MGReferralQRCard() {
   const [input, setInput] = useState("");
   const [qrValue, setQrValue] = useState<string | null>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // tính kích thước QR theo ô hiển thị
   const boxRef = useRef<HTMLDivElement>(null);
+  const qrRef = useRef<HTMLDivElement>(null);
   const [qrSize, setQrSize] = useState(240);
   const [qrBgWhite, setQrBgWhite] = useState(false);
 
@@ -32,6 +35,19 @@ export default function MGReferralQRCard() {
     if (!code) return;
     setQrValue(`${BASE_URL}${encodeURIComponent(code)}`);
     setQrBgWhite(true); // bật nền trắng cho khung QR
+  };
+
+  const handleDownload = async () => {
+    if (!qrRef.current) return;
+    try {
+      const canvas = await html2canvas(qrRef.current);
+      const link = document.createElement('a');
+      link.download = 'qr-code.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+    }
   };
 
   return (
@@ -81,7 +97,20 @@ export default function MGReferralQRCard() {
                       ${qrBgWhite ? "bg-white" : "bg-transparent"}`}
         >
           {qrValue ? (
-            <QRCode value={qrValue} size={qrSize} />
+            <div
+              ref={qrRef}
+              className="relative cursor-pointer"
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+              onClick={handleDownload}
+            >
+              <QRCode value={qrValue} size={qrSize} />
+              {showTooltip && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded whitespace-nowrap">
+                  click to download
+                </div>
+              )}
+            </div>
           ) : (
             <div className="text-sm opacity-50">Chưa có QR</div>
           )}
