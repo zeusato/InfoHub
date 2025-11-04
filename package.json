@@ -27,6 +27,7 @@
     "tw-merge": "^0.0.1-alpha.3"
   },
   "devDependencies": {
+    "@types/html2canvas": "^0.5.35",
     "@types/node": "^24.3.1",
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",

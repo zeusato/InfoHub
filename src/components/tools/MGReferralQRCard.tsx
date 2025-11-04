@@ -5,7 +5,7 @@ import html2canvas from "html2canvas";
 // chỉnh import này theo project của đại ca nếu khác đường dẫn
 import GlowingCard from "@/components/lightswind/glowing-cards";
 
-const BASE_URL = "https://shsmart.onelink.me/Odsh/3wr4issy?remNo=";
+const BASE_URL = "https://shsmart.onelink.me/Odsh?remNo=";
 
 export default function MGReferralQRCard() {
   const [input, setInput] = useState("");
