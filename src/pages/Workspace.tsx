@@ -12,10 +12,12 @@ import RotateOverlay from "@/components/RotateOverlay";
 import { GlowingCards, GlowingCard } from "@/components/lightswind/glowing-cards";
 import ShinyText from "@/components/lightswind/shiny-text";
 import MGReferralQRCard from "@/components/tools/MGReferralQRCard";
+import QRDepositCard from "@/components/tools/QRDepositCard";
 import QrApp from "@/assets/qr-app.jpg";
 import NeonAnimatedButton from "@/components/tools/NeonAnimatedButton";
 import IPO from "@/assets/IPO.png";
 import SHSmartQR from "@/assets/QR SHSmart.jpg";
+import * as Tabs from "@radix-ui/react-tabs";
 
 import RssFetcher from "@/components/news/RssFetcher";
 import RssSourcesPanel from "@/components/news/RssSourcesPanel";
@@ -196,7 +198,28 @@ export default function Workspace() {
                 glowColor="#f59e0b"
                 className="p-0 flex items-center justify-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition"
               >
-                <MGReferralQRCard />
+                <Tabs.Root defaultValue="qr-ekyc" className="w-full h-full">
+                  <Tabs.List className="flex border-b border-white/10 mb-4">
+                    <Tabs.Trigger
+                      value="qr-ekyc"
+                      className="px-4 py-2 text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                    >
+                      QR eKYC
+                    </Tabs.Trigger>
+                    <Tabs.Trigger
+                      value="qr-nop-tien"
+                      className="px-2 py-2 text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                    >
+                      QR nộp tiền 24/7
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  <Tabs.Content value="qr-ekyc" className="h-full">
+                    <MGReferralQRCard />
+                  </Tabs.Content>
+                  <Tabs.Content value="qr-nop-tien" className="h-full">
+                    <QRDepositCard />
+                  </Tabs.Content>
+                </Tabs.Root>
               </GlowingCard>
               <GlowingCard glowColor="#8b5cf6" className="flex items-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition p-4">
                 <div className="flex-1 flex justify-end pr-4">
