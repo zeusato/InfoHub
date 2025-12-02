@@ -47,13 +47,11 @@ export const DynamicNavigation = ({
     activeLink || (links.length > 0 ? links[0].id : null)
   );
 
-  // Directly define the default black and white theme styles
   const defaultThemeStyles = {
-    bg: backgroundColor || "bg-background", // Use provided or default black
+    bg: backgroundColor || "bg-background",
     border: "border",
-    text: textColor || "text-foreground", // Use provided or default white
-    highlight: highlightColor || "bg-foreground/10", // Use provided or default white/10
-    glow: `shadow-[0_0_${glowIntensity}px_rgba(255,255,255,0.3)]`,
+    text: textColor || "text-foreground",
+    highlight: highlightColor || "bg-foreground/10",
   };
 
   // Update highlight position based on active link
@@ -68,9 +66,8 @@ export const DynamicNavigation = ({
     const { left, width } = linkElement.getBoundingClientRect();
     const navRect = navRef.current.getBoundingClientRect();
 
-    highlightRef.current.style.transform = `translateX(${
-      left - navRect.left
-    }px)`;
+    highlightRef.current.style.transform = `translateX(${left - navRect.left
+      }px)`;
     highlightRef.current.style.width = `${width}px`;
   };
 
@@ -83,12 +80,10 @@ export const DynamicNavigation = ({
     const diameter = Math.max(button.clientWidth, button.clientHeight);
 
     circle.style.width = circle.style.height = `${diameter}px`;
-    circle.style.left = `${
-      event.clientX - button.getBoundingClientRect().left - diameter / 2
-    }px`;
-    circle.style.top = `${
-      event.clientY - button.getBoundingClientRect().top - diameter / 2
-    }px`;
+    circle.style.left = `${event.clientX - button.getBoundingClientRect().left - diameter / 2
+      }px`;
+    circle.style.top = `${event.clientY - button.getBoundingClientRect().top - diameter / 2
+      }px`;
     circle.classList.add(
       "absolute",
       "bg-white",
@@ -152,15 +147,15 @@ export const DynamicNavigation = ({
     <nav
       ref={navRef}
       className={cn(
-        `relative rounded-full  backdrop-blur-md
+        `relative rounded-full backdrop-blur-md
         shadow-lg transition-all duration-300`,
-        defaultThemeStyles.bg,        
-        defaultThemeStyles.glow,
+        defaultThemeStyles.bg,
         className
       )}
       style={{
         backgroundColor: backgroundColor,
         color: textColor,
+        boxShadow: glowIntensity > 0 ? `0 0 ${glowIntensity}px rgba(255,255,255,0.3)` : undefined,
       }}
     >
       {/* Background highlight */}
@@ -192,17 +187,17 @@ export const DynamicNavigation = ({
                 defaultThemeStyles.text,
                 active === link.id && "font-semibold"
               )}
-            onClick={(e) => {
-            e.preventDefault();
-            handleLinkClick(link.id, e);
-            if (link.href) {
-                window.open(link.href, "_blank"); // mở link ở tab mới
-            }
-            }}
+              onClick={(e) => {
+                e.preventDefault();
+                handleLinkClick(link.id, e);
+                if (link.href) {
+                  window.open(link.href, "_blank");
+                }
+              }}
               onMouseEnter={() => handleLinkHover(link.id)}
             >
               {link.icon && (
-                <span className="text-current text-xs ">
+                <span className="text-current text-xs">
                   {link.icon}
                 </span>
               )}
@@ -218,7 +213,7 @@ export const DynamicNavigation = ({
 
       <style
         dangerouslySetInnerHTML={{
-          __html: `        @keyframes ripple {
+          __html: `@keyframes ripple {
           to {
             transform: scale(4);
             opacity: 0;

@@ -18,7 +18,8 @@ export const RSS_SOURCES = {
     feeds: ["https://cafebiz.vn/rss/home.rss"],
   },
   vietstock: {
-    label: "Vietstock",
+    label: "VietStock",
+
     feeds: [
       "https://vietstock.vn/830/chung-khoan/co-phieu.rss",
       "https://vietstock.vn/739/chung-khoan/giao-dich-noi-bo.rss",

@@ -12,10 +12,11 @@ export type LeafPayload = {
 type Props = {
   menu: MenuNode[]
   onLeafSelect: (leaf: LeafPayload) => void
-  onHomeClick?: () => void   // ← thêm prop
+  onHomeClick?: () => void
+  onClose?: () => void  // ← close sidebar after leaf selection (mobile)
 }
 
-export default function SidebarMenu({ menu, onLeafSelect, onHomeClick }: Props) {
+export default function SidebarMenu({ menu, onLeafSelect, onHomeClick, onClose }: Props) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
   // Build parent & depth maps to control accordion by level
@@ -68,25 +69,35 @@ export default function SidebarMenu({ menu, onLeafSelect, onHomeClick }: Props) 
   const goHome = () => {
     collapseAll()
     onHomeClick?.()
+    onClose?.()
   }
 
+
   const header = (
-    <div className="flex items-center justify-between p-3 border-b border-white/10">
+    <div className="p-3 border-b border-white/10 space-y-2">
+      {/* Title */}
+      <div className="flex items-center justify-between">
+        <div className="font-bold">
+          <span className="text-brand">Info</span>Hub
+        </div>
+        <button
+          className="px-2 py-1 rounded-lg border border-white/10 hover:border-brand/50 hover:text-brand transition text-xs"
+          onClick={collapseAll}
+          title="Thu gọn tất cả"
+        >
+          ☰
+        </button>
+      </div>
+
+      {/* Home Button */}
       <button
         type="button"
         onClick={goHome}
-        className="font-bold text-left hover:text-brand transition focus:outline-none"
+        className="w-full px-3 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition flex items-center justify-center gap-2 group"
         title="Về màn hình mặc định"
       >
-        <span className="text-brand">Info</span>Hub
-      </button>
-
-      <button
-        className="px-2 py-1 rounded-lg border border-white/10 hover:border-brand/50 hover:text-brand transition"
-        onClick={collapseAll}
-        title="Thu gọn"
-      >
-        ☰
+        <span className="text-lg">🏠</span>
+        <span className="font-semibold text-emerald-400 group-hover:text-emerald-300">Trang chủ</span>
       </button>
     </div>
   )
@@ -103,6 +114,7 @@ export default function SidebarMenu({ menu, onLeafSelect, onHomeClick }: Props) 
             expanded={expanded}
             onToggle={(id) => toggleBranch(id)}
             onLeafSelect={onLeafSelect}
+            onClose={onClose}
           />
         ))}
       </div>
@@ -116,12 +128,14 @@ function MenuBranch({
   expanded,
   onToggle,
   onLeafSelect,
+  onClose,
 }: {
   node: MenuNode
   depth: number
   expanded: Record<string, boolean>
   onToggle: (id: string) => void
   onLeafSelect: (leaf: LeafPayload) => void
+  onClose?: () => void
 }) {
   const isLeaf = !node.children || node.children.length === 0
   const open = expanded[node.id]
@@ -130,21 +144,21 @@ function MenuBranch({
 
   const bullet = (
     <span
-      className={`inline-block h-2 w-2 rounded-full mr-2 ${
-        depth === 0 ? 'bg-brand'
+      className={`inline-block h-2 w-2 rounded-full mr-2 ${depth === 0 ? 'bg-brand'
         : depth === 1 ? 'bg-emerald-400'
-        : depth === 2 ? 'bg-cyan-400'
-        : 'bg-purple-400'
-      }`}
+          : depth === 2 ? 'bg-cyan-400'
+            : 'bg-purple-400'
+        }`}
     />
   )
 
   if (isLeaf) {
     return (
       <button
-        onClick={() =>
+        onClick={() => {
           onLeafSelect({ id: node.id, label: node.label, path: node.path ?? node.id })
-        }
+          onClose?.()  // Auto-close sidebar on mobile after selection
+        }}
         className={`w-full text-left my-1 px-3 py-2 rounded-xl border ${color} hover:border-brand/60 hover:bg-brand/10 transition`}
       >
         <div className="flex items-center">
@@ -180,6 +194,7 @@ function MenuBranch({
                 expanded={expanded}
                 onToggle={onToggle}
                 onLeafSelect={onLeafSelect}
+                onClose={onClose}
               />
             </div>
           ))}

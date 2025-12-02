@@ -93,21 +93,26 @@ export default function BannerCarousel() {
             {cur.title}
           </h3>
           <p className="text-[#4ade80] mt-1">{cur.desc}</p>
-          <div className="mt-auto"> 
+          <div className="mt-auto">
             {/* chỗ để nút hoặc nội dung muốn đẩy xuống cuối */}
           </div>
         </div>
       </a>
 
       {/* Dots */}
-      <div className="absolute bottom-3 right-5 flex gap-2">
+      <div className="absolute bottom-3 right-5 flex items-center gap-2">
         {slides.map((s, i) => (
           <button
             key={s.id}
             onClick={() => setIdx(i)}
-            className={`h-2.5 rounded-full transition-all ${
-              i === idx ? "w-6 bg-brand" : "w-2.5 bg-white/40"
-            }`}
+            className={`rounded-full transition-all flex-shrink-0 ${i === idx ? "bg-brand" : "bg-white/40"
+              }`}
+            style={{
+              width: i === idx ? '24px' : '10px',
+              height: '10px',
+              minWidth: i === idx ? '24px' : '10px',
+              minHeight: '10px'
+            }}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
@@ -162,11 +167,10 @@ export default function BannerCarousel() {
         {/* Navigation items container.  When collapsed it has zero width and is fully transparent.
             When expanded it gains margin and opacity so items appear smoothly. */}
         <ul
-          className={`flex items-center overflow-hidden transition-all duration-300 ${
-            menuOpen
-              ? "ml-3 opacity-100 max-w-none"
-              : "ml-0 opacity-0 max-w-0"
-          }`}
+          className={`flex items-center overflow-hidden transition-all duration-300 ${menuOpen
+            ? "ml-3 opacity-100 max-w-none"
+            : "ml-0 opacity-0 max-w-0"
+            }`}
         >
           {links.map((link) => (
             <li key={link.id} className="px-2">

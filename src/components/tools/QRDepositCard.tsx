@@ -1,5 +1,8 @@
-// src/components/tools/QRDepositCard.tsx
 import { useEffect, useState } from "react";
+import QRModal from "@/components/QRModal";
+
+import AlertModal from "@/components/AlertModal";
+
 
 export default function QRDepositCard() {
   const [stockAccount, setStockAccount] = useState("069C");
@@ -8,6 +11,10 @@ export default function QRDepositCard() {
   const [saveInfo, setSaveInfo] = useState(false);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [qrCreated, setQrCreated] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -30,12 +37,14 @@ export default function QRDepositCard() {
     const afterPrefix = value.substring(4);
     const cleaned = afterPrefix.replace(/[^0-9]/g, '');
     setStockAccount('069C' + cleaned.substring(0, 6));
+    setQrCreated(false);
   };
 
   // Handle sub-account input
   const handleSubAccountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9]/g, '').substring(0, 2);
     setSubAccount(value);
+    setQrCreated(false);
   };
 
   // Handle amount input with formatting
@@ -46,6 +55,7 @@ export default function QRDepositCard() {
     } else {
       setAmount('');
     }
+    setQrCreated(false);
   };
 
   // Generate QR
@@ -53,7 +63,16 @@ export default function QRDepositCard() {
     e.preventDefault();
 
     if (!stockAccount || !subAccount) {
-      alert('Vui lòng nhập đủ thông tin Số tài khoản chứng khoán và Tiểu khoản!');
+      setAlertMessage('Vui lòng nhập đủ thông tin Số tài khoản chứng khoán và Tiểu khoản!');
+      setShowAlert(true);
+      return;
+    }
+
+    // Check max amount
+    const amountRaw = amount.replace(/[^0-9]/g, '') || '0';
+    if (Number(amountRaw) > 499000000) {
+      setAlertMessage('Số tiền tối đa cho mỗi lần nộp 24/7 là 499.000.000 đồng');
+      setShowAlert(true);
       return;
     }
 
@@ -69,10 +88,10 @@ export default function QRDepositCard() {
     }
 
     setLoading(true);
+    setQrCreated(false);
 
     const stk = "SHS" + stockAccount + subAccount;
     const bank = '970443'; // SHB mặc định
-    const amountRaw = amount.replace(/[^0-9]/g, '') || '0';
 
     const url = `https://zeusato.github.io/qr-payment/qr.html?bank=${encodeURIComponent(bank)}&stk=${encodeURIComponent(stk)}&amount=${encodeURIComponent(amountRaw)}&t=${Date.now()}`;
 
@@ -80,43 +99,50 @@ export default function QRDepositCard() {
 
     setTimeout(() => {
       setLoading(false);
+      setQrCreated(true);
     }, 2000);
   };
 
-  return (
-    <div className="p-4 w-full h-full flex">
-      <div className="w-1/2 pr-4">
-        <form onSubmit={handleSubmit} className="space-y-4 h-full flex flex-col">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-200 mb-1">
-                Số TK chứng khoán*
-              </label>
-              <input
-                type="text"
-                value={stockAccount}
-                onChange={handleStockAccountChange}
-                className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="069Cxxxxxx"
-                maxLength={10}
-                required
-              />
-            </div>
+  const handleDownloadQR = () => {
+    if (!qrUrl) return;
+    window.open(qrUrl, '_blank');
+  };
 
-            <div>
-              <label className="block text-sm font-medium text-zinc-200 mb-1">
-                Tiểu khoản*
-              </label>
-              <input
-                type="text"
-                value={subAccount}
-                onChange={handleSubAccountChange}
-                className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                placeholder="xx"
-                maxLength={2}
-                required
-              />
-            </div>
+  return (
+    <div className="p-4 w-full h-full flex flex-col sm:flex-row gap-4">
+      {/* Form section - full width on mobile, half on desktop */}
+      <div className="w-full sm:w-1/2">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 h-full flex flex-col">
+          {/* Row 1: Stock Account - always full width */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-200 mb-1">
+              Số TK chứng khoán*
+            </label>
+            <input
+              type="text"
+              value={stockAccount}
+              onChange={handleStockAccountChange}
+              className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm sm:text-base text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              placeholder="069Cxxxxxx"
+              maxLength={10}
+              required
+            />
+          </div>
+
+          {/* Row 2: Sub Account - full width on mobile (separate row) */}
+          <div>
+            <label className="block text-sm font-medium text-zinc-200 mb-1">
+              Tiểu khoản*
+            </label>
+            <input
+              type="text"
+              value={subAccount}
+              onChange={handleSubAccountChange}
+              className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm sm:text-base text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              placeholder="xx"
+              maxLength={2}
+              required
+            />
           </div>
 
           <div className="flex items-center">
@@ -134,33 +160,45 @@ export default function QRDepositCard() {
 
           <div>
             <label className="block text-sm font-medium text-zinc-200 mb-1">
-              Số tiền (VNĐ)
+              Số tiền (VNĐ) - Tối đa 499 triệu
             </label>
             <input
               type="text"
               value={amount}
               onChange={handleAmountChange}
-              className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm sm:text-base text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               placeholder="Nhập số tiền (mặc định 0)"
             />
           </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition"
+            disabled={loading || qrCreated}
+            className="w-full py-2 px-4 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition text-sm sm:text-base"
           >
-            {loading ? '⏳ Đang tạo QR...' : '🎯 Tạo mã QR'}
+            {loading ? '\u23f3 \u0110ang t\u1ea1o QR...' : (qrCreated ? '\u2713 QR \u0111\u00e3 t\u1ea1o' : '\ud83c\udfaf T\u1ea1o m\u00e3 QR')}
           </button>
+
+          {/* Mobile: View QR button - only show when QR is fully created */}
+          {qrCreated && (
+            <button
+              type="button"
+              onClick={() => setShowModal(true)}
+              className="sm:hidden w-full px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-400 text-white font-semibold rounded-lg shadow-md hover:from-orange-700 hover:to-orange-500 transition"
+            >
+              👁️ Xem QR
+            </button>
+          )}
         </form>
       </div>
 
-      <div className="w-1/2 flex items-center justify-center">
+      {/* QR Display section - hidden on mobile */}
+      <div className="hidden sm:flex w-1/2 items-center justify-center">
         {qrUrl ? (
           <iframe
             src={qrUrl}
             className="w-full h-full border border-white/20 rounded-lg"
-            // title="QR Code Result"
+            title="QR Code Result"
           />
         ) : (
           <div className="text-zinc-400 text-sm text-center">
@@ -168,6 +206,26 @@ export default function QRDepositCard() {
           </div>
         )}
       </div>
+
+      {/* Modal for mobile */}
+      <QRModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onDownload={handleDownloadQR}
+      >
+        {qrUrl && (
+          <iframe
+            src={qrUrl}
+            className="w-full h-72 border-0 rounded-lg"
+            title="QR Code in Modal"
+          />
+        )}
+      </QRModal>
+      <AlertModal
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        message={alertMessage}
+      />
     </div>
   );
 }

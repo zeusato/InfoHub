@@ -160,14 +160,14 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
                 ref={imgRef}
                 src={current?.src}
                 alt={current?.alt || `Slide ${idx + 1}`}
-                className="block shadow-lg"
+                className="block shadow-lg object-contain"
                 style={{
-                  // Ảnh không vượt quá port; port đã co = displayW
                   width: displayW,
-                  height: displayH,
+                  maxHeight: displayH,
                 }}
                 draggable={false}
               />
+
             </div>
           </div>
 

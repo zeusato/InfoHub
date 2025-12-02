@@ -8,6 +8,7 @@ import { MENU } from "@/lib/menuData";
 import logo from "@/assets/LOGO.png";
 import { Link, useSearchParams } from "react-router-dom";
 import { BorderBeam } from "@/components/lightswind/border-beam";
+import RotateOverlay from "@/components/RotateOverlay";
 import { GlowingCards, GlowingCard } from "@/components/lightswind/glowing-cards";
 import ShinyText from "@/components/lightswind/shiny-text";
 import MGReferralQRCard from "@/components/tools/MGReferralQRCard";
@@ -24,8 +25,6 @@ import cafebizLogo from "@/assets/cafebiz.jpg";
 import vietstockLogo from "@/assets/vietstock.jpg";
 import SymbolChart from '@/components/Index/SymbolChart';
 import shaQR from '@/assets/SH Advisor.png'
-import HamburgerButton from "@/components/HamburgerButton"
-import { downloadQRImage } from "@/lib/downloadQR"
 
 type LeafPayload = Parameters<typeof ContentHost>[0]["activeLeaf"];
 
@@ -72,7 +71,6 @@ export default function Workspace() {
   })();
 
   const [activeLeaf, setActiveLeaf] = useState<LeafPayload | null>(initialLeaf);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Effect: When the `leaf` query param changes, sync it into activeLeaf.
   useEffect(() => {
@@ -112,30 +110,16 @@ export default function Workspace() {
   // Khi ở màn default (activeLeaf === null) → check RSS TTL
   const checkToken = activeLeaf === null ? Date.now() : 0;
 
-  // Close sidebar when clicking outside on mobile
-  useEffect(() => {
-    if (sidebarOpen) {
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setSidebarOpen(false);
-      };
-      window.addEventListener('keydown', handleEscape);
-      return () => window.removeEventListener('keydown', handleEscape);
-    }
-  }, [sidebarOpen]);
-
   return (
     <div className="min-h-screen bg-[var(--bg)] text-zinc-200 flex flex-col">
       {/* Fetcher (ẩn) */}
       <RssFetcher checkNow={checkToken} />
 
-      {/* Hamburger Menu Button (Mobile only) */}
-      <HamburgerButton isOpen={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)} />
-
       {/* Top row: Logo block + Banner block */}
       <div className="px-3 pt-3 p-3">
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-3">
-          {/* Logo card - Hidden on mobile */}
-          <div className="hidden lg:block rounded-2xl border border-white/10 bg-white/[0.04] shadow-inner relative">
+        <div className="grid grid-cols-[300px_1fr] gap-3">
+          {/* Logo card */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] shadow-inner relative">
             <BorderBeam colorFrom="#7400ff" colorTo="#9b41ff" size={100} duration={6} borderThickness={2} glowIntensity={0} />
             <Link to="/Intro">
               <div className="h-full grid place-items-center px-4">
@@ -152,29 +136,15 @@ export default function Workspace() {
       </div>
 
       {/* Main area */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-3 p-3 pt-0">
-        {/* Sidebar - Desktop: static, Mobile: overlay drawer */}
-        <>
-          {/* Mobile overlay backdrop */}
-          {sidebarOpen && (
-            <div
-              className="sidebar-overlay"
-              onClick={() => setSidebarOpen(false)}
-              aria-hidden="true"
-            />
-          )}
-
-          {/* Sidebar */}
-          <aside className={`glass rounded-2xl overflow-hidden lg:static lg:translate-x-0 ${sidebarOpen ? 'sidebar-mobile open' : 'sidebar-mobile closed'}`}>
-
-            <SidebarMenu
-              menu={MENU}
-              onLeafSelect={(leaf) => setActiveLeaf(leaf)}
-              onHomeClick={() => setActiveLeaf(null)}
-              onClose={() => setSidebarOpen(false)}
-            />
-          </aside>
-        </>
+      <div className="flex-1 grid grid-cols-[300px_1fr] gap-3 p-3 pt-0">
+        {/* Sidebar */}
+        <aside className="glass rounded-2xl overflow-hidden">
+          <SidebarMenu
+            menu={MENU}
+            onLeafSelect={(leaf) => setActiveLeaf(leaf)}
+            onHomeClick={() => setActiveLeaf(null)}
+          />
+        </aside>
 
         {/* Content area */}
         <section className="glass rounded-2xl p-4 overflow-auto relative h-full">
@@ -183,62 +153,46 @@ export default function Workspace() {
           ) : (
             <GlowingCards
               gap="2rem"
-              className="h-full grid grid-cols-1 sm:grid-cols-2 gap-4"
+              className="h-full grid grid-cols-1 md:grid-cols-2 grid-rows-2 gap-4"
               borderRadius="0 rem"
               maxWidth="none"
             >
               {/* News sources panel (bên trái, row-span-2).
                   BẤM chọn nguồn → mở LIST full-width ở ContentHost */}
-              <GlowingCard hoverEffect={false} glowColor="#8b5cf6" className="w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition p-4">
-                {/* Flex container - column on mobile, row on desktop */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 h-full">
-                  {/* Left section - Text and buttons */}
-                  <div className="flex-1 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+              <GlowingCard glowColor="#8b5cf6" className="flex items-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition p-4">
+                <div className="flex-1 flex justify-end pr-4">
+                  <div className="flex flex-col items-end">
                     <ShinyText
                       baseColor="rgba(251, 146, 60, 0.8)"
                       size="4xl"
                       shineColor="rgba(251, 146, 60, 1)"
                       speed={5}
-                      className="text-3xl sm:text-4xl lg:text-5xl whitespace-nowrap"
                     >
                       SH Smart
                     </ShinyText>
-                    <div className="flex items-center gap-2 flex-wrap justify-center">
+                    <div className="flex items-center gap-2 mt-2">
                       <button
-                        className="px-3 sm:px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-400 text-white font-semibold rounded-lg shadow-md hover:from-orange-700 hover:to-orange-500 transition duration-300 whitespace-nowrap text-sm"
+                        className="px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-400 text-white font-semibold rounded-lg shadow-md hover:from-orange-700 hover:to-orange-500 transition duration-300 whitespace-nowrap"
                         onClick={() => window.open('https://q.me-qr.com/l/SHSmart', '_blank')}
                       >
                         Giao dịch ngay
                       </button>
-                      {/* Desktop: show QR text, Mobile: show download button */}
-                      <div className="hidden lg:block">
-                        <ShinyText
-                          baseColor="rgba(251, 146, 60, 0.8)"
-                          size="base"
-                          shineColor="rgba(251, 146, 60, 1)"
-                          speed={5}
-                          className="text-sm whitespace-nowrap"
-                        >
-                          hoặc quét QR
-                        </ShinyText>
-                      </div>
-                      <button
-                        className="sm:hidden px-3 py-2 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/50 text-orange-300 text-sm rounded-lg hover:from-orange-500/30 hover:to-orange-600/30 transition whitespace-nowrap font-medium"
-                        onClick={() => downloadQRImage(SHSmartQR, 'SHSmart-QR.jpg')}
+                      <ShinyText
+                        baseColor="rgba(251, 146, 60, 0.8)"
+                        size="base"
+                        shineColor="rgba(251, 146, 60, 1)"
+                        speed={5}
                       >
-                        📥 QR
-                      </button>
+                        hoặc quét QR
+                      </ShinyText>
                     </div>
                   </div>
-                  {/* Divider - hidden on mobile */}
-                  <div className="hidden sm:block w-px bg-white/20 self-stretch"></div>
-                  {/* QR Code - hidden on mobile */}
-                  <div className="hidden sm:flex items-center justify-center">
-                    <img src={SHSmartQR} alt="SH Smart QR" className="h-32 sm:h-40 lg:h-48 w-auto object-contain" />
-                  </div>
+                </div>
+                <div className="w-px bg-white/20 h-full"></div>
+                <div className="flex-1 flex justify-start pl-4">
+                  <img src={SHSmartQR} alt="shaQR" className="h-48 w-auto object-contain" />
                 </div>
               </GlowingCard>
-
               <GlowingCard
                 hoverEffect={false}
                 glowColor="#f59e0b"
@@ -248,16 +202,15 @@ export default function Workspace() {
                   <Tabs.List className="flex border-b border-white/10 mb-4">
                     <Tabs.Trigger
                       value="qr-ekyc"
-                      className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                      className="px-4 py-2 text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
                     >
                       QR eKYC
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value="qr-nop-tien"
-                      className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                      className="px-2 py-2 text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
                     >
-                      <span className="hidden sm:inline">QR nộp tiền 24/7</span>
-                      <span className="sm:hidden">Nộp tiền 24/7</span>
+                      QR nộp tiền 24/7
                     </Tabs.Trigger>
                   </Tabs.List>
                   <Tabs.Content value="qr-ekyc" className="h-full">
@@ -268,57 +221,41 @@ export default function Workspace() {
                   </Tabs.Content>
                 </Tabs.Root>
               </GlowingCard>
-              <GlowingCard hoverEffect={false} glowColor="#8b5cf6" className="w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition p-4">
-                {/* Flex container - column on mobile, row on desktop */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 h-full">
-                  {/* Left section - Text and buttons */}
-                  <div className="flex-1 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+              <GlowingCard glowColor="#8b5cf6" className="flex items-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition p-4">
+                <div className="flex-1 flex justify-end pr-4">
+                  <div className="flex flex-col items-end">
                     <ShinyText
                       baseColor="rgba(255, 255, 255, 0.8)"
                       size="4xl"
                       shineColor="rgba(255, 255, 255, 1)"
                       speed={5}
-                      className="text-3xl sm:text-4xl lg:text-5xl whitespace-nowrap"
                     >
                       SHAdvisor
                     </ShinyText>
-                    <div className="flex items-center gap-2 flex-wrap justify-center">
+                    <div className="flex items-center gap-2 mt-2">
                       <button
-                        className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 transition duration-300 text-sm whitespace-nowrap"
+                        className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 transition duration-300"
                         onClick={() => window.open('https://q.me-qr.com/Zb80ouRe', '_blank')}
                       >
                         Truy cập ngay
                       </button>
-                      {/* Desktop: show QR text, Mobile: show download button */}
-                      <div className="hidden lg:block">
-                        <ShinyText
-                          baseColor="rgba(255, 255, 255, 0.8)"
-                          size="base"
-                          shineColor="rgba(255, 255, 255, 1)"
-                          speed={5}
-                          className="text-sm whitespace-nowrap"
-                        >
-                          hoặc quét QR
-                        </ShinyText>
-                      </div>
-                      <button
-                        className="sm:hidden px-3 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/50 text-purple-300 text-sm rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition whitespace-nowrap font-medium"
-                        onClick={() => downloadQRImage(shaQR, 'SHAdvisor-QR.png')}
+                      <ShinyText
+                        baseColor="rgba(255, 255, 255, 0.8)"
+                        size="base"
+                        shineColor="rgba(255, 255, 255, 1)"
+                        speed={5}
                       >
-                        📥 QR
-                      </button>
+                        hoặc quét QR
+                      </ShinyText>
                     </div>
                   </div>
-                  {/* Divider - hidden on mobile */}
-                  <div className="hidden sm:block w-px bg-white/20 self-stretch"></div>
-                  {/* QR Code - hidden on mobile */}
-                  <div className="hidden sm:flex items-center justify-center">
-                    <img src={shaQR} alt="SHAdvisor QR" className="h-32 sm:h-40 lg:h-48 w-auto object-contain" />
-                  </div>
+                </div>
+                <div className="w-px bg-white/20 h-full"></div>
+                <div className="flex-1 flex justify-start pl-4">
+                  <img src={shaQR} alt="shaQR" className="h-48 w-auto object-contain" />
                 </div>
                 {/* <SymbolChart symbol="VN" height={300} colorTheme="dark" /> */}
               </GlowingCard>
-
               <GlowingCard
                 hoverEffect={false}
                 glowColor="#10b981"
@@ -326,21 +263,21 @@ export default function Workspace() {
                            bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)]
                            transition"
               >
-                <RssSourcesPanel
-                  icons={{
-                    cafebiz: cafebizLogo,
-                    vietstock: vietstockLogo,
-                  }}
-                  onSelect={(src) =>
-                    setActiveLeaf({
-                      id: `news-${src}-list`,
-                      label: `Danh sách ${src}`,
-                      path: `news/${src}/list`,
-                      page: 1,
-                    } as any)
-                  }
-                  className="h-full"
-                />
+              <RssSourcesPanel
+                icons={{
+                  cafebiz: cafebizLogo,
+                  vietstock: vietstockLogo,
+                }}
+                onSelect={(src) =>
+                  setActiveLeaf({
+                    id: `news-${src}-list`,
+                    label: `Danh sách ${src}`,
+                    path: `news/${src}/list`,
+                    page: 1,
+                  } as any)
+                }
+                className="h-full"
+              />
               </GlowingCard>
             </GlowingCards>
           )}
@@ -350,6 +287,7 @@ export default function Workspace() {
       <div className="p-3 pt-0">
         <Footer />
       </div>
+      <RotateOverlay />
     </div>
   );
 }

@@ -13,7 +13,7 @@ type Props = {
 };
 
 const ACCENT: Record<keyof typeof RSS_SOURCES, { from: string; to: string }> = {
-  cafebiz:   { from: "#f43f5e", to: "#f59e0b" }, // rose → amber
+  cafebiz: { from: "#f43f5e", to: "#f59e0b" }, // rose → amber
   vietstock: { from: "#06b6d4", to: "#3b82f6" }, // cyan → blue
 };
 
@@ -63,14 +63,16 @@ export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
                   />
 
                   <div className="relative flex items-center justify-between gap-4 p-4 h-full">
-                    <div className="min-w-0 pr-2">
+                    <div className="min-w-0 pr-2 flex items-center gap-2">
+
                       <ChevronRight
                         className="block md:hidden size-4 translate-x-0 group-hover/card:translate-x-[2px] transition-transform"
                         aria-hidden="true"
                       />
-                      <div className="hidden md:block text-[1.075rem] sm:hidden font-semibold truncate">
+                      <div className="text-[1.075rem] font-semibold truncate">
                         {cfg.label} News
                       </div>
+
                       <div className="hidden lg:block text-xs text-white/60 mt-1 sm:hidden">
                         Bấm để xem danh sách mới nhất
                       </div>
