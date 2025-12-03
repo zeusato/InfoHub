@@ -26,26 +26,55 @@ export default function ArticlesList() {
         setLoading(false)
     }
 
-    const handleDelete = async (id: string, title: string) => {
+    const handleDelete = async (id: string, title: string, path: string) => {
         if (!confirm(`Delete "${title}"?`)) return
 
-        const { error } = await supabase
+        // 1. Delete article
+        const { error: articleError } = await supabase
             .from('articles')
             .delete()
             .eq('id', id)
 
-        if (error) {
-            alert('Error deleting: ' + error.message)
-        } else {
-            alert('Deleted!')
-            loadArticles()
+        if (articleError) {
+            alert('Error deleting article: ' + articleError.message)
+            return
         }
+
+        // 2. Delete corresponding menu item (if any)
+        const { error: menuError } = await supabase
+            .from('menu_items')
+            .delete()
+            .eq('path', path)
+
+        if (menuError) {
+            console.error('Error deleting menu item:', menuError)
+            // Don't block success alert if menu delete fails, just log it
+        }
+
+        alert('Deleted!')
+        loadArticles()
     }
 
-    const filtered = articles.filter(a =>
-        a.title.toLowerCase().includes(search.toLowerCase()) ||
-        a.path.toLowerCase().includes(search.toLowerCase())
-    )
+    const [activeTab, setActiveTab] = useState('All')
+
+    const tabs = ['All', 'ProductNews', 'FeatureGuide', 'VideoEmbed', 'FAQAccordion']
+
+    const filtered = articles.filter(a => {
+        const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) ||
+            a.path.toLowerCase().includes(search.toLowerCase())
+        const matchesTab = activeTab === 'All' || a.template_key === activeTab
+        return matchesSearch && matchesTab
+    })
+
+    const getTemplateBadgeColor = (key: string) => {
+        switch (key) {
+            case 'ProductNews': return 'bg-blue-500/20 border-blue-500/40 text-blue-400'
+            case 'FeatureGuide': return 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+            case 'VideoEmbed': return 'bg-red-500/20 border-red-500/40 text-red-400'
+            case 'FAQAccordion': return 'bg-purple-500/20 border-purple-500/40 text-purple-400'
+            default: return 'bg-zinc-500/20 border-zinc-500/40 text-zinc-400'
+        }
+    }
 
     return (
         <div className="p-8">
@@ -60,7 +89,24 @@ export default function ArticlesList() {
                 </Link>
             </div>
 
-            <div className="mb-6">
+            <div className="flex flex-col gap-4 mb-6">
+                {/* Tabs */}
+                <div className="flex gap-2 border-b border-white/10 pb-1">
+                    {tabs.map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors relative top-[1px] ${activeTab === tab
+                                ? 'text-brand border-b-2 border-brand bg-white/5'
+                                : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Search */}
                 <input
                     type="text"
                     value={search}
@@ -96,7 +142,7 @@ export default function ArticlesList() {
                                         <td className="px-4 py-3 text-white">{article.title}</td>
                                         <td className="px-4 py-3 text-zinc-400 text-sm font-mono">{article.path}</td>
                                         <td className="px-4 py-3">
-                                            <span className="px-2 py-1 bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 rounded text-xs">
+                                            <span className={`px-2 py-1 border rounded text-xs ${getTemplateBadgeColor(article.template_key)}`}>
                                                 {article.template_key}
                                             </span>
                                         </td>
@@ -110,7 +156,7 @@ export default function ArticlesList() {
                                                     <Pencil size={16} />
                                                 </Link>
                                                 <button
-                                                    onClick={() => handleDelete(article.id, article.title)}
+                                                    onClick={() => handleDelete(article.id, article.title, article.path)}
                                                     className="p-2 hover:bg-red-500/20 rounded-lg text-zinc-400 hover:text-red-400"
                                                     title="Delete"
                                                 >

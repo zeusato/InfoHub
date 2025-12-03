@@ -32,6 +32,7 @@ export interface Article {
     ending_note?: string
     gallery?: string[]
     faq_json_path?: string
+    video_url?: string
     created_at: string
     updated_at: string
 }
@@ -160,6 +161,22 @@ export async function getFAQsByCategory(category: string): Promise<FAQItem[]> {
     }
 
     return data || []
+}
+
+export async function getFAQCategories(): Promise<string[]> {
+    const { data, error } = await supabase
+        .from('faq_items')
+        .select('category')
+        .eq('active', true)
+
+    if (error) {
+        console.error('Error fetching FAQ categories:', error)
+        return []
+    }
+
+    // Get distinct categories
+    const categories = Array.from(new Set(data?.map(item => item.category) || []))
+    return categories.sort()
 }
 
 // Workspace cards operations

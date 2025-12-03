@@ -136,10 +136,16 @@ export function ContentHost({
     const templateKey = entry.templateKey || entry.template_key
 
     // Process images from Supabase (convert relative paths to full URLs)
+    // AND normalize keys to camelCase for components
     const processedEntry = supabaseArticle ? {
       ...entry,
       bannerImg: entry.banner_img ? getStorageUrl(entry.banner_img) : undefined,
       gallery: entry.gallery?.map((img: string) => getStorageUrl(img)) || [],
+      contentHtml: entry.content_html,
+      endingNote: entry.ending_note,
+      templateKey: entry.template_key,
+      faqJsonPath: entry.faq_json_path,
+      videoUrl: (entry as any).video_url,
     } : entry
 
     switch (templateKey) {
@@ -153,8 +159,8 @@ export function ContentHost({
             subtitle={processedEntry.subtitle}
             gallery={(processedEntry.gallery || []).map((src: string) => ({ src }))}
             contentBlocks={Array.isArray(processedEntry.content) ? processedEntry.content : undefined}
-            contentHtml={typeof processedEntry.content_html === 'string' ? processedEntry.content_html : (typeof processedEntry.contentHtml === 'string' ? processedEntry.contentHtml : undefined)}
-            endingNote={processedEntry.ending_note || processedEntry.endingNote}
+            contentHtml={processedEntry.contentHtml}
+            endingNote={processedEntry.endingNote}
           />
         )
 
@@ -165,8 +171,8 @@ export function ContentHost({
             subtitle={processedEntry.subtitle}
             videoUrl={processedEntry.videoUrl}
             contentBlocks={Array.isArray(processedEntry.content) ? processedEntry.content : undefined}
-            contentHtml={typeof processedEntry.content_html === 'string' ? processedEntry.content_html : (typeof processedEntry.contentHtml === 'string' ? processedEntry.contentHtml : undefined)}
-            endingNote={processedEntry.ending_note || processedEntry.endingNote}
+            contentHtml={processedEntry.contentHtml}
+            endingNote={processedEntry.endingNote}
           />
         )
 
@@ -175,8 +181,8 @@ export function ContentHost({
           <FAQAccordionTemplate
             title={processedEntry.title}
             subtitle={processedEntry.subtitle}
-            faqJsonPath={processedEntry.faq_json_path || processedEntry.faqJsonPath}
-            endingNote={processedEntry.ending_note || processedEntry.endingNote}
+            faqJsonPath={processedEntry.faqJsonPath}
+            endingNote={processedEntry.endingNote}
           />
         )
 

@@ -8,9 +8,11 @@
     "build": "vite build && copy dist\\index.html dist\\404.html",
     "preview": "vite preview",
     "predeploy": "npm run build && node -e \"const fs=require('fs'); fs.mkdirSync('dist',{recursive:true}); fs.writeFileSync('dist/.nojekyll',''); fs.copyFileSync('dist/index.html','dist/404.html');\"",
-    "deploy": "gh-pages -d dist -b gh-pages"
+    "deploy": "gh-pages -d dist -b gh-pages",
+    "test:supabase": "node test-supabase-connection.js"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-tabs": "^1.1.13",
     "@supabase/auth-helpers-react": "^0.15.0",
     "@supabase/supabase-js": "^2.86.0",

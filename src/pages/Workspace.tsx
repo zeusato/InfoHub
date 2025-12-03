@@ -1,10 +1,10 @@
 // src/pages/Workspace.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import BannerCarousel from "@/components/BannerCarousel";
 import SidebarMenu from "@/components/SidebarMenu";
 import Footer from "@/components/Footer";
 import { ContentHost } from "@/components/content/ContentHost";
-import { MENU } from "@/lib/menuData";
+import { useMenuTree } from "@/hooks/useMenuTree";
 import logo from "@/assets/LOGO.png";
 import { Link, useSearchParams } from "react-router-dom";
 import { BorderBeam } from "@/components/lightswind/border-beam";
@@ -33,47 +33,34 @@ type LeafPayload = Parameters<typeof ContentHost>[0]["activeLeaf"];
 
 export default function Workspace() {
   // Manage URL search parameters to enable deep linking to a specific leaf.
-  // We will use a single query param "leaf" that stores the path of the
-  // selected leaf. When the page loads with this parameter present, the
-  // corresponding content will be displayed automatically. When the user
-  // selects a leaf or navigates back, we update this param to reflect
-  // the current state.
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Load menu from DB
+  const { menuItems, loading: menuLoading, buildTree } = useMenuTree();
+  const menuTree = useMemo(() => buildTree(), [menuItems]);
 
   /**
    * Recursively search the menu tree for a leaf node matching the given
    * path. Returns the node if found, otherwise null.
    */
-  function findLeafByPath(nodes: typeof MENU, targetPath: string): any {
+  function findLeafByPath(nodes: any[], targetPath: string): any {
     for (const node of nodes) {
-      const children: any = (node as any).children;
+      const children = node.children;
       if (Array.isArray(children) && children.length) {
         const found = findLeafByPath(children, targetPath);
         if (found) return found;
       }
-      if ((node as any).path && (node as any).path === targetPath) {
+      if (node.path && node.path === targetPath) {
         return node;
       }
     }
     return null;
   }
 
-  // Determine the initial active leaf based on the current query param. Doing
-  // this in the initializer avoids an initial render with null, which can
-  // cause a brief flash of the default workspace before the content loads.
-  const initialLeaf: LeafPayload | null = (() => {
-    const initialPath = searchParams.get('leaf');
-    if (initialPath) {
-      const node = findLeafByPath(MENU, initialPath);
-      if (node) {
-        return { id: node.id, label: node.label, path: node.path ?? node.id } as any;
-      }
-      return { id: initialPath, label: initialPath, path: initialPath } as any;
-    }
-    return null;
-  })();
-
-  const [activeLeaf, setActiveLeaf] = useState<LeafPayload | null>(initialLeaf);
+  // Determine the initial active leaf based on the current query param.
+  // We need to wait for menu to load to find the leaf by path, 
+  // but we can set a temporary leaf if we have the path.
+  const [activeLeaf, setActiveLeaf] = useState<LeafPayload | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Fetch workspace cards from Supabase
@@ -81,27 +68,25 @@ export default function Workspace() {
   const shSmartCard = getCard('sh_smart');
   const shAdvisorCard = getCard('sh_advisor');
 
-  // Effect: When the `leaf` query param changes, sync it into activeLeaf.
+  // Effect: Initialize activeLeaf from URL once menu is loaded
   useEffect(() => {
+    if (menuLoading) return;
+
     const param = searchParams.get('leaf');
     if (param) {
-      if (!activeLeaf || activeLeaf.path !== param) {
-        const node = findLeafByPath(MENU, param);
-        if (node) {
-          setActiveLeaf({ id: node.id, label: node.label, path: node.path ?? node.id } as any);
-        } else {
-          setActiveLeaf({ id: param, label: param, path: param } as any);
-        }
+      const node = findLeafByPath(menuTree, param);
+      if (node) {
+        setActiveLeaf({ id: node.id, label: node.label, path: node.path ?? node.id } as any);
+      } else {
+        // Fallback if not found in menu (e.g. old link or hidden item)
+        setActiveLeaf({ id: param, label: param, path: param } as any);
       }
     } else {
-      if (activeLeaf) setActiveLeaf(null);
+      setActiveLeaf(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, menuLoading, menuTree]);
 
-  // Effect: When activeLeaf changes, push the value into the URL. This
-  // ensures that copyable links reflect the current leaf. We avoid
-  // unnecessary updates by checking the existing parameter value.
+  // Effect: When activeLeaf changes, push the value into the URL.
   useEffect(() => {
     if (activeLeaf && activeLeaf.path) {
       const current = searchParams.get('leaf');
@@ -113,7 +98,6 @@ export default function Workspace() {
         setSearchParams({});
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeLeaf]);
 
   // Khi ở màn default (activeLeaf === null) → check RSS TTL
@@ -173,13 +157,16 @@ export default function Workspace() {
 
           {/* Sidebar */}
           <aside className={`glass rounded-2xl overflow-hidden lg:static lg:translate-x-0 ${sidebarOpen ? 'sidebar-mobile open' : 'sidebar-mobile closed'}`}>
-
-            <SidebarMenu
-              menu={MENU}
-              onLeafSelect={(leaf) => setActiveLeaf(leaf)}
-              onHomeClick={() => setActiveLeaf(null)}
-              onClose={() => setSidebarOpen(false)}
-            />
+            {menuLoading ? (
+              <div className="p-4 text-center text-zinc-500">Loading menu...</div>
+            ) : (
+              <SidebarMenu
+                menu={menuTree as any} // Cast to any to avoid strict type mismatch if minor diffs exist
+                onLeafSelect={(leaf) => setActiveLeaf(leaf)}
+                onHomeClick={() => setActiveLeaf(null)}
+                onClose={() => setSidebarOpen(false)}
+              />
+            )}
           </aside>
         </>
 

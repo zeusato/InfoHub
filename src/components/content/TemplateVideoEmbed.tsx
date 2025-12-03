@@ -16,6 +16,7 @@ export type VideoTemplateProps = {
 
 /** Parse nhiều dạng URL YouTube → embed src (ưu tiên youtube-nocookie) */
 function toYouTubeEmbedSrc(input: string): string | null {
+  if (!input) return null
   try {
     const url = new URL(input)
     const host = url.hostname.replace(/^www\./, '')
@@ -155,9 +156,10 @@ export default function TemplateVideoEmbed({
       </div>
 
       {/* Content */}
-      {contentHtml
-        ? <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: contentHtml }} />
-        : <Blocks blocks={contentBlocks} />}
+      {contentBlocks && <Blocks blocks={contentBlocks} />}
+      {contentHtml && (
+        <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: contentHtml }} />
+      )}
 
       {/* Footer note */}
       {endingNote ? (

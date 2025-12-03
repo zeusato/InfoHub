@@ -181,10 +181,9 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
       ) : null}
 
       {/* Text content (optional) */}
-      {contentHtml ? (
+      {contentBlocks && <Blocks blocks={contentBlocks} />}
+      {contentHtml && (
         <div className="prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: contentHtml }} />
-      ) : (
-        <Blocks blocks={contentBlocks} />
       )}
 
       {/* Ending note */}

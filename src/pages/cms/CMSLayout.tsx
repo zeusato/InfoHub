@@ -46,8 +46,8 @@ export default function CMSLayout() {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${isActive
-                                        ? 'bg-brand/20 text-brand border border-brand/40'
-                                        : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                                    ? 'bg-brand/20 text-brand border border-brand/40'
+                                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
                                     }`}
                             >
                                 <Icon size={18} />

@@ -7,6 +7,7 @@ import CMSDashboard from '@/pages/cms/Dashboard'
 import ArticlesList from '@/pages/cms/articles/ArticlesList'
 import ArticleEditor from '@/pages/cms/articles/ArticleEditor'
 import FAQManager from '@/pages/cms/faq/FAQManager'
+import MenuManager from '@/pages/cms/menu/MenuManager'
 import FAQEditor from '@/pages/cms/faq/FAQEditor'
 import CarouselEditor from '@/pages/cms/carousel/CarouselEditor'
 import WorkspaceCardsEditor from '@/pages/cms/workspace/WorkspaceCardsEditor'
@@ -29,7 +30,7 @@ export function AppRoutes() {
         <Route path="articles" element={<ArticlesList />} />
         <Route path="articles/new" element={<ArticleEditor />} />
         <Route path="articles/edit/:id" element={<ArticleEditor />} />
-        <Route path="menu" element={<div className="p-8 text-white">Menu Editor (Coming Soon)</div>} />
+        <Route path="menu" element={<MenuManager />} />
         <Route path="faq" element={<FAQManager />} />
         <Route path="faq/edit/:category" element={<FAQEditor />} />
         <Route path="carousel" element={<CarouselEditor />} />
