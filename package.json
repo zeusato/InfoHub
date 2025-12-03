@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && copy dist\\index.html dist\\404.html",
+    "build": "vite build && node -e \"const fs=require('fs'); if(fs.existsSync('dist/index.html')) fs.copyFileSync('dist/index.html', 'dist/404.html');\"",
     "preview": "vite preview",
     "predeploy": "npm run build && node -e \"const fs=require('fs'); fs.mkdirSync('dist',{recursive:true}); fs.writeFileSync('dist/.nojekyll',''); fs.copyFileSync('dist/index.html','dist/404.html');\"",
     "deploy": "gh-pages -d dist -b gh-pages",
