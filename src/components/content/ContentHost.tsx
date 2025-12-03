@@ -6,6 +6,8 @@ import Placeholder from './Placeholder'
 import TemplateFeatureGuide from './TemplateFeatureGuide'
 import FAQAccordionTemplate from './FAQAccordionTemplate'
 import TemplateVideoEmbed from './TemplateVideoEmbed'
+import { useArticle } from '@/hooks/useArticle'
+import { getStorageUrl } from '@/lib/supabase'
 
 // === NEW: generic RSS components ===
 import RssList from '@/components/news/RssList'
@@ -19,6 +21,9 @@ export function ContentHost({
   activeLeaf: LeafPayload | null,
   setActiveLeaf: (leaf: LeafPayload | null) => void
 }) {
+  // Fetch article from Supabase
+  const { article: supabaseArticle, loading } = useArticle(activeLeaf?.path || null)
+
   if (!activeLeaf) {
     return (
       <div className="h-full w-full flex items-center justify-center text-zinc-400">
@@ -113,44 +118,65 @@ export function ContentHost({
   // -------------------------
   // Template-based rendering
   // -------------------------
-  const entry = (contentJson as any)[activeLeaf.path]
 
-  if (entry?.renderType === 'template') {
-    switch (entry.templateKey) {
+  // Try Supabase first, fallback to JSON
+  const entry = supabaseArticle || (contentJson as any)[activeLeaf.path]
+
+  // Show loading state
+  if (loading && !entry) {
+    return (
+      <div className="h-full w-full flex items-center justify-center text-zinc-400">
+        Đang tải...
+      </div>
+    )
+  }
+
+
+  if (entry?.renderType === 'template' || (supabaseArticle && entry?.template_key)) {
+    const templateKey = entry.templateKey || entry.template_key
+
+    // Process images from Supabase (convert relative paths to full URLs)
+    const processedEntry = supabaseArticle ? {
+      ...entry,
+      bannerImg: entry.banner_img ? getStorageUrl(entry.banner_img) : undefined,
+      gallery: entry.gallery?.map((img: string) => getStorageUrl(img)) || [],
+    } : entry
+
+    switch (templateKey) {
       case 'ProductNews':
-        return <ProductNewsTemplate {...entry} />
+        return <ProductNewsTemplate {...processedEntry} />
 
       case 'FeatureGuide':
         return (
           <TemplateFeatureGuide
-            title={entry.title}
-            subtitle={entry.subtitle}
-            gallery={(entry.gallery || []).map((src: string) => ({ src }))}
-            contentBlocks={Array.isArray(entry.content) ? entry.content : undefined}
-            contentHtml={typeof entry.contentHtml === 'string' ? entry.contentHtml : undefined}
-            endingNote={entry.endingNote}
+            title={processedEntry.title}
+            subtitle={processedEntry.subtitle}
+            gallery={(processedEntry.gallery || []).map((src: string) => ({ src }))}
+            contentBlocks={Array.isArray(processedEntry.content) ? processedEntry.content : undefined}
+            contentHtml={typeof processedEntry.content_html === 'string' ? processedEntry.content_html : (typeof processedEntry.contentHtml === 'string' ? processedEntry.contentHtml : undefined)}
+            endingNote={processedEntry.ending_note || processedEntry.endingNote}
           />
         )
 
       case 'VideoEmbed':
         return (
           <TemplateVideoEmbed
-            title={entry.title}
-            subtitle={entry.subtitle}
-            videoUrl={entry.videoUrl}
-            contentBlocks={Array.isArray(entry.content) ? entry.content : undefined}
-            contentHtml={typeof entry.contentHtml === 'string' ? entry.contentHtml : undefined}
-            endingNote={entry.endingNote}
+            title={processedEntry.title}
+            subtitle={processedEntry.subtitle}
+            videoUrl={processedEntry.videoUrl}
+            contentBlocks={Array.isArray(processedEntry.content) ? processedEntry.content : undefined}
+            contentHtml={typeof processedEntry.content_html === 'string' ? processedEntry.content_html : (typeof processedEntry.contentHtml === 'string' ? processedEntry.contentHtml : undefined)}
+            endingNote={processedEntry.ending_note || processedEntry.endingNote}
           />
         )
 
       case 'FAQAccordion':
         return (
           <FAQAccordionTemplate
-            title={entry.title}
-            subtitle={entry.subtitle}
-            faqJsonPath={entry.faqJsonPath}
-            endingNote={entry.endingNote}
+            title={processedEntry.title}
+            subtitle={processedEntry.subtitle}
+            faqJsonPath={processedEntry.faq_json_path || processedEntry.faqJsonPath}
+            endingNote={processedEntry.ending_note || processedEntry.endingNote}
           />
         )
 

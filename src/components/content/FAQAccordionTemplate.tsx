@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { useFAQs } from '@/hooks/useFAQs'
 
 type FaqItem = {
   qNo: number | string
@@ -36,10 +37,20 @@ export default function FAQAccordionTemplate({
   faqJsonPath,
   endingNote,
 }: Props) {
-  const [faqs, setFaqs] = useState<FaqItem[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [localFaqs, setLocalFaqs] = useState<FaqItem[]>([])
+  const [localLoading, setLocalLoading] = useState(false)
+  const [localError, setLocalError] = useState<string | null>(null)
   const [openSet, setOpenSet] = useState<Set<string | number>>(new Set())
+
+  // Extract category from faqJsonPath (e.g., "faqs/faq-giao-dich.json" -> "faq-giao-dich")
+  const category = useMemo(() => {
+    if (!faqJsonPath) return ''
+    const match = faqJsonPath.match(/\/?(faqs?\/)?([^\/]+)\.json$/i)
+    return match ? match[2] : ''
+  }, [faqJsonPath])
+
+  // Fetch from Supabase
+  const { faqs: supabaseFaqs, loading: supabaseLoading, error: supabaseError } = useFAQs(category)
 
   // Bảo toàn đường dẫn khi deploy gh-pages (BASE_URL khác '/')
   const buildUrl = (path: string) => {
@@ -53,25 +64,49 @@ export default function FAQAccordionTemplate({
     }
   }
 
+  const resolveFaqUrl = (p: string) => {
+    if (!p) return ''
+    if (/^https?:\/\//i.test(p)) return p
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')  // dev: '' | build: '/InfoHub'
+    const rel = p.replace(/^\//, '')                                  // 'faqs/faq-giao-dich.json'
+    return `${base}/${rel}`
+  }
+
+  // Fallback: fetch from JSON if Supabase returns empty
   useEffect(() => {
-    if (!faqJsonPath) {
-      setError("Chưa cấu hình 'faqJsonPath' trong leaf content.")
+    if (!faqJsonPath || supabaseFaqs.length > 0 || supabaseLoading) {
       return
     }
-    const url = resolveFaqUrl(faqJsonPath)    
-    setLoading(true)
-    setError(null)
+
+    const url = resolveFaqUrl(faqJsonPath)
+    setLocalLoading(true)
+    setLocalError(null)
     fetch(url, { cache: 'no-store' })
       .then(async (r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         const data = await r.json()
         const list: FaqItem[] = Array.isArray(data?.faqs) ? data.faqs : []
         if (!list.length) throw new Error('Sai cấu trúc JSON hoặc không có mục FAQ.')
-        setFaqs(list)
+        setLocalFaqs(list)
       })
-      .catch((e: any) => setError(`Không tải được FAQ: ${e?.message || String(e)}`))
-      .finally(() => setLoading(false))
-  }, [faqJsonPath])
+      .catch((e: any) => setLocalError(`Không tải được FAQ: ${e?.message || String(e)}`))
+      .finally(() => setLocalLoading(false))
+  }, [faqJsonPath, supabaseFaqs.length, supabaseLoading])
+
+  // Combine Supabase and local FAQs
+  const faqs = useMemo(() => {
+    if (supabaseFaqs.length > 0) {
+      return supabaseFaqs.map(f => ({
+        qNo: f.order_index,
+        question: f.question,
+        answer: f.answer
+      }))
+    }
+    return localFaqs
+  }, [supabaseFaqs, localFaqs])
+
+  const loading = supabaseLoading || localLoading
+  const error = supabaseError?.message || localError
 
   const sortedFaqs = useMemo(() => {
     return [...faqs].sort((a, b) => {
@@ -82,13 +117,7 @@ export default function FAQAccordionTemplate({
     })
   }, [faqs])
 
-    const resolveFaqUrl = (p: string) => {
-    if (!p) return ''
-    if (/^https?:\/\//i.test(p)) return p
-    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')  // dev: '' | build: '/InfoHub'
-    const rel  = p.replace(/^\//, '')                                  // 'faqs/faq-giao-dich.json'
-    return `${base}/${rel}`
-    }
+
 
 
   const toggle = (id: string | number) => {

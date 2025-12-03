@@ -26,6 +26,8 @@ import SymbolChart from '@/components/Index/SymbolChart';
 import shaQR from '@/assets/SH Advisor.png'
 import HamburgerButton from "@/components/HamburgerButton"
 import { downloadQRImage } from "@/lib/downloadQR"
+import { useWorkspaceCards } from "@/hooks/useWorkspaceCards"
+import { getStorageUrl } from "@/lib/supabase"
 
 type LeafPayload = Parameters<typeof ContentHost>[0]["activeLeaf"];
 
@@ -73,6 +75,11 @@ export default function Workspace() {
 
   const [activeLeaf, setActiveLeaf] = useState<LeafPayload | null>(initialLeaf);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Fetch workspace cards from Supabase
+  const { getCard, loading: cardsLoading } = useWorkspaceCards();
+  const shSmartCard = getCard('sh_smart');
+  const shAdvisorCard = getCard('sh_advisor');
 
   // Effect: When the `leaf` query param changes, sync it into activeLeaf.
   useEffect(() => {
@@ -201,14 +208,14 @@ export default function Workspace() {
                       speed={5}
                       className="text-3xl sm:text-4xl lg:text-5xl whitespace-nowrap"
                     >
-                      SH Smart
+                      {shSmartCard?.title || 'SH Smart'}
                     </ShinyText>
                     <div className="flex items-center gap-2 flex-wrap justify-center">
                       <button
                         className="px-3 sm:px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-400 text-white font-semibold rounded-lg shadow-md hover:from-orange-700 hover:to-orange-500 transition duration-300 whitespace-nowrap text-sm"
-                        onClick={() => window.open('https://q.me-qr.com/l/SHSmart', '_blank')}
+                        onClick={() => window.open(shSmartCard?.button_url || 'https://q.me-qr.com/l/SHSmart', '_blank')}
                       >
-                        Giao dịch ngay
+                        {shSmartCard?.button_text || 'Giao dịch ngay'}
                       </button>
                       {/* Desktop: show QR text, Mobile: show download button */}
                       <div className="hidden lg:block">
@@ -224,7 +231,7 @@ export default function Workspace() {
                       </div>
                       <button
                         className="sm:hidden px-3 py-2 bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/50 text-orange-300 text-sm rounded-lg hover:from-orange-500/30 hover:to-orange-600/30 transition whitespace-nowrap font-medium"
-                        onClick={() => downloadQRImage(SHSmartQR, 'SHSmart-QR.jpg')}
+                        onClick={() => downloadQRImage(shSmartCard ? getStorageUrl(shSmartCard.qr_image_url) : SHSmartQR, 'SHSmart-QR.jpg')}
                       >
                         📥 QR
                       </button>
@@ -234,7 +241,7 @@ export default function Workspace() {
                   <div className="hidden sm:block w-px bg-white/20 self-stretch"></div>
                   {/* QR Code - hidden on mobile */}
                   <div className="hidden sm:flex items-center justify-center">
-                    <img src={SHSmartQR} alt="SH Smart QR" className="h-32 sm:h-40 lg:h-48 w-auto object-contain" />
+                    <img src={shSmartCard ? getStorageUrl(shSmartCard.qr_image_url) : SHSmartQR} alt="SH Smart QR" className="h-32 sm:h-40 lg:h-48 w-auto object-contain" />
                   </div>
                 </div>
               </GlowingCard>
@@ -280,14 +287,14 @@ export default function Workspace() {
                       speed={5}
                       className="text-3xl sm:text-4xl lg:text-5xl whitespace-nowrap"
                     >
-                      SHAdvisor
+                      {shAdvisorCard?.title || 'SHAdvisor'}
                     </ShinyText>
                     <div className="flex items-center gap-2 flex-wrap justify-center">
                       <button
                         className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-md hover:from-purple-600 hover:to-pink-600 transition duration-300 text-sm whitespace-nowrap"
-                        onClick={() => window.open('https://q.me-qr.com/Zb80ouRe', '_blank')}
+                        onClick={() => window.open(shAdvisorCard?.button_url || 'https://q.me-qr.com/Zb80ouRe', '_blank')}
                       >
-                        Truy cập ngay
+                        {shAdvisorCard?.button_text || 'Truy cập ngay'}
                       </button>
                       {/* Desktop: show QR text, Mobile: show download button */}
                       <div className="hidden lg:block">
@@ -303,7 +310,7 @@ export default function Workspace() {
                       </div>
                       <button
                         className="sm:hidden px-3 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/50 text-purple-300 text-sm rounded-lg hover:from-purple-500/30 hover:to-pink-500/30 transition whitespace-nowrap font-medium"
-                        onClick={() => downloadQRImage(shaQR, 'SHAdvisor-QR.png')}
+                        onClick={() => downloadQRImage(shAdvisorCard ? getStorageUrl(shAdvisorCard.qr_image_url) : shaQR, 'SHAdvisor-QR.png')}
                       >
                         📥 QR
                       </button>
@@ -313,7 +320,7 @@ export default function Workspace() {
                   <div className="hidden sm:block w-px bg-white/20 self-stretch"></div>
                   {/* QR Code - hidden on mobile */}
                   <div className="hidden sm:flex items-center justify-center">
-                    <img src={shaQR} alt="SHAdvisor QR" className="h-32 sm:h-40 lg:h-48 w-auto object-contain" />
+                    <img src={shAdvisorCard ? getStorageUrl(shAdvisorCard.qr_image_url) : shaQR} alt="SHAdvisor QR" className="h-32 sm:h-40 lg:h-48 w-auto object-contain" />
                   </div>
                 </div>
                 {/* <SymbolChart symbol="VN" height={300} colorTheme="dark" /> */}

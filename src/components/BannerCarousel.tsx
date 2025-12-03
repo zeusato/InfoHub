@@ -4,6 +4,8 @@ import slidesJson from "@/data/slides.json";
 // DynamicNavigation is no longer used because the banner menu is now collapsible.
 // import { DynamicNavigation } from "@/components/lightswind/dynamic-navigation";
 import { Home, CandlestickChart, BarChart, LayoutGrid, Menu as MenuIcon, ChevronRight } from "lucide-react";
+import { useBannerSlides } from "@/hooks/useBannerSlides";
+import { getStorageUrl } from "@/lib/supabase";
 
 type Slide = {
   id: string;
@@ -22,17 +24,33 @@ const links = [
 
 export default function BannerCarousel() {
   const [idx, setIdx] = useState(0);
-
-  // State to control the collapsible navigation in the banner.
-  // When `menuOpen` is true the navigation items are shown, otherwise only the menu button is visible.
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const slides: (Slide & { imgUrl: string })[] = useMemo(() => {
+  // Fetch slides from Supabase
+  const { slides: supabaseSlides, loading } = useBannerSlides();
+
+  // Fallback to local slides if Supabase is empty or loading
+  const localSlides: (Slide & { imgUrl: string })[] = useMemo(() => {
     return (slidesJson as Slide[]).map((s) => ({
       ...s,
       imgUrl: new URL(`../assets/${s.img}`, import.meta.url).href,
     }));
   }, []);
+
+  // Map Supabase slides to expected format
+  const slides = useMemo(() => {
+    if (loading || supabaseSlides.length === 0) {
+      return localSlides;
+    }
+    return supabaseSlides.map(s => ({
+      id: s.id,
+      title: s.title,
+      desc: s.title, // Use title as description
+      img: s.image_url,
+      imgUrl: getStorageUrl(s.image_url),
+      link: s.link_url || '#'
+    }));
+  }, [supabaseSlides, loading, localSlides]);
 
   useEffect(() => {
     const t = setInterval(() => setIdx((v) => (v + 1) % slides.length), 5000);
