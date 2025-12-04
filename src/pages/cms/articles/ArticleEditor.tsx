@@ -260,108 +260,135 @@ export default function ArticleEditor() {
                 faq_json_path: config.fields.includes('faqJsonPath') ? (form.faq_json_path || null) : null,
             }
 
-            if (id) {
-                const { error } = await supabase
-                    .from('articles')
-                    .update(article)
-                    .eq('id', id)
-                if (error) throw error
-                alert('Article updated!')
-            } else {
-                const { error } = await supabase
-                    .from('articles')
-                    .insert([article])
-                if (error) throw error
 
-                // Create menu item if enabled
-                if (menuConfig.createMenu && menuConfig.menuLabel) {
-                    let currentParentId: string | null = null
-                    let currentLevel = 0
+            // Handle menu creation logic (shared for both create and update)
+            const handleMenuCreation = async () => {
+                // In edit mode, menuLabel might be empty (hidden input). Use title as fallback.
+                const labelToUse = menuConfig.menuLabel || form.title
 
-                    // Handle Level 1
-                    if (menuConfig.level1 === '__NEW__') {
-                        const label = menuConfig.level1Label
-                        const slug = vietnameseToSlug(label)
-                        const { data: newL1, error: l1Error } = await supabase
+                // In create mode, check createMenu flag. In edit mode, always proceed if we have a label.
+                if (!id && !menuConfig.createMenu) return
+                if (!labelToUse) return
+
+                let currentParentId: string | null = null
+                let currentLevel = 0
+
+                // Handle Level 1
+                if (menuConfig.level1 === '__NEW__') {
+                    const label = menuConfig.level1Label
+                    const slug = vietnameseToSlug(label)
+                    const { data: newL1, error: l1Error } = await supabase
+                        .from('menu_items')
+                        .insert([{
+                            label: label,
+                            path: slug,
+                            parent_id: null,
+                            level: 1,
+                            order_index: 99,
+                            active: true
+                        }])
+                        .select()
+                        .single()
+                    if (l1Error) throw l1Error
+                    currentParentId = newL1.id
+                    currentLevel = 1
+                } else if (menuConfig.level1) {
+                    currentParentId = menuConfig.level1
+                    currentLevel = 1
+                }
+
+                // Handle Level 2
+                if (currentParentId && menuConfig.level2 === '__NEW__') {
+                    const label = menuConfig.level2Label
+                    const slug = vietnameseToSlug(label)
+                    const { data: parent } = await supabase.from('menu_items').select('path').eq('id', currentParentId).single()
+                    const fullPath = `${parent?.path}/${slug}`
+
+                    const { data: newL2, error: l2Error } = await supabase
+                        .from('menu_items')
+                        .insert([{
+                            label: label,
+                            path: fullPath,
+                            parent_id: currentParentId,
+                            level: 2,
+                            order_index: 99,
+                            active: true
+                        }])
+                        .select()
+                        .single()
+                    if (l2Error) throw l2Error
+                    currentParentId = newL2.id
+                    currentLevel = 2
+                } else if (menuConfig.level2) {
+                    currentParentId = menuConfig.level2
+                    currentLevel = 2
+                }
+
+                // Handle Level 3
+                if (currentParentId && menuConfig.level3 === '__NEW__') {
+                    const label = menuConfig.level3Label
+                    const slug = vietnameseToSlug(label)
+                    const { data: parent } = await supabase.from('menu_items').select('path').eq('id', currentParentId).single()
+                    const fullPath = `${parent?.path}/${slug}`
+
+                    const { data: newL3, error: l3Error } = await supabase
+                        .from('menu_items')
+                        .insert([{
+                            label: label,
+                            path: fullPath,
+                            parent_id: currentParentId,
+                            level: 3,
+                            order_index: 99,
+                            active: true
+                        }])
+                        .select()
+                        .single()
+                    if (l3Error) throw l3Error
+                    currentParentId = newL3.id
+                    currentLevel = 3
+                } else if (menuConfig.level3) {
+                    currentParentId = menuConfig.level3
+                    currentLevel = 3
+                }
+
+                // Create or update the article's menu item
+                if (id) {
+                    // Edit mode: update existing menu item or create new one
+                    const { data: existingMenu } = await supabase
+                        .from('menu_items')
+                        .select('id')
+                        .eq('path', form.path)
+                        .single()
+
+                    if (existingMenu) {
+                        // Update existing menu item
+                        await supabase
                             .from('menu_items')
-                            .insert([{
-                                label: label,
-                                path: slug,
-                                parent_id: null,
-                                level: 1,
-                                order_index: 99, // Append to end
-                                active: true
-                            }])
-                            .select()
-                            .single()
-                        if (l1Error) throw l1Error
-                        currentParentId = newL1.id
-                        currentLevel = 1
-                    } else if (menuConfig.level1) {
-                        currentParentId = menuConfig.level1
-                        currentLevel = 1
-                    }
-
-                    // Handle Level 2
-                    if (currentParentId && menuConfig.level2 === '__NEW__') {
-                        const label = menuConfig.level2Label
-                        const slug = vietnameseToSlug(label)
-                        // Need to get parent path to build full path
-                        const { data: parent } = await supabase.from('menu_items').select('path').eq('id', currentParentId).single()
-                        const fullPath = `${parent?.path}/${slug}`
-
-                        const { data: newL2, error: l2Error } = await supabase
-                            .from('menu_items')
-                            .insert([{
-                                label: label,
-                                path: fullPath,
+                            .update({
+                                label: labelToUse,
                                 parent_id: currentParentId,
-                                level: 2,
+                                level: currentLevel + 1
+                            })
+                            .eq('id', existingMenu.id)
+                    } else {
+                        // Create new menu item for this article
+                        await supabase
+                            .from('menu_items')
+                            .insert([{
+                                label: labelToUse,
+                                path: form.path,
+                                parent_id: currentParentId,
+                                level: currentLevel + 1,
                                 order_index: 99,
                                 active: true
                             }])
-                            .select()
-                            .single()
-                        if (l2Error) throw l2Error
-                        currentParentId = newL2.id
-                        currentLevel = 2
-                    } else if (menuConfig.level2) {
-                        currentParentId = menuConfig.level2
-                        currentLevel = 2
                     }
-
-                    // Handle Level 3
-                    if (currentParentId && menuConfig.level3 === '__NEW__') {
-                        const label = menuConfig.level3Label
-                        const slug = vietnameseToSlug(label)
-                        const { data: parent } = await supabase.from('menu_items').select('path').eq('id', currentParentId).single()
-                        const fullPath = `${parent?.path}/${slug}`
-
-                        const { data: newL3, error: l3Error } = await supabase
-                            .from('menu_items')
-                            .insert([{
-                                label: label,
-                                path: fullPath,
-                                parent_id: currentParentId,
-                                level: 3,
-                                order_index: 99,
-                                active: true
-                            }])
-                            .select()
-                            .single()
-                        if (l3Error) throw l3Error
-                        currentParentId = newL3.id
-                        currentLevel = 3
-                    } else if (menuConfig.level3) {
-                        currentParentId = menuConfig.level3
-                        currentLevel = 3
-                    }
-
-                    // Finally create the article menu item
+                } else {
+                    // Create mode: always create new menu item
                     const { error: menuError } = await supabase
                         .from('menu_items')
                         .insert([{
-                            label: menuConfig.menuLabel,
+                            label: labelToUse,
                             path: form.path,
                             parent_id: currentParentId,
                             level: currentLevel + 1,
@@ -371,6 +398,28 @@ export default function ArticleEditor() {
 
                     if (menuError) console.error('Menu creation error:', menuError)
                 }
+            }
+
+            if (id) {
+                const { error } = await supabase
+                    .from('articles')
+                    .update(article)
+                    .eq('id', id)
+                if (error) throw error
+
+                // Handle menu creation/update in edit mode
+                await handleMenuCreation()
+
+                alert('Article updated!')
+                navigate('/CMS/articles')
+            } else {
+                const { error } = await supabase
+                    .from('articles')
+                    .insert([article])
+                if (error) throw error
+
+                // Create menu item if enabled
+                await handleMenuCreation()
 
                 alert('Article created!')
                 navigate('/CMS/articles')

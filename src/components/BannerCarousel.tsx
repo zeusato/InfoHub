@@ -110,7 +110,6 @@ export default function BannerCarousel() {
           <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#4ade80]">
             {cur.title}
           </h3>
-          <p className="text-[#4ade80] mt-1">{cur.desc}</p>
           <div className="mt-auto">
             {/* chỗ để nút hoặc nội dung muốn đẩy xuống cuối */}
           </div>
