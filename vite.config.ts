@@ -20,7 +20,7 @@ export default defineConfig(({ command }) => ({
         theme_color: '#fb923c',
         background_color: '#0b0b0d',
         display: 'standalone',
-        start_url: '/InfoHub/app',
+        start_url: '/InfoHub/',
         scope: '/InfoHub/',
         icons: [
           {
