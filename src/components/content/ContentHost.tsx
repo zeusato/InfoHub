@@ -1,4 +1,5 @@
 // src/components/content/ContentHost.tsx
+import { useEffect } from 'react'
 import { LeafPayload } from '@/components/SidebarMenu'
 import contentJson from '@/data/leafContent.json'
 import ProductNewsTemplate from './ProductNewsTemplate'
@@ -8,6 +9,7 @@ import FAQAccordionTemplate from './FAQAccordionTemplate'
 import TemplateVideoEmbed from './TemplateVideoEmbed'
 import { useArticle } from '@/hooks/useArticle'
 import { getStorageUrl } from '@/lib/supabase'
+import { trackArticleView } from '@/lib/analytics'
 
 // === NEW: generic RSS components ===
 import RssList from '@/components/news/RssList'
@@ -23,6 +25,13 @@ export function ContentHost({
 }) {
   // Fetch article from Supabase
   const { article: supabaseArticle, loading } = useArticle(activeLeaf?.path || null)
+
+  // Track article views (3-second debounce)
+  useEffect(() => {
+    if (activeLeaf?.path && supabaseArticle) {
+      trackArticleView(activeLeaf.path, supabaseArticle.id)
+    }
+  }, [activeLeaf?.path, supabaseArticle])
 
   if (!activeLeaf) {
     return (

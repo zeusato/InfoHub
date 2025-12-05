@@ -7,7 +7,8 @@ import {
     HelpCircle,
     ImageIcon,
     Briefcase,
-    LogOut
+    LogOut,
+    BarChart3
 } from 'lucide-react'
 
 export default function CMSLayout() {
@@ -21,6 +22,7 @@ export default function CMSLayout() {
         { path: '/CMS/faq', label: 'FAQ', icon: HelpCircle },
         { path: '/CMS/carousel', label: 'Carousel', icon: ImageIcon },
         { path: '/CMS/workspace', label: 'Workspace', icon: Briefcase },
+        { path: '/CMS/analytics', label: 'Analytics', icon: BarChart3 },
     ]
 
     const handleLogout = () => {

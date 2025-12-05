@@ -3,9 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import slidesJson from "@/data/slides.json";
 // DynamicNavigation is no longer used because the banner menu is now collapsible.
 // import { DynamicNavigation } from "@/components/lightswind/dynamic-navigation";
-import { Home, CandlestickChart, BarChart, LayoutGrid, Menu as MenuIcon, ChevronRight } from "lucide-react";
+import { Home, CandlestickChart, BarChart, LayoutGrid, Menu as MenuIcon, ChevronRight, Download } from "lucide-react";
 import { useBannerSlides } from "@/hooks/useBannerSlides";
 import { getStorageUrl } from "@/lib/supabase";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 type Slide = {
   id: string;
@@ -25,6 +26,9 @@ const links = [
 export default function BannerCarousel() {
   const [idx, setIdx] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // PWA Install hook
+  const { isInstallable, promptInstall } = usePWAInstall();
 
   // Fetch slides from Supabase
   const { slides: supabaseSlides, loading } = useBannerSlides();
@@ -204,6 +208,20 @@ export default function BannerCarousel() {
               </a>
             </li>
           ))}
+
+          {/* PWA Install Button - only show when installable */}
+          {isInstallable && (
+            <li className="px-2">
+              <button
+                onClick={promptInstall}
+                className="flex items-center gap-1 text-xs md:text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                title="Tải App về thiết bị"
+              >
+                <Download size={16} />
+                <span className="hidden sm:inline">Tải App</span>
+              </button>
+            </li>
+          )}
         </ul>
       </div>
 

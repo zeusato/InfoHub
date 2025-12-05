@@ -1,23 +1,34 @@
 <!doctype html>
 <html lang="vi" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>InfoHub</title>
-    <meta name="theme-color" content="#0b0b0d" />
-    <meta property="og:image" content="/InfoHub/OG.png" />
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8GXNQXHZDK"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
 
-      gtag('config', 'G-8GXNQXHZDK');
-    </script>
-  </head>
-  <body class="bg-[#0b0b0d] text-zinc-200">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InfoHub</title>
+  <meta name="theme-color" content="#0b0b0d" />
+  <meta name="description" content="Nền tảng quản lý thông tin nội bộ SHS" />
+
+  <!-- PWA Meta Tags -->
+  <link rel="apple-touch-icon" href="/InfoHub/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="InfoHub" />
+
+  <meta property="og:image" content="/InfoHub/OG.png" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8GXNQXHZDK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-8GXNQXHZDK');
+  </script>
+</head>
+
+<body class="bg-[#0b0b0d] text-zinc-200">
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

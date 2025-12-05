@@ -1,6 +1,7 @@
 // src/components/SidebarMenu.tsx
 import { useMemo, useState } from 'react'
 import { MENU_COLORS, MenuNode } from '@/lib/menuData'
+import SearchBar from './SearchBar'
 
 export type LeafPayload = {
   id: string
@@ -99,6 +100,12 @@ export default function SidebarMenu({ menu, onLeafSelect, onHomeClick, onClose }
         <span className="text-lg">🏠</span>
         <span className="font-semibold text-emerald-400 group-hover:text-emerald-300">Trang chủ</span>
       </button>
+
+      {/* Search Bar */}
+      <SearchBar
+        onSelect={(result) => onLeafSelect(result)}
+        onClose={onClose}
+      />
     </div>
   )
 
