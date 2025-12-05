@@ -76,6 +76,7 @@ export function ContentHost({
   }
 
   const newsRoute = parseNewsRoute(path)
+  console.log('[ContentHost] path:', path, 'newsRoute:', newsRoute, 'activeLeaf:', activeLeaf)
 
   if (newsRoute?.kind === 'list') {
     const { source } = newsRoute
@@ -87,15 +88,18 @@ export function ContentHost({
         initialPage={initialPage}
         onBack={() => setActiveLeaf(null)} // quay về Workspace default (Sources panel)
         onOpenDetail={(item: RssItem, page: number) => {
+          console.log('[ContentHost] onOpenDetail called with item:', item)
           // Khi mở Detail, set lại leaf kèm page để khi Back quay đúng trang
           const legacy = path === 'cafebiz/list'
-          setActiveLeaf({
+          const newLeaf = {
             id: `${source}-detail`,
             label: item.title,
             path: legacy ? 'cafebiz/detail' : `news/${source}/detail`,
             item,
             page
-          } as any)
+          }
+          console.log('[ContentHost] Setting activeLeaf to:', newLeaf)
+          setActiveLeaf(newLeaf as any)
         }}
       />
     )

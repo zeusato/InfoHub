@@ -58,7 +58,18 @@ const parseImageFromDescription = (html?: string) => {
 const parseXmlToItems = (xmlText: string, source: string): Omit<RssItem, "id">[] => {
   const parser = new DOMParser();
   const xml = parser.parseFromString(xmlText, "application/xml");
+
+  // Check for XML parsing errors
+  const parseError = xml.querySelector("parsererror");
+  if (parseError) {
+    console.error("[RSS] XML parse error:", parseError.textContent);
+    console.log("[RSS] First 500 chars of response:", xmlText.substring(0, 500));
+    return [];
+  }
+
   const itemNodes = Array.from(xml.getElementsByTagName("item"));
+  console.log(`[RSS] ${source}: Found ${itemNodes.length} items`);
+
   return itemNodes.map((it) => {
     const get = (tag: string) => it.getElementsByTagName(tag)[0]?.textContent ?? "";
     const title = (get("title") || "").trim();
@@ -127,7 +138,11 @@ function needRefresh(srcKey: keyof typeof RSS_SOURCES) {
   try {
     const raw = localStorage.getItem(indexKey(srcKey));
     if (!raw) return true;
-    const { fetchedAt } = JSON.parse(raw) as { fetchedAt: number };
+    const { fetchedAt, ids } = JSON.parse(raw) as { fetchedAt: number; ids: string[] };
+    // Also refresh if ids is empty (fetch failed previously)
+    if (!ids || ids.length === 0) {
+      return true;
+    }
     return Date.now() - fetchedAt >= TTL_MS;
   } catch {
     return true;
@@ -137,14 +152,20 @@ function needRefresh(srcKey: keyof typeof RSS_SOURCES) {
 // ===== component =====
 export default function RssFetcher({ checkNow }: Props): JSX.Element {
   useEffect(() => {
+    console.log("[RSS] RssFetcher useEffect triggered, checkNow:", checkNow);
+
     const run = async () => {
       for (const srcKey of Object.keys(RSS_SOURCES) as (keyof typeof RSS_SOURCES)[]) {
-        if (needRefresh(srcKey)) {
+        const shouldRefresh = needRefresh(srcKey);
+        console.log(`[RSS] ${srcKey}: needRefresh = ${shouldRefresh}`);
+        if (shouldRefresh) {
+          console.log(`[RSS] ${srcKey}: Starting fetch...`);
           await fetchSource(srcKey);
+          console.log(`[RSS] ${srcKey}: Fetch complete`);
         }
       }
     };
-    run().catch(console.error);
+    run().catch((e) => console.error("[RSS] Error in run:", e));
 
     // optional: allow forcing refresh from outside
     const onForce = (e: CustomEvent<{ source?: keyof typeof RSS_SOURCES }>) => {

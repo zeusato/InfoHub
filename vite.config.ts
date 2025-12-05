@@ -63,5 +63,15 @@ export default defineConfig(({ command }) => ({
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
+  },
+  server: {
+    proxy: {
+      // Proxy for RSS feeds on localhost - forwards to AllOrigins
+      '/_p': {
+        target: 'https://api.allorigins.win',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/_p/, '/raw'),
+      }
+    }
   }
 }))

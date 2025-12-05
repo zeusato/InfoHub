@@ -11,6 +11,7 @@ import { BorderBeam } from "@/components/lightswind/border-beam";
 import { GlowingCards, GlowingCard } from "@/components/lightswind/glowing-cards";
 import ShinyText from "@/components/lightswind/shiny-text";
 import MGReferralQRCard from "@/components/tools/MGReferralQRCard";
+import MarginCalculator from "@/components/tools/MarginCalculator";
 import QRDepositCard from "@/components/tools/QRDepositCard";
 import QrApp from "@/assets/qr-app.jpg";
 import NeonAnimatedButton from "@/components/tools/NeonAnimatedButton";
@@ -69,10 +70,17 @@ export default function Workspace() {
   const shAdvisorCard = getCard('sh_advisor');
 
   // Effect: Initialize activeLeaf from URL once menu is loaded
+  // Skip if activeLeaf already has the correct path (preserves item for RSS detail)
   useEffect(() => {
     if (menuLoading) return;
 
     const param = searchParams.get('leaf');
+
+    // Skip if activeLeaf already matches the URL param (preserves item, page, etc.)
+    if (activeLeaf && activeLeaf.path === param) {
+      return;
+    }
+
     if (param) {
       const node = findLeafByPath(menuTree, param);
       if (node) {
@@ -253,12 +261,22 @@ export default function Workspace() {
                       <span className="hidden sm:inline">QR nộp tiền 24/7</span>
                       <span className="sm:hidden">Nộp tiền 24/7</span>
                     </Tabs.Trigger>
+                    <Tabs.Trigger
+                      value="margin-calc"
+                      className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                    >
+                      <span className="hidden sm:inline">Tính Margin</span>
+                      <span className="sm:hidden">Margin</span>
+                    </Tabs.Trigger>
                   </Tabs.List>
                   <Tabs.Content value="qr-ekyc" className="h-full">
                     <MGReferralQRCard />
                   </Tabs.Content>
                   <Tabs.Content value="qr-nop-tien" className="h-full">
                     <QRDepositCard />
+                  </Tabs.Content>
+                  <Tabs.Content value="margin-calc" className="h-full overflow-auto">
+                    <MarginCalculator />
                   </Tabs.Content>
                 </Tabs.Root>
               </GlowingCard>

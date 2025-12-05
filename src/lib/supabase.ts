@@ -90,10 +90,13 @@ export async function getArticleByPath(path: string): Promise<Article | null> {
         .from('articles')
         .select('*')
         .eq('path', path)
-        .single()
+        .maybeSingle()
 
     if (error) {
-        console.error('Error fetching article:', error)
+        // PGRST116 means no rows found - this is expected, not an error
+        if (error.code !== 'PGRST116') {
+            console.error('Error fetching article:', error)
+        }
         return null
     }
 
