@@ -14,7 +14,7 @@ export default defineConfig(({ command }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon-192x192.png'],
       manifest: {
-        name: 'InfoHub - Knowledge Base',
+        name: 'InfoHub',
         short_name: 'InfoHub',
         description: 'Nền tảng quản lý thông tin nội bộ SHS',
         theme_color: '#fb923c',
