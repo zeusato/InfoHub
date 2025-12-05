@@ -215,13 +215,15 @@ export default function BannerCarousel() {
           <li className="px-2">
             <button
               onClick={async () => {
-                // If can install natively (Android/Chrome), trigger prompt
-                if (isInstallable) {
-                  await promptInstall();
-                } else {
-                  // Otherwise show instruction modal (iOS or already installed)
+                // Try native install prompt first
+                const result = await promptInstall();
+
+                // If native prompt not available, show instruction modal
+                if (result === 'unavailable') {
                   setShowInstallModal(true);
                 }
+                // If user dismissed, do nothing (they can try again)
+                // If accepted, app will install
               }}
               className="flex items-center gap-1 text-xs md:text-sm text-brand hover:text-brand/80 transition-colors font-medium"
               title="Tải App về thiết bị"
