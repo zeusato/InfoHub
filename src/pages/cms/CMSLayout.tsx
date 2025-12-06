@@ -1,4 +1,5 @@
 // CMS Layout with sidebar navigation
+import { useState, useEffect } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
     Home,
@@ -10,10 +11,12 @@ import {
     LogOut,
     BarChart3
 } from 'lucide-react'
+import HamburgerButton from '@/components/HamburgerButton'
 
 export default function CMSLayout() {
     const location = useLocation()
     const navigate = useNavigate()
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const navItems = [
         { path: '/CMS', label: 'Dashboard', icon: Home },
@@ -30,10 +33,40 @@ export default function CMSLayout() {
         navigate('/CMS/login')
     }
 
+    // Close sidebar when clicking a nav item on mobile
+    const handleNavClick = () => {
+        if (window.innerWidth < 1024) {
+            setSidebarOpen(false)
+        }
+    }
+
+    // Close sidebar on Escape key
+    useEffect(() => {
+        if (sidebarOpen) {
+            const handleEscape = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') setSidebarOpen(false)
+            }
+            window.addEventListener('keydown', handleEscape)
+            return () => window.removeEventListener('keydown', handleEscape)
+        }
+    }, [sidebarOpen])
+
     return (
         <div className="flex h-screen bg-[#0b0b0d]">
+            {/* Hamburger Menu Button (Mobile only) */}
+            <HamburgerButton isOpen={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)} />
+
+            {/* Mobile overlay backdrop */}
+            {sidebarOpen && (
+                <div
+                    className="sidebar-overlay"
+                    onClick={() => setSidebarOpen(false)}
+                    aria-hidden="true"
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-64 border-r border-white/10 flex flex-col">
+            <aside className={`w-64 border-r border-white/10 flex flex-col bg-[#0b0b0d] lg:static lg:translate-x-0 ${sidebarOpen ? 'sidebar-mobile open' : 'sidebar-mobile closed'}`}>
                 <div className="p-4 border-b border-white/10">
                     <h1 className="text-xl font-bold text-brand">InfoHub CMS</h1>
                 </div>
@@ -47,6 +80,7 @@ export default function CMSLayout() {
                             <Link
                                 key={item.path}
                                 to={item.path}
+                                onClick={handleNavClick}
                                 className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${isActive
                                     ? 'bg-brand/20 text-brand border border-brand/40'
                                     : 'text-zinc-400 hover:text-white hover:bg-white/5'
