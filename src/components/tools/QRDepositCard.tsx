@@ -109,7 +109,7 @@ export default function QRDepositCard() {
   };
 
   return (
-    <div className="p-4 w-full h-full flex flex-col sm:flex-row gap-4">
+    <div className="p-4 w-full h-full flex flex-col sm:flex-row gap-4 overflow-x-auto">
       {/* Form section - full width on mobile, half on desktop */}
       <div className="w-full sm:w-1/2">
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 h-full flex flex-col">
@@ -226,6 +226,6 @@ export default function QRDepositCard() {
         onClose={() => setShowAlert(false)}
         message={alertMessage}
       />
-    </div>
+    </div >
   );
 }
