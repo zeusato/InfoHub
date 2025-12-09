@@ -266,10 +266,10 @@ export default function Workspace() {
               <GlowingCard
                 hoverEffect={false}
                 glowColor="#f59e0b"
-                className="p-0 flex items-center justify-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition"
+                className="p-0 flex flex-col w-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition"
               >
-                <Tabs.Root defaultValue="qr-ekyc" className="w-full h-full">
-                  <Tabs.List className="flex border-b border-[var(--border-color)] mb-4">
+                <Tabs.Root defaultValue="qr-ekyc" className="w-full flex flex-col flex-1 min-h-0">
+                  <Tabs.List className="flex border-b border-[var(--border-color)] mb-4 shrink-0">
                     <Tabs.Trigger
                       value="qr-ekyc"
                       className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
@@ -291,13 +291,13 @@ export default function Workspace() {
                       <span className="sm:hidden">Margin</span>
                     </Tabs.Trigger>
                   </Tabs.List>
-                  <Tabs.Content value="qr-ekyc" className="h-full">
+                  <Tabs.Content value="qr-ekyc" className="flex-1 min-h-0">
                     <MGReferralQRCard />
                   </Tabs.Content>
-                  <Tabs.Content value="qr-nop-tien" className="h-full">
+                  <Tabs.Content value="qr-nop-tien" className="flex-1 min-h-0">
                     <QRDepositCard />
                   </Tabs.Content>
-                  <Tabs.Content value="margin-calc" className="h-full overflow-auto">
+                  <Tabs.Content value="margin-calc" className="flex-1 min-h-0 overflow-auto pb-4">
                     <MarginCalculator />
                   </Tabs.Content>
                 </Tabs.Root>
