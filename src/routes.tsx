@@ -13,12 +13,13 @@ import CarouselEditor from '@/pages/cms/carousel/CarouselEditor'
 import WorkspaceCardsEditor from '@/pages/cms/workspace/WorkspaceCardsEditor'
 import Analytics from '@/pages/cms/analytics/Analytics'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { ThemeProvider } from '@/hooks/useTheme'
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Intro />} />
-      <Route path="/app" element={<Workspace />} />
+      <Route path="/app" element={<ThemeProvider><Workspace /></ThemeProvider>} />
 
       {/* CMS Routes */}
       <Route path="/CMS/login" element={<CMSLogin />} />

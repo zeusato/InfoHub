@@ -136,16 +136,16 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{title}</h1>
-        {subtitle ? <div className="text-sm md:text-base text-white/70">{subtitle}</div> : null}
+        {subtitle ? <div className="text-sm md:text-base text-[var(--text-secondary)]">{subtitle}</div> : null}
       </div>
 
       {/* Gallery */}
       {hasGallery ? (
-        <div className="relative rounded-2xl border border-white/10 bg-white/[0.04]">
+        <div className="relative rounded-2xl border border-[var(--border-color)] bg-[var(--bg-glass)]">
           {/* Controls */}
           <div className="absolute top-3 right-3 z-10 flex gap-2">
-            <button className="px-2 py-1 rounded-md border border-white/15 bg-black/40 hover:bg-black/60" onClick={() => go(-1)} title="Ảnh trước">←</button>
-            <button className="px-2 py-1 rounded-md border border-white/15 bg-black/40 hover:bg-black/60" onClick={() => go(1)} title="Ảnh sau">→</button>
+            <button className="px-2 py-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-glass)] hover:bg-[var(--bg-glass-hover)] text-[var(--text-primary)]" onClick={() => go(-1)} title="Ảnh trước">←</button>
+            <button className="px-2 py-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-glass)] hover:bg-[var(--bg-glass-hover)] text-[var(--text-primary)]" onClick={() => go(1)} title="Ảnh sau">→</button>
           </div>
 
           {/* Frame (w-full để đo được giới hạn; port sẽ co theo ảnh) */}
@@ -173,7 +173,7 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
 
           {/* Caption */}
           {current?.caption ? (
-            <div className="px-4 py-3 text-sm text-white/80 border-t border-white/10">{current.caption}</div>
+            <div className="px-4 py-3 text-sm text-[var(--text-secondary)] border-t border-[var(--border-color)]">{current.caption}</div>
           ) : null}
 
           <Indicators />
@@ -188,7 +188,7 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
 
       {/* Ending note */}
       {endingNote ? (
-        <div className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm">
+        <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-glass)] px-4 py-3 text-sm">
           {endingNote}
         </div>
       ) : null}

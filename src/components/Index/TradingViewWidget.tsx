@@ -55,9 +55,9 @@ const fmt = (n: number | null | undefined) =>
 const fmtBillion = (vnd: number | null | undefined) =>
   typeof vnd === "number" && isFinite(vnd)
     ? (vnd / 1_000_000_000).toLocaleString(undefined, {
-        maximumFractionDigits: 3,
-        minimumFractionDigits: 0,
-      })
+      maximumFractionDigits: 3,
+      minimumFractionDigits: 0,
+    })
     : "-";
 
 // Tooltip render ra body (vượt mọi overflow), neo theo con trỏ
@@ -88,8 +88,8 @@ function PortalTooltip({
       className={clsx(
         "rounded-xl px-3 py-2 border backdrop-blur-md shadow-lg",
         theme === "dark"
-          ? "bg-white/10 text-white border-white/20"
-          : "bg-black/10 text-gray-900 border-black/15"
+          ? "bg-black/80 text-white border-white/20"
+          : "bg-white/95 text-gray-900 border-stone-300 shadow-xl"
       )}
     >
       {content}
@@ -166,8 +166,8 @@ export default memo(function TradingViewWidget({
         const list: any[] = Array.isArray(json)
           ? json
           : Array.isArray(json?.data)
-          ? json.data
-          : Object.values(json || {}).filter(
+            ? json.data
+            : Object.values(json || {}).filter(
               (v) => v && typeof v === "object"
             );
 
@@ -270,10 +270,10 @@ export default memo(function TradingViewWidget({
     ch == null
       ? "text-gray-400"
       : ch > 0
-      ? "text-green-500"
-      : ch < 0
-      ? "text-red-500"
-      : "text-yellow-400";
+        ? "text-green-500"
+        : ch < 0
+          ? "text-red-500"
+          : "text-yellow-400";
 
   // --- State & handlers cho tooltip portal theo con trỏ ---
   const [ttOpen, setTtOpen] = useState(false);
@@ -294,8 +294,8 @@ export default memo(function TradingViewWidget({
                 r.change > 0
                   ? "text-emerald-400"
                   : r.change < 0
-                  ? "text-red-500"
-                  : "text-yellow-400"
+                    ? "text-red-500"
+                    : "text-yellow-400"
               }
             >
               {r.change > 0 ? "+" : ""}
@@ -307,8 +307,8 @@ export default memo(function TradingViewWidget({
                 r.change > 0
                   ? "text-emerald-400"
                   : r.change < 0
-                  ? "text-red-500"
-                  : "text-yellow-400"
+                    ? "text-red-500"
+                    : "text-yellow-400"
               }
             >
               {r.percent.toFixed(2)}%

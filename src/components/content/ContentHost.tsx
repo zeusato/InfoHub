@@ -35,7 +35,7 @@ export function ContentHost({
 
   if (!activeLeaf) {
     return (
-      <div className="h-full w-full flex items-center justify-center text-zinc-400">
+      <div className="h-full w-full flex items-center justify-center text-[var(--text-secondary)]">
         Chọn mục ở menu bên trái để bắt đầu.
       </div>
     )
@@ -138,7 +138,7 @@ export function ContentHost({
   // Show loading state
   if (loading && !entry) {
     return (
-      <div className="h-full w-full flex items-center justify-center text-zinc-400">
+      <div className="h-full w-full flex items-center justify-center text-[var(--text-secondary)]">
         Đang tải...
       </div>
     )

@@ -20,7 +20,7 @@ const ACCENT: Record<keyof typeof RSS_SOURCES, { from: string; to: string }> = {
 export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
   return (
     <div className={cn("w-full h-full p-4", className)}>
-      <div className="text-sm font-bold uppercase tracking-wider text-white mb-2">Đọc báo</div>
+      <div className="text-sm font-bold uppercase tracking-wider text-[var(--text-primary)] mb-2">Đọc báo</div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 h-[calc(100%-1.5rem)]">
         {(Object.entries(RSS_SOURCES) as [keyof typeof RSS_SOURCES, (typeof RSS_SOURCES)[keyof typeof RSS_SOURCES]][])
@@ -54,7 +54,7 @@ export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
                 />
 
                 {/* Content card */}
-                <div className="relative z-10 m-[1px] rounded-[1rem] border border-white/10 bg-white/[0.035] backdrop-blur-sm h-full">
+                <div className="relative z-10 m-[1px] rounded-[1rem] border border-[var(--border-color)] bg-[var(--bg-glass)] backdrop-blur-sm h-full">
                   {/* blob ánh sáng bên phải */}
                   <div
                     aria-hidden
@@ -73,7 +73,7 @@ export default function RssSourcesPanel({ onSelect, className, icons }: Props) {
                         {cfg.label} News
                       </div>
 
-                      <div className="hidden lg:block text-xs text-white/60 mt-1 sm:hidden">
+                      <div className="hidden lg:block text-xs text-[var(--text-muted)] mt-1 sm:hidden">
                         Bấm để xem danh sách mới nhất
                       </div>
                     </div>

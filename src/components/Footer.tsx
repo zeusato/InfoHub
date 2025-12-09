@@ -1,8 +1,11 @@
 import TradingViewWidget from "@/components/Index/TradingViewWidget";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Footer() {
+  const { isDark } = useTheme();
+
   return (
-    <footer className="glass rounded-2xl px-4 py-3 flex items-center gap-3 text-sm text-zinc-400">
+    <footer className="glass rounded-2xl px-4 py-3 flex items-center gap-3 text-sm text-[var(--text-secondary)]">
       <div className="basis-[200px] shrink-0 hidden md:block">
         © {new Date().getFullYear()} SHS — InfoHub
       </div>
@@ -10,7 +13,7 @@ export default function Footer() {
       <div className="flex-1 min-w-0">
         {/* tuỳ chiều cao ticker */}
         <div className="flex-1 min-w-0 flex items-center h-[46px]">
-          <TradingViewWidget refreshMs={1000} />
+          <TradingViewWidget refreshMs={1000} colorTheme={isDark ? "dark" : "light"} />
         </div>
       </div>
 

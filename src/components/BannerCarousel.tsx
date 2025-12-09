@@ -8,6 +8,7 @@ import { useBannerSlides } from "@/hooks/useBannerSlides";
 import { getStorageUrl } from "@/lib/supabase";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import PWAInstallModal from "./PWAInstallModal";
+import { useTheme } from "@/hooks/useTheme";
 
 type Slide = {
   id: string;
@@ -31,6 +32,9 @@ export default function BannerCarousel() {
 
   // PWA Install hook
   const { isInstallable, isInstalled, promptInstall } = usePWAInstall();
+
+  // Theme hook
+  const { isDark } = useTheme();
 
   // Fetch slides from Supabase
   const { slides: supabaseSlides, loading } = useBannerSlides();
@@ -100,8 +104,9 @@ export default function BannerCarousel() {
       <div
         className="absolute inset-y-0 left-0 w-[60%] min-w-[280px]"
         style={{
-          background:
-            "linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.4) 45%, rgba(0,0,0,.3) 70%, rgba(0,0,0,0) 100%)",
+          background: isDark
+            ? "linear-gradient(90deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.4) 45%, rgba(0,0,0,.3) 70%, rgba(0,0,0,0) 100%)"
+            : "linear-gradient(90deg, rgba(255,248,240,.85) 0%, rgba(255,248,240,.7) 45%, rgba(255,248,240,.4) 70%, rgba(255,248,240,0) 100%)",
           height: "var(--banner-h)",
         }}
       />
@@ -113,7 +118,7 @@ export default function BannerCarousel() {
         style={{ height: "var(--banner-h)" }}
       >
         <div className="flex flex-col h-full">
-          <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#4ade80]">
+          <h3 className={`text-2xl md:text-3xl font-extrabold tracking-tight ${isDark ? 'text-[#4ade80]' : 'text-emerald-600'}`}>
             {cur.title}
           </h3>
           <div className="mt-auto">
@@ -128,7 +133,7 @@ export default function BannerCarousel() {
           <button
             key={s.id}
             onClick={() => setIdx(i)}
-            className={`rounded-full transition-all flex-shrink-0 ${i === idx ? "bg-brand" : "bg-white/40"
+            className={`rounded-full transition-all flex-shrink-0 ${i === idx ? "bg-brand" : isDark ? "bg-white/40" : "bg-stone-400/60"
               }`}
             style={{
               width: i === idx ? '24px' : '10px',
@@ -149,7 +154,7 @@ export default function BannerCarousel() {
           its contents rather than using a fixed width so it adapts to varying
           viewport sizes and number of links. */}
       <div
-        className="absolute z-20 flex items-center bg-black/10 backdrop-blur shadow-[0_16px_36px_-18px_rgba(0,0,0,0.8)] rounded-2xl transition-all"
+        className={`absolute z-20 flex items-center backdrop-blur shadow-[0_16px_36px_-18px_rgba(0,0,0,0.8)] rounded-2xl transition-all ${isDark ? 'bg-black/10' : 'bg-white/80 border border-stone-200'}`}
         style={{
           left: `calc(0px + var(--gap))`,
           bottom: `calc(0px + var(--gap))`,

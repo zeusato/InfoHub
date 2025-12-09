@@ -5,7 +5,9 @@ import SidebarMenu from "@/components/SidebarMenu";
 import Footer from "@/components/Footer";
 import { ContentHost } from "@/components/content/ContentHost";
 import { useMenuTree } from "@/hooks/useMenuTree";
-import logo from "@/assets/LOGO.png";
+import logoDark from "@/assets/LOGO.png";
+import logoLight from "@/assets/LOGO Light.png";
+import { useTheme } from "@/hooks/useTheme";
 import { Link, useSearchParams } from "react-router-dom";
 import { BorderBeam } from "@/components/lightswind/border-beam";
 import { GlowingCards, GlowingCard } from "@/components/lightswind/glowing-cards";
@@ -74,6 +76,9 @@ export default function Workspace() {
   // Initialize article notifications (auto-checks on load)
   const { notifications, dismissNotification } = useArticleNotifications();
 
+  // Get current theme
+  const { isDark } = useTheme();
+
   // Handle notification click - navigate to article
   const handleNotificationNavigate = (path: string) => {
     setActiveLeaf({ id: path, label: path, path } as any);
@@ -133,7 +138,7 @@ export default function Workspace() {
   }, [sidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-zinc-200 flex flex-col">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] flex flex-col transition-colors duration-300">
       {/* Notification Toasts */}
       <NotificationToast
         notifications={notifications}
@@ -151,17 +156,17 @@ export default function Workspace() {
       <div className="px-3 pt-3 p-3">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-3">
           {/* Logo card - Hidden on mobile */}
-          <div className="hidden lg:block rounded-2xl border border-white/10 bg-white/[0.04] shadow-inner relative">
+          <div className="hidden lg:block rounded-2xl border border-[var(--border-color)] bg-[var(--card-bg)] shadow-inner relative">
             <BorderBeam colorFrom="#7400ff" colorTo="#9b41ff" size={100} duration={6} borderThickness={2} glowIntensity={0} />
             <Link to="/Intro">
               <div className="h-full grid place-items-center px-4">
-                <img src={logo} alt="SHS Logo" className="h-full p-10 w-auto object-contain" />
+                <img src={isDark ? logoDark : logoLight} alt="SHS Logo" className="h-full p-10 w-auto object-contain" />
               </div>
             </Link>
           </div>
 
           {/* Banner */}
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] overflow-hidden">
+          <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--card-bg)] overflow-hidden">
             <BannerCarousel />
           </div>
         </div>
@@ -264,23 +269,23 @@ export default function Workspace() {
                 className="p-0 flex items-center justify-center w-full h-full group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_10px_30px_-15px_rgba(0,0,0,0.6)] transition"
               >
                 <Tabs.Root defaultValue="qr-ekyc" className="w-full h-full">
-                  <Tabs.List className="flex border-b border-white/10 mb-4">
+                  <Tabs.List className="flex border-b border-[var(--border-color)] mb-4">
                     <Tabs.Trigger
                       value="qr-ekyc"
-                      className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                      className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
                     >
                       QR eKYC
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value="qr-nop-tien"
-                      className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                      className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
                     >
                       <span className="hidden sm:inline">QR nộp tiền 24/7</span>
                       <span className="sm:hidden">Nộp tiền 24/7</span>
                     </Tabs.Trigger>
                     <Tabs.Trigger
                       value="margin-calc"
-                      className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-zinc-200 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                      className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
                     >
                       <span className="hidden sm:inline">Tính Margin</span>
                       <span className="sm:hidden">Margin</span>
@@ -303,9 +308,9 @@ export default function Workspace() {
                   {/* Left section - Text and buttons */}
                   <div className="flex-1 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
                     <ShinyText
-                      baseColor="rgba(255, 255, 255, 0.8)"
+                      baseColor={isDark ? "rgba(255, 255, 255, 0.8)" : "rgba(139, 92, 246, 0.9)"}
                       size="4xl"
-                      shineColor="rgba(255, 255, 255, 1)"
+                      shineColor={isDark ? "rgba(255, 255, 255, 1)" : "rgba(168, 85, 247, 1)"}
                       speed={5}
                       className="text-3xl sm:text-4xl lg:text-5xl whitespace-nowrap"
                     >
@@ -321,9 +326,9 @@ export default function Workspace() {
                       {/* Desktop: show QR text, Mobile: show download button */}
                       <div className="hidden lg:block">
                         <ShinyText
-                          baseColor="rgba(255, 255, 255, 0.8)"
+                          baseColor={isDark ? "rgba(255, 255, 255, 0.8)" : "rgba(139, 92, 246, 0.8)"}
                           size="base"
-                          shineColor="rgba(255, 255, 255, 1)"
+                          shineColor={isDark ? "rgba(255, 255, 255, 1)" : "rgba(168, 85, 247, 1)"}
                           speed={5}
                           className="text-sm whitespace-nowrap"
                         >

@@ -105,7 +105,7 @@ export default function SearchBar({ onSelect, onClose }: Props) {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Tìm bài viết..."
-                    className="w-full pl-9 pr-8 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/30 transition"
+                    className="w-full pl-9 pr-8 py-2 bg-[var(--bg-glass)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/30 transition"
                 />
                 {query && (
                     <button
@@ -119,22 +119,22 @@ export default function SearchBar({ onSelect, onClose }: Props) {
 
             {/* Dropdown Results */}
             {showDropdown && (
-                <div className="absolute z-50 w-full mt-2 py-1 bg-[#1a1b1e] border border-white/10 rounded-xl shadow-xl max-h-64 overflow-auto">
+                <div className="absolute z-50 w-full mt-2 py-1 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-xl max-h-64 overflow-auto">
                     {loading ? (
-                        <div className="px-3 py-2 text-sm text-zinc-500">Đang tìm...</div>
+                        <div className="px-3 py-2 text-sm text-[var(--text-muted)]">Đang tìm...</div>
                     ) : results.length === 0 ? (
-                        <div className="px-3 py-2 text-sm text-zinc-500">Không tìm thấy kết quả</div>
+                        <div className="px-3 py-2 text-sm text-[var(--text-muted)]">Không tìm thấy kết quả</div>
                     ) : (
                         results.map((result) => (
                             <button
                                 key={result.id}
                                 onClick={() => handleSelect(result)}
-                                className="w-full px-3 py-2 text-left hover:bg-white/10 transition group"
+                                className="w-full px-3 py-2 text-left hover:bg-[var(--bg-glass-hover)] transition group"
                             >
-                                <div className="text-sm text-white group-hover:text-brand truncate">
+                                <div className="text-sm text-[var(--text-primary)] group-hover:text-brand truncate">
                                     {result.title}
                                 </div>
-                                <div className="text-xs text-zinc-500 truncate">
+                                <div className="text-xs text-[var(--text-muted)] truncate">
                                     {result.path}
                                 </div>
                             </button>

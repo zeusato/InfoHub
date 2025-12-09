@@ -13,19 +13,16 @@ export default function HamburgerButton({ isOpen, onClick }: Props) {
     >
       <div className="w-6 h-5 flex flex-col justify-between">
         <span
-          className={`block h-0.5 w-full bg-white transition-all duration-300 ${
-            isOpen ? 'rotate-45 translate-y-2' : ''
-          }`}
+          className={`block h-0.5 w-full bg-[var(--text-primary)] transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-2' : ''
+            }`}
         />
         <span
-          className={`block h-0.5 w-full bg-white transition-all duration-300 ${
-            isOpen ? 'opacity-0' : ''
-          }`}
+          className={`block h-0.5 w-full bg-[var(--text-primary)] transition-all duration-300 ${isOpen ? 'opacity-0' : ''
+            }`}
         />
         <span
-          className={`block h-0.5 w-full bg-white transition-all duration-300 ${
-            isOpen ? '-rotate-45 -translate-y-2' : ''
-          }`}
+          className={`block h-0.5 w-full bg-[var(--text-primary)] transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-2' : ''
+            }`}
         />
       </div>
     </button>

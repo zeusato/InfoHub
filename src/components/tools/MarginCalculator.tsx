@@ -35,17 +35,17 @@ function NumberInput({ label, value, onChange, suffix, isPercent = false }: Inpu
 
     return (
         <div className="grid grid-cols-[1fr_120px_16px] items-center gap-1">
-            <label className="text-xs text-zinc-400 whitespace-nowrap">{label}</label>
+            <label className="text-xs text-[var(--text-secondary)] whitespace-nowrap">{label}</label>
             <div>
                 <input
                     type="text"
                     inputMode="numeric"
                     value={value}
                     onChange={handleChange}
-                    className="w-full px-2 py-1 text-right text-sm bg-white/5 border border-white/10 rounded focus:border-orange-400 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full px-2 py-1 text-right text-sm text-[var(--text-primary)] bg-[var(--bg-glass)] border border-[var(--border-color)] rounded focus:border-orange-400 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
             </div>
-            <div className="text-xs text-zinc-400 text-left">
+            <div className="text-xs text-[var(--text-secondary)] text-left">
                 {suffix || ''}
             </div>
         </div>
@@ -55,8 +55,8 @@ function NumberInput({ label, value, onChange, suffix, isPercent = false }: Inpu
 function ResultLabel({ label, value, unit = "", highlight = false }: { label: string; value: string | number; unit?: string; highlight?: boolean }) {
     return (
         <div className={`flex items-center justify-between py-1 px-2 rounded ${highlight ? 'bg-orange-500/10' : ''}`}>
-            <span className="text-xs text-zinc-400">{label}</span>
-            <span className={`text-sm font-medium ${highlight ? 'text-orange-400' : 'text-zinc-200'}`}>
+            <span className="text-xs text-[var(--text-secondary)]">{label}</span>
+            <span className={`text-sm font-medium ${highlight ? 'text-orange-500' : 'text-[var(--text-primary)]'}`}>
                 {typeof value === 'number' ? formatNumber(value) : value}{unit}
             </span>
         </div>
@@ -146,22 +146,22 @@ export default function MarginCalculator() {
                 <NumberInput label="Tỷ lệ vay" value={tyLeVay} onChange={setTyLeVay} suffix="%" isPercent />
             </div>
 
-            <div className="bg-white/5 rounded-lg p-2 mb-3">
+            <div className="bg-[var(--bg-glass)] rounded-lg p-2 mb-3">
                 <ResultLabel label="NAV" value={calculated.nav} highlight />
                 <ResultLabel label="CMR" value={calculated.cmr} unit="%" highlight />
             </div>
 
             <Tabs.Root defaultValue="tab-ty-le" className="flex-1">
-                <Tabs.List className="flex border-b border-white/10 mb-2">
+                <Tabs.List className="flex border-b border-[var(--border-color)] mb-2">
                     <Tabs.Trigger
                         value="tab-ty-le"
-                        className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                        className="px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
                     >
                         Đưa về tỷ lệ
                     </Tabs.Trigger>
                     <Tabs.Trigger
                         value="tab-nop"
-                        className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white data-[state=active]:text-orange-400 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
+                        className="px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] data-[state=active]:text-orange-500 data-[state=active]:border-b-2 data-[state=active]:border-orange-400 transition"
                     >
                         Tính tiền nộp
                     </Tabs.Trigger>
@@ -169,18 +169,18 @@ export default function MarginCalculator() {
 
                 <Tabs.Content value="tab-ty-le" className="space-y-2">
                     <NumberInput label="Tỷ lệ cần đưa về" value={toRate} onChange={setToRate} suffix="%" isPercent />
-                    <div className="bg-white/5 rounded-lg p-2 mt-2">
+                    <div className="bg-[var(--bg-glass)] rounded-lg p-2 mt-2">
                         <ResultLabel label="Phải Bán" value={calculated.phaiBan > 0 ? calculated.phaiBan : 0} highlight={calculated.phaiBan > 0} />
-                        <div className="text-center text-xs text-zinc-500 py-1">— hoặc —</div>
+                        <div className="text-center text-xs text-[var(--text-muted)] py-1">— hoặc —</div>
                         <ResultLabel label="Phải Nộp" value={calculated.phaiNop > 0 ? calculated.phaiNop : 0} highlight={calculated.phaiNop > 0} />
                     </div>
                 </Tabs.Content>
 
                 <Tabs.Content value="tab-nop" className="space-y-2">
                     <NumberInput label="Giá trị mua" value={gtMua} onChange={setGtMua} />
-                    <div className="bg-white/5 rounded-lg p-2 mt-2">
+                    <div className="bg-[var(--bg-glass)] rounded-lg p-2 mt-2">
                         <ResultLabel label="Nộp tối thiểu" value={calculated.nopToiThieu} highlight={calculated.nopToiThieu > 0} />
-                        <div className="text-center text-xs text-zinc-500 py-1">— hoặc —</div>
+                        <div className="text-center text-xs text-[var(--text-muted)] py-1">— hoặc —</div>
                         <ResultLabel label="Nộp phát vay" value={calculated.nopPhatVay} highlight={calculated.nopPhatVay > 0} />
                     </div>
                 </Tabs.Content>

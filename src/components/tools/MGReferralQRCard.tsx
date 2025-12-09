@@ -83,7 +83,7 @@ export default function MGReferralQRCard() {
       <div className="flex flex-col sm:grid sm:grid-cols-[2fr_1fr] items-center gap-4">
         {/* Bên trái: label + input + button */}
         <div className="flex flex-col gap-3 w-full">
-          <label className="text-sm font-medium opacity-90">
+          <label className="text-sm font-medium text-[var(--text-primary)]">
             Nhập mã MG để tạo QR giới thiệu mở tài khoản:
           </label>
 
@@ -95,7 +95,7 @@ export default function MGReferralQRCard() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && input.trim() && submit()}
               placeholder="VD: MG123456"
-              className="flex-1 rounded-xl bg-white/5 border border-white/10 px-3 py-2 text-sm sm:text-base outline-none
+              className="flex-1 rounded-xl bg-[var(--bg-glass)] border border-[var(--border-color)] px-3 py-2 text-sm sm:text-base text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none
                          focus:ring-2 focus:ring-cyan-500/50"
             />
             <button
@@ -121,7 +121,7 @@ export default function MGReferralQRCard() {
 
           {/* hiện link đã ghép (optional) */}
           {qrValue && (
-            <div className="text-xs opacity-60 break-all hidden sm:block">{qrValue}</div>
+            <div className="text-xs text-[var(--text-muted)] break-all hidden sm:block">{qrValue}</div>
           )}
           <div className="text-xs break-all text-orange-400">
             Lưu ý: Không dùng Zalo để quét mã QR, vì Zalo chặn link rút gọn
@@ -131,7 +131,7 @@ export default function MGReferralQRCard() {
         {/* Bên phải: khung QR vuông - hidden on mobile */}
         <div
           ref={boxRef}
-          className={`hidden sm:flex w-40 ml-auto aspect-square rounded-2xl border border-white/10 items-center justify-center
+          className={`hidden sm:flex w-40 ml-auto aspect-square rounded-2xl border border-[var(--border-color)] items-center justify-center
                       ${qrBgWhite ? "bg-white" : "bg-transparent"}`}
         >
           {qrValue ? (
@@ -149,7 +149,7 @@ export default function MGReferralQRCard() {
               )}
             </div>
           ) : (
-            <div className="text-sm opacity-50">Chưa có QR</div>
+            <div className="text-sm text-[var(--text-muted)]">Chưa có QR</div>
           )}
         </div>
       </div>

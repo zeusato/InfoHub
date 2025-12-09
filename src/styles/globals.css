@@ -2,12 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Brand tokens */
-:root {
+/* Brand tokens - Dark theme (default) */
+:root,
+:root.dark {
   --bg: #0b0b0d;
+  --bg-primary: #0b0b0d;
+  --bg-secondary: #1a1b1e;
+  --bg-tertiary: #0e0f12;
+  --bg-glass: rgba(255, 255, 255, 0.05);
+  --bg-glass-hover: rgba(255, 255, 255, 0.1);
   --glass: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.12);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color-strong: rgba(255, 255, 255, 0.2);
+
   --brand: #ff7a18;
+  --brand-light: #fb923c;
+
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.6);
+}
+
+/* Light theme - Warm cream with good contrast */
+:root.light {
+  /* Warm cream/beige backgrounds - more interesting than plain gray */
+  --bg: #faf7f2;
+  --bg-primary: #faf7f2;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f0e8;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-hover: rgba(255, 255, 255, 0.95);
+  --glass: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(180, 140, 100, 0.25);
+
+  /* High contrast text - dark charcoal */
+  --text-primary: #1c1917;
+  --text-secondary: #44403c;
+  --text-muted: #78716c;
+
+  /* Stronger border colors for better definition */
+  --border-color: rgba(180, 140, 100, 0.25);
+  --border-color-strong: rgba(180, 140, 100, 0.4);
+
+  /* Brand stays vibrant orange */
+  --brand: #ea580c;
+  --brand-light: #f97316;
+
+  /* Cards with stronger shadow for depth */
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-shadow: 0 4px 20px -4px rgba(120, 80, 40, 0.12), 0 2px 6px -2px rgba(120, 80, 40, 0.08);
+
+  /* Sidebar specific - stronger styling */
+  --sidebar-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.1);
 }
 
 html,
@@ -18,11 +69,16 @@ body,
 
 /* Glass helpers */
 .glass {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  background: var(--bg-glass);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 .glass-hover:hover {
-  @apply bg-white/10 border-white/20;
+  background: var(--bg-glass-hover);
+  border-color: var(--border-color-strong);
 }
 
 /* Neon brand glow */
@@ -106,6 +162,7 @@ body,
   from {
     width: 100%;
   }
+
   to {
     width: 0%;
   }

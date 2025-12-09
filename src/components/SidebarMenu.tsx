@@ -2,6 +2,8 @@
 import { useMemo, useState } from 'react'
 import { MENU_COLORS, MenuNode } from '@/lib/menuData'
 import SearchBar from './SearchBar'
+import ThemeToggle from './ThemeToggle'
+import { useTheme } from '@/hooks/useTheme'
 
 export type LeafPayload = {
   id: string
@@ -19,6 +21,7 @@ type Props = {
 
 export default function SidebarMenu({ menu, onLeafSelect, onHomeClick, onClose }: Props) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const { isDark } = useTheme()
 
   // Build parent & depth maps to control accordion by level
   const { parentOf, depthOf, topAncestorOf } = useMemo(() => {
@@ -75,19 +78,24 @@ export default function SidebarMenu({ menu, onLeafSelect, onHomeClick, onClose }
 
 
   const header = (
-    <div className="p-3 border-b border-white/10 space-y-2">
+    <div className="p-3 border-b border-[var(--border-color)] space-y-2">
       {/* Title */}
       <div className="flex items-center justify-between">
-        <div className="font-bold">
+        <div className="font-bold text-[var(--text-primary)]">
           <span className="text-brand">Info</span>Hub
         </div>
-        <button
-          className="px-2 py-1 rounded-lg border border-white/10 hover:border-brand/50 hover:text-brand transition text-xs"
-          onClick={collapseAll}
-          title="Thu gọn tất cả"
-        >
-          ☰
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+          {/* Collapse All Button */}
+          <button
+            className="px-2 py-1 rounded-lg border border-[var(--border-color)] hover:border-brand/50 hover:text-brand transition text-xs text-[var(--text-secondary)]"
+            onClick={collapseAll}
+            title="Thu gọn tất cả"
+          >
+            ☰
+          </button>
+        </div>
       </div>
 
       {/* Home Button */}
@@ -122,6 +130,7 @@ export default function SidebarMenu({ menu, onLeafSelect, onHomeClick, onClose }
             onToggle={(id) => toggleBranch(id)}
             onLeafSelect={onLeafSelect}
             onClose={onClose}
+            isDark={isDark}
           />
         ))}
       </div>
@@ -136,6 +145,7 @@ function MenuBranch({
   onToggle,
   onLeafSelect,
   onClose,
+  isDark,
 }: {
   node: MenuNode
   depth: number
@@ -143,10 +153,28 @@ function MenuBranch({
   onToggle: (id: string) => void
   onLeafSelect: (leaf: LeafPayload) => void
   onClose?: () => void
+  isDark: boolean
 }) {
   const isLeaf = !node.children || node.children.length === 0
   const open = expanded[node.id]
-  const color = MENU_COLORS[depth] ?? 'border-white/15 bg-white/5'
+
+  // Theme-aware colors: stronger opacity for light mode
+  const getColorClass = (d: number) => {
+    if (isDark) {
+      // Dark mode: subtle colors
+      if (d === 0) return 'border-brand/40 bg-brand/5'
+      if (d === 1) return 'border-emerald-400/30 bg-emerald-400/5'
+      if (d === 2) return 'border-cyan-400/30 bg-cyan-400/5'
+      return 'border-white/15 bg-white/5'
+    } else {
+      // Light mode: stronger colors for visibility
+      if (d === 0) return 'border-orange-400/60 bg-orange-50'
+      if (d === 1) return 'border-emerald-500/50 bg-emerald-50'
+      if (d === 2) return 'border-cyan-500/50 bg-cyan-50'
+      return 'border-stone-300 bg-stone-50'
+    }
+  }
+  const color = getColorClass(depth)
   const indentPx = Math.min(depth, 3) * 12 // tối đa 36px
 
   const bullet = (
@@ -202,6 +230,7 @@ function MenuBranch({
                 onToggle={onToggle}
                 onLeafSelect={onLeafSelect}
                 onClose={onClose}
+                isDark={isDark}
               />
             </div>
           ))}

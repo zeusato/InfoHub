@@ -115,14 +115,14 @@ export default function QRDepositCard() {
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 h-full flex flex-col">
           {/* Row 1: Stock Account - always full width */}
           <div>
-            <label className="block text-sm font-medium text-zinc-200 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               Số TK chứng khoán*
             </label>
             <input
               type="text"
               value={stockAccount}
               onChange={handleStockAccountChange}
-              className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm sm:text-base text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full rounded-lg bg-[var(--bg-glass)] border border-[var(--border-color)] px-3 py-2 text-sm sm:text-base text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               placeholder="069Cxxxxxx"
               maxLength={10}
               required
@@ -131,14 +131,14 @@ export default function QRDepositCard() {
 
           {/* Row 2: Sub Account - full width on mobile (separate row) */}
           <div>
-            <label className="block text-sm font-medium text-zinc-200 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               Tiểu khoản*
             </label>
             <input
               type="text"
               value={subAccount}
               onChange={handleSubAccountChange}
-              className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm sm:text-base text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full rounded-lg bg-[var(--bg-glass)] border border-[var(--border-color)] px-3 py-2 text-sm sm:text-base text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               placeholder="xx"
               maxLength={2}
               required
@@ -153,20 +153,20 @@ export default function QRDepositCard() {
               onChange={(e) => setSaveInfo(e.target.checked)}
               className="mr-2"
             />
-            <label htmlFor="saveInfo" className="text-xs text-zinc-400">
+            <label htmlFor="saveInfo" className="text-xs text-[var(--text-secondary)]">
               Lưu thông tin tài khoản và tiểu khoản
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-200 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-primary)] mb-1">
               Số tiền (VNĐ) - Tối đa 499 triệu
             </label>
             <input
               type="text"
               value={amount}
               onChange={handleAmountChange}
-              className="w-full rounded-lg bg-white/10 border border-white/20 px-3 py-2 text-sm sm:text-base text-zinc-200 placeholder-zinc-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full rounded-lg bg-[var(--bg-glass)] border border-[var(--border-color)] px-3 py-2 text-sm sm:text-base text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               placeholder="Nhập số tiền (mặc định 0)"
             />
           </div>
@@ -201,7 +201,7 @@ export default function QRDepositCard() {
             title="QR Code Result"
           />
         ) : (
-          <div className="text-zinc-400 text-sm text-center">
+          <div className="text-[var(--text-muted)] text-sm text-center">
             QR sẽ hiển thị ở đây sau khi tạo
           </div>
         )}
