@@ -68,7 +68,8 @@ export default function ArticleEditor() {
         gallery: [] as string[],
         video_url: '',
         faq_json_path: '',
-        ending_note: 'Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.'
+        ending_note: 'Thông tin chi tiết vui lòng liên hệ Hotline 1900-63-8588 để được hỗ trợ.',
+        notify_enabled: false
     })
 
     // Load FAQ categories on mount
@@ -159,7 +160,8 @@ export default function ArticleEditor() {
                 gallery: data.gallery || [],
                 video_url: data.video_url || '',
                 faq_json_path: data.faq_json_path || '',
-                ending_note: data.ending_note || ''
+                ending_note: data.ending_note || '',
+                notify_enabled: data.notify_enabled || false
             })
 
             // Parse FAQ category from path
@@ -252,6 +254,7 @@ export default function ArticleEditor() {
                 render_type: 'template',
                 template_key: form.template_key,
                 ending_note: form.ending_note || null,
+                notify_enabled: form.notify_enabled,
                 // Conditional fields
                 banner_img: config.fields.includes('bannerImg') ? (form.banner_img || null) : null,
                 content_html: config.fields.includes('contentHtml') ? (form.content_html || null) : null,
@@ -819,6 +822,22 @@ export default function ArticleEditor() {
                         </div>
                     </div>
                 )}
+
+                {/* Push Notification */}
+                <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-xl">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={form.notify_enabled}
+                            onChange={(e) => setForm({ ...form, notify_enabled: e.target.checked })}
+                            className="w-5 h-5 rounded border-purple-500/50 bg-[#0e0f12] text-purple-500 focus:ring-purple-500 focus:ring-offset-0"
+                        />
+                        <div>
+                            <span className="text-sm font-medium text-purple-300">🔔 Push Notification</span>
+                            <p className="text-xs text-zinc-500 mt-0.5">Gửi thông báo đến người dùng khi họ mở trang (trong vòng 7 ngày)</p>
+                        </div>
+                    </label>
+                </div>
 
                 {/* Ending Note */}
                 <div>

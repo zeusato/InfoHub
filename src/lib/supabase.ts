@@ -33,6 +33,7 @@ export interface Article {
     gallery?: string[]
     faq_json_path?: string
     video_url?: string
+    notify_enabled?: boolean
     created_at: string
     updated_at: string
 }

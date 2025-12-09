@@ -29,6 +29,8 @@ import HamburgerButton from "@/components/HamburgerButton"
 import { downloadQRImage } from "@/lib/downloadQR"
 import { useWorkspaceCards } from "@/hooks/useWorkspaceCards"
 import { getStorageUrl } from "@/lib/supabase"
+import { useArticleNotifications } from "@/hooks/useArticleNotifications"
+import NotificationToast from "@/components/NotificationToast"
 
 type LeafPayload = Parameters<typeof ContentHost>[0]["activeLeaf"];
 
@@ -68,6 +70,14 @@ export default function Workspace() {
   const { getCard, loading: cardsLoading } = useWorkspaceCards();
   const shSmartCard = getCard('sh_smart');
   const shAdvisorCard = getCard('sh_advisor');
+
+  // Initialize article notifications (auto-checks on load)
+  const { notifications, dismissNotification } = useArticleNotifications();
+
+  // Handle notification click - navigate to article
+  const handleNotificationNavigate = (path: string) => {
+    setActiveLeaf({ id: path, label: path, path } as any);
+  };
 
   // Effect: Initialize activeLeaf from URL once menu is loaded
   // Skip if activeLeaf already has the correct path (preserves item for RSS detail)
@@ -124,6 +134,13 @@ export default function Workspace() {
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-zinc-200 flex flex-col">
+      {/* Notification Toasts */}
+      <NotificationToast
+        notifications={notifications}
+        onDismiss={dismissNotification}
+        onNavigate={handleNotificationNavigate}
+      />
+
       {/* Fetcher (ẩn) */}
       <RssFetcher checkNow={checkToken} />
 
