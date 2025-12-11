@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import QRModal from "@/components/QRModal";
 
-const BASE_URL = "https://shsmart.onelink.me/Odsh?remNo=";
+// Template URL với placeholder MG001 sẽ được thay thế bằng mã người dùng nhập
+const REFERRAL_URL_TEMPLATE = "https://shsmart.onelink.me/Odsh?af_xp=referral&pid=User_invite&deep_link_value=invite&deep_link_sub1=MG001&af_dp=shone%3A%2F%2Fdeeplink.ftl.shs";
 
 export default function MGReferralQRCard() {
   const [input, setInput] = useState("");
@@ -31,7 +32,9 @@ export default function MGReferralQRCard() {
   const submit = () => {
     const code = input.trim();
     if (!code) return;
-    setQrValue(`${BASE_URL}${encodeURIComponent(code)}`);
+    // Thay thế "MG001" trong template bằng mã người dùng nhập
+    const referralUrl = REFERRAL_URL_TEMPLATE.replace("MG001", code);
+    setQrValue(referralUrl);
     setQrBgWhite(true); // bật nền trắng cho khung QR
   };
 
