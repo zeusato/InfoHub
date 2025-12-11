@@ -126,9 +126,6 @@ export default function MGReferralQRCard() {
           {qrValue && (
             <div className="text-xs text-[var(--text-muted)] break-all hidden sm:block">{qrValue}</div>
           )}
-          <div className="text-xs break-all text-orange-400">
-            Lưu ý: Không dùng Zalo để quét mã QR, vì Zalo chặn link rút gọn
-          </div>
         </div>
 
         {/* Bên phải: khung QR vuông - hidden on mobile */}
