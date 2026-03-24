@@ -1,5 +1,5 @@
-// src/components/TemplateFeatureGuide.tsx
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 type ContentBlock =
   | { type: 'paragraph'; text?: string }
@@ -126,7 +126,7 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
   }
 
   const Indicators = () => (
-    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur text-xs">
+    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 text-white backdrop-blur-md shadow-md text-sm font-medium border border-white/10">
       <span>{idx + 1} / {total}</span>
     </div>
   )
@@ -143,9 +143,21 @@ export default function TemplateFeatureGuide(props: FeatureGuideProps) {
       {hasGallery ? (
         <div className="relative rounded-2xl border border-[var(--border-color)] bg-[var(--bg-glass)]">
           {/* Controls */}
-          <div className="absolute top-3 right-3 z-10 flex gap-2">
-            <button className="px-2 py-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-glass)] hover:bg-[var(--bg-glass-hover)] text-[var(--text-primary)]" onClick={() => go(-1)} title="Ảnh trước">←</button>
-            <button className="px-2 py-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-glass)] hover:bg-[var(--bg-glass-hover)] text-[var(--text-primary)]" onClick={() => go(1)} title="Ảnh sau">→</button>
+          <div className="absolute top-1/2 -translate-y-1/2 left-3 right-3 z-10 flex justify-between pointer-events-none">
+            <button 
+              className="pointer-events-auto flex items-center justify-center w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-900 border border-gray-200/50 shadow-lg backdrop-blur-md transition-all dark:bg-gray-900/80 dark:hover:bg-gray-900 dark:text-gray-100 dark:border-gray-700/50 dark:shadow-black/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+              onClick={() => go(-1)} 
+              title="Ảnh trước"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              className="pointer-events-auto flex items-center justify-center w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-900 border border-gray-200/50 shadow-lg backdrop-blur-md transition-all dark:bg-gray-900/80 dark:hover:bg-gray-900 dark:text-gray-100 dark:border-gray-700/50 dark:shadow-black/50 focus:outline-none focus:ring-2 focus:ring-primary/50"
+              onClick={() => go(1)} 
+              title="Ảnh sau"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
           </div>
 
           {/* Frame (w-full để đo được giới hạn; port sẽ co theo ảnh) */}

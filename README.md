@@ -1,26 +1,33 @@
 # InfoHub
 
-InfoHub là một nền tảng quản lý thông tin nội bộ (Knowledge Base) hiện đại, được xây dựng với React, Vite, Tailwind CSS và Supabase.
+InfoHub là một nền tảng quản lý thông tin nội bộ (Knowledge Base) hiện đại, được xây dựng với hệ sinh thái React, Vite và Supabase, tối ưu hóa cho trải nghiệm người dùng và hiệu suất quản trị.
 
 ## 🚀 Tính năng chính
 
 ### 1. User Workspace (`/app`)
-- **Giao diện Glassmorphism**: Thiết kế hiện đại, dark mode, tối ưu trải nghiệm đọc.
-- **Dynamic Menu**: Menu 3 cấp độ được tải động từ Database.
-- **Nội dung đa dạng**: Hỗ trợ bài viết, video, slide, FAQ.
+- **Giao diện Glassmorphism**: Thiết kế hiện đại, hỗ trợ Dark/Light mode linh hoạt với hiệu ứng mượt mà.
+- **Dynamic Content**: Menu 3 cấp độ được tải động từ Database, tự động cập nhật cấu hình theo thời gian thực.
+- **Trải nghiệm Premium**: Tích hợp bộ thư viện **Lightswind** (Border Beam, Glowing Cards, Shiny Text, Smokey Cursor) tạo cảm giác cao cấp.
+- **Công cụ hỗ trợ chuyên sâu**:
+    - **QR Tools**: Bộ tạo và quản lý mã QR (Referral QR, Deposit QR, App Download).
+    - **Financial Tools**: Công cụ tính toán Margin chứng khoán tích hợp.
+    - **News Integration**: Theo dõi tin tức tài chính qua RSS feed (Cafebiz, Vietstock).
+- **Hệ thống thông báo**: Tự động hiển thị Toast notification cho các bài viết mới hoặc bài viết cập nhật gần đây.
 
 ### 2. Content Management System (CMS)
-- **Dashboard**: Thống kê tổng quan.
-- **Article Editor**: Soạn thảo bài viết với Rich Text Editor (Quill), hỗ trợ upload ảnh, video.
-- **Menu Manager**: Quản lý cấu trúc menu (kéo thả, xóa đệ quy).
-    - **An toàn**: Có mật khẩu bảo vệ và modal xác nhận 2 lớp khi xóa.
-- **FAQ Manager**: Quản lý câu hỏi thường gặp.
-- **Carousel Manager**: Quản lý banner/slide trang chủ.
+- **Advanced Analytics**: Theo dõi lưu lượng truy cập trực quan với biểu đồ **ECharts** (Traffic theo ngày, Top bài viết phổ biến).
+- **Article Editor**: Trình soạn thảo Rich Text (Quill) mạnh mẽ, hỗ trợ đa phương tiện (Video, Slide, Hình ảnh).
+- **Menu Manager**: Quản lý cấu trúc cây đệ quy với cơ chế bảo mật xác thực 2 lớp.
+- **Resource Management**: Quản lý Carousel, FAQ, và phân quyền người dùng tập trung.
 
-### 3. Backend & Infrastructure (Supabase)
-- **Database**: PostgreSQL lưu trữ bài viết, menu, FAQ.
-- **Authentication**: Đăng nhập quản trị viên.
-- **Storage**: Lưu trữ hình ảnh, video.
+### 3. Progressive Web App (PWA)
+- **Cài đặt dễ dàng**: Hỗ trợ cài đặt như một ứng dụng native trên mobile và desktop.
+- **Offline Readiness**: Cấu hình Service Worker tối ưu để đảm bảo tốc độ tải trang nhanh và khả năng truy cập cơ bản khi mất kết nối.
+
+### 4. Backend & Infrastructure (Supabase)
+- **PostgreSQL**: Lưu trữ dữ liệu cấu trúc phức tạp, hỗ trợ truy vấn hiệu năng cao.
+- **Authentication**: Hệ thống đăng nhập bảo mật cho quản trị viên.
+- **Storage**: CDN lưu trữ và tối ưu hóa tài nguyên hình ảnh/video.
 
 ## 🛠 Cài đặt & Chạy Local
 
@@ -59,18 +66,19 @@ InfoHub là một nền tảng quản lý thông tin nội bộ (Knowledge Base)
 
 ## 📦 Deployment (GitHub Pages)
 
-Project đã được cấu hình để deploy tự động qua GitHub Actions.
+Project được tự động hóa quy trình CI/CD qua **GitHub Actions**.
 
 ### Cấu hình GitHub Secrets
-Vào **Settings > Secrets and variables > Actions** và thêm 2 biến:
+Vào **Settings > Secrets and variables > Actions** và thêm:
 - `VITE_SUPABASE_URL`: URL Supabase project.
 - `VITE_SUPABASE_ANON_KEY`: Anon key của Supabase.
 
-### Deploy
+### Quy trình Deploy
 1.  Push code lên nhánh `main`.
-2.  GitHub Action sẽ tự động build và deploy lên nhánh `gh-pages`.
-3.  Vào **Settings > Pages**, chọn source là `Deploy from a branch` và chọn nhánh `gh-pages`.
+2.  Action `deploy.yml` sẽ tự động thực hiện build và đẩy bản build lên nhánh `gh-pages`.
+3.  Cấu hình GitHub Pages từ nhánh `gh-pages` để website hoạt động.
 
 ## 📚 Tài liệu tham khảo
 - [Supabase Setup Guide](./SETUP-SUPABASE.md)
-- [Walkthrough](./walkthrough.md)
+- [Walkthrough & Verification](./walkthrough.md)
+
