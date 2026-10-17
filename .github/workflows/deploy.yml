@@ -29,7 +29,7 @@ jobs:
           # Map the repository variables to environment variables
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
-          # Optional SHOne embed URL; empty uses the stable embed-mode Preview alias
+          # Optional SHOne embed URL; empty uses the SHOne production URL
           VITE_SHONE_EMBED_URL: ${{ vars.VITE_SHONE_EMBED_URL }}
           # Base URL for GitHub Pages (repo name)
           VITE_BASE: '/InfoHub/'

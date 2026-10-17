@@ -1,8 +1,8 @@
 import type { Theme } from '@/hooks/useTheme';
 
-// Branch alias stays stable across embed-mode deployments. Replace through the build variable
-// when embed is enabled on SHOne production; never put an authentication/bypass token here.
-const DEFAULT_EMBED_URL = 'https://shone-git-embed-mode-manhquyet88-gmailcoms-projects.vercel.app/embed/demo/board';
+// Production iframe entry. Override only with a public HTTPS embed URL;
+// never put an authentication/bypass token in this frontend configuration.
+const DEFAULT_EMBED_URL = 'https://shone-platform.vercel.app/embed/infohub/board';
 
 export function createShoneEmbedUrl(configured: string | undefined, theme: Theme): URL | null {
   try {

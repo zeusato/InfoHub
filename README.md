@@ -86,11 +86,11 @@ Vào **Settings > Secrets and variables > Actions** và thêm:
 
 Mục **Trading_System** trong banner mở SHOne ngay trong workspace. Nút **InfoHub** trở lại nội dung trước đó; chọn Trang chủ/bài viết ở sidebar cũng đóng khung. Đổi theme hoặc kích thước cửa sổ không tải lại iframe. Tải lại trang InfoHub trở về luồng điều hướng hiện có.
 
-- Mặc định dùng SHOne Preview nhánh `embed-mode`, partner `demo`, module `board`.
+- Mặc định dùng SHOne Production, partner `infohub`, module `board`.
 - URL có thể đổi bằng biến build `VITE_SHONE_EMBED_URL` trong `.env.local` hoặc GitHub **Settings → Secrets and variables → Actions → Variables**. Không đưa token/khóa phiên vào biến này.
-- Trang production: `https://zeusato.github.io/InfoHub/app`; origin cần có trong Global Config `embedPartners.partners.demo.domains`: `https://zeusato.github.io` (không có đường dẫn).
-- Chạy test local bằng `npm run dev -- --host 127.0.0.1 --port 5174 --strictPort`, mở `http://127.0.0.1:5174/app`; origin này đã có trong partner `demo`.
-- SHOne Preview phải cho phép truy cập công khai để nhúng: trang đăng nhập Vercel bị chặn trong iframe. Không dùng URL bypass bí mật trong frontend.
-- Khi SHOne embed lên production, đổi URL ở biến build rồi build/deploy lại InfoHub.
+- Trang production: `https://zeusato.github.io/InfoHub/app`; origin cần có trong Global Config `embedPartners.partners.infohub.domains`: `https://zeusato.github.io` (không có đường dẫn).
+- Chạy local bằng `npm run dev -- --host 127.0.0.1 --port 5174 --strictPort`. Partner production `infohub` chỉ cho phép origin HTTPS của InfoHub; kiểm iframe production trên GitHub Pages sau deploy. Muốn test iframe local, dùng một partner Preview riêng qua biến URL build.
+- Domain SHOne Production phải truy cập công khai; đăng nhập nghiệp vụ diễn ra bên trong SHOne. Không dùng URL bypass bí mật trong frontend.
+- Khi đổi domain/partner, cập nhật biến build rồi build/deploy lại InfoHub.
 
 Hồ sơ màn và checklist: [docs/screens/trading-embed.md](docs/screens/trading-embed.md). Deploy: commit/push `main`; workflow hiện có sẽ build và xuất bản GitHub Pages.
