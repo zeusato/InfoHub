@@ -21,11 +21,16 @@ type Slide = {
 const links = [
   { id: 'home', label: 'Homepage', href: 'https://www.shs.com.vn/', icon: <Home /> },
   { id: 'ChartCandlestick', label: 'Sboard', href: 'https://sboard.shs.com.vn/', icon: <CandlestickChart /> },
-  { id: 'Trading', label: 'Trading_System', href: 'https://q.me-qr.com/l/SHSmart', icon: <BarChart /> },
+  { id: 'Trading', label: 'Trading_System', icon: <BarChart /> },
   { id: 'Utilities', label: 'Utilities', href: 'https://zeusato.github.io/Z-Utilities/', icon: <LayoutGrid /> }
 ];
 
-export default function BannerCarousel() {
+type BannerCarouselProps = {
+  onTradingClick: () => void;
+  tradingActive?: boolean;
+};
+
+export default function BannerCarousel({ onTradingClick, tradingActive = false }: BannerCarouselProps) {
   const [idx, setIdx] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showInstallModal, setShowInstallModal] = useState(false);
@@ -180,6 +185,8 @@ export default function BannerCarousel() {
            */
           className="flex items-center gap-1 h-full px-4 py-1.5 focus:outline-none hover:text-brand transition-colors"
           type="button"
+          aria-label="Mở menu nhanh"
+          aria-expanded={menuOpen}
         >
           <MenuIcon size={24} />
           <div className="flex items-center">
@@ -202,6 +209,19 @@ export default function BannerCarousel() {
         >
           {links.map((link) => (
             <li key={link.id} className="px-2">
+              {link.id === 'Trading' ? (
+                <button
+                  type="button"
+                  onClick={onTradingClick}
+                  aria-label="Trading_System"
+                  aria-pressed={tradingActive}
+                  title="Mở Trading_System trong workspace"
+                  className={`flex items-center gap-1 text-xs md:text-sm hover:text-brand transition-colors ${tradingActive ? 'text-brand' : 'text-current'}`}
+                >
+                  <span aria-hidden="true">{link.icon}</span>
+                  <span className="hidden sm:inline">{link.label}</span>
+                </button>
+              ) : (
               <a
                 href={link.href}
                 target="_blank"
@@ -213,6 +233,7 @@ export default function BannerCarousel() {
                 )}
                 <span className="hidden sm:inline">{link.label}</span>
               </a>
+              )}
             </li>
           ))}
 

@@ -1,6 +1,7 @@
 // src/pages/Workspace.tsx
 import { useEffect, useState, useMemo } from "react";
 import BannerCarousel from "@/components/BannerCarousel";
+import TradingEmbedWorkspace from "@/components/TradingEmbedWorkspace";
 import SidebarMenu from "@/components/SidebarMenu";
 import Footer from "@/components/Footer";
 import { ContentHost } from "@/components/content/ContentHost";
@@ -67,6 +68,7 @@ export default function Workspace() {
   // but we can set a temporary leaf if we have the path.
   const [activeLeaf, setActiveLeaf] = useState<LeafPayload | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [tradingOpen, setTradingOpen] = useState(false);
 
   // Fetch workspace cards from Supabase
   const { getCard, loading: cardsLoading } = useWorkspaceCards();
@@ -81,6 +83,7 @@ export default function Workspace() {
 
   // Handle notification click - navigate to article
   const handleNotificationNavigate = (path: string) => {
+    setTradingOpen(false);
     setActiveLeaf({ id: path, label: path, path } as any);
   };
 
@@ -167,13 +170,19 @@ export default function Workspace() {
 
           {/* Banner */}
           <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--card-bg)] overflow-hidden">
-            <BannerCarousel />
+            <BannerCarousel
+              tradingActive={tradingOpen}
+              onTradingClick={() => {
+                setTradingOpen(true);
+                setSidebarOpen(false);
+              }}
+            />
           </div>
         </div>
       </div>
 
       {/* Main area */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-3 p-3 pt-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] gap-3 p-3 pt-0">
         {/* Sidebar - Desktop: static, Mobile: overlay drawer */}
         <>
           {/* Mobile overlay backdrop */}
@@ -192,8 +201,14 @@ export default function Workspace() {
             ) : (
               <SidebarMenu
                 menu={menuTree as any} // Cast to any to avoid strict type mismatch if minor diffs exist
-                onLeafSelect={(leaf) => setActiveLeaf(leaf)}
-                onHomeClick={() => setActiveLeaf(null)}
+                onLeafSelect={(leaf) => {
+                  setTradingOpen(false);
+                  setActiveLeaf(leaf);
+                }}
+                onHomeClick={() => {
+                  setTradingOpen(false);
+                  setActiveLeaf(null);
+                }}
                 onClose={() => setSidebarOpen(false)}
               />
             )}
@@ -201,8 +216,12 @@ export default function Workspace() {
         </>
 
         {/* Content area */}
-        <section className="glass rounded-2xl p-4 overflow-auto relative h-full">
-          {activeLeaf ? (
+        <section className={tradingOpen
+          ? "glass rounded-2xl overflow-hidden relative min-w-0"
+          : "glass rounded-2xl p-4 overflow-auto relative h-full min-w-0"}>
+          {tradingOpen ? (
+            <TradingEmbedWorkspace onClose={() => setTradingOpen(false)} />
+          ) : activeLeaf ? (
             <ContentHost activeLeaf={activeLeaf} setActiveLeaf={setActiveLeaf} />
           ) : (
             <GlowingCards
